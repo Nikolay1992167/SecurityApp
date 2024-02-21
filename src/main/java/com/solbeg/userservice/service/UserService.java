@@ -10,7 +10,9 @@ import com.solbeg.userservice.dto.response.UserResponse;
 
 public interface UserService {
 
-    UserResponse register(UserRegisterRequest request);
+    UserResponse registerJournalist(UserRegisterRequest request);
+
+    UserResponse registerSubscriber(UserRegisterRequest request);
 
     UserResponse authenticate(UserAuthenticationRequest request);
 

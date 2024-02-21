@@ -17,7 +17,6 @@ import com.solbeg.userservice.service.JwtService;
 import com.solbeg.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,17 +36,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserResponse register(UserRegisterRequest request) {
-        User userToSave = userMapper.fromRequest(request);
-        userToSave.setPassword(passwordEncoder.encode(userToSave.getPassword()));
-        try {
-            repository.persist(userToSave);
-        } catch (DataIntegrityViolationException e) {
-            throw new UniqueEmailException("Email " + userToSave.getEmail()
-                                           + " is occupied! Another user is already registered by this email!");
-        }
-        String jwtToken = jwtService.generateToken(userToSave);
-        return userMapper.toResponse(userToSave, jwtToken, jwtService.extractExpiration(jwtToken).toString());
+    public UserResponse registerJournalist(UserRegisterRequest request) {
+        return registerUser(request, Role.JOURNALIST);
+    }
+
+    @Override
+    @Transactional
+    public UserResponse registerSubscriber(UserRegisterRequest request) {
+        return registerUser(request, Role.SUBSCRIBER);
     }
 
     @Override
@@ -101,10 +97,25 @@ public class UserServiceImpl implements UserService {
                             }
                             repository.delete(user);
                         },
-                        () -> { throw new NoSuchUserEmailException("There is no user with email " + email + " to delete"); }
+                        () -> {
+                            throw new NoSuchUserEmailException("There is no user with email " + email + " to delete");
+                        }
                 );
         return DeleteResponse.builder()
                 .message("User with email " + email + " was successfully deleted")
                 .build();
+    }
+
+    private UserResponse registerUser(UserRegisterRequest request, Role role) {
+        if (repository.findByEmail(request.getEmail()).isPresent()) {
+            throw new UniqueEmailException("Email " + request.getEmail()
+                                           + " is occupied! Another user is already registered by this email!");
+        }
+        User userToSave = userMapper.fromRequest(request);
+        userToSave.setRole(role);
+        userToSave.setPassword(passwordEncoder.encode(userToSave.getPassword()));
+        repository.persist(userToSave);
+        String jwtToken = jwtService.generateToken(userToSave);
+        return userMapper.toResponse(userToSave, jwtToken, jwtService.extractExpiration(jwtToken).toString());
     }
 }

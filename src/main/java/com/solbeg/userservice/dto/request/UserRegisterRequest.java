@@ -2,7 +2,6 @@ package com.solbeg.userservice.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,10 +29,6 @@ public class UserRegisterRequest {
     @NotBlank
     @Size(min = 3, max = 100)
     private String password;
-
-    @NotBlank
-    @Pattern(regexp = "JOURNALIST|SUBSCRIBER")
-    private String role;
 
     private boolean statusActive;
 }

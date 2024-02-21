@@ -26,10 +26,16 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@RequestBody UserRegisterRequest request) {
+    @PostMapping("/registerjournalist")
+    public ResponseEntity<UserResponse> registerJournalist(@RequestBody UserRegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(userService.register(request));
+                .body(userService.registerJournalist(request));
+    }
+
+    @PostMapping("/registersubscriber")
+    public ResponseEntity<UserResponse> registerSubscriber(@RequestBody UserRegisterRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(userService.registerSubscriber(request));
     }
 
     @PostMapping("/authenticate")
