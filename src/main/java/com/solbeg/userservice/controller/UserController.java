@@ -9,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +27,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @PreAuthorize("hasRole('admin')")
     @GetMapping
     public ResponseEntity<Page<UserResponse>> findAll(@PageableDefault(15) Pageable pageable) {
         Page<UserResponse> usersPage = userService.findAll(pageable);
