@@ -1,7 +1,10 @@
 package com.solbeg.userservice.exception.handler;
 
+import com.solbeg.userservice.exception.AccessDeniedException;
 import com.solbeg.userservice.exception.InformationChangeStatusUserException;
+import com.solbeg.userservice.exception.JwtParsingException;
 import com.solbeg.userservice.exception.NoSuchUserEmailException;
+import com.solbeg.userservice.exception.NotFoundException;
 import com.solbeg.userservice.exception.UniqueEmailException;
 import com.solbeg.userservice.exception.model.IncorrectData;
 import com.solbeg.userservice.exception.model.ValidationErrorResponse;
@@ -22,9 +25,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceExceptionHandler {
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<IncorrectData> accessDeniedException(AccessDeniedException exception) {
+        return getResponse(exception.getClass().getSimpleName(), exception.getMessage(), HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(InformationChangeStatusUserException.class)
     public ResponseEntity<IncorrectData> informationChangeStatusUserException(InformationChangeStatusUserException exception) {
         return getResponse(exception.getClass().getSimpleName(), exception.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(JwtParsingException.class)
+    public ResponseEntity<IncorrectData> jwtParsingException(JwtParsingException exception) {
+        return getResponse(exception.getClass().getSimpleName(), exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
@@ -34,6 +47,11 @@ public class UserServiceExceptionHandler {
 
     @ExceptionHandler(NoSuchUserEmailException.class)
     public ResponseEntity<IncorrectData> noSuchUserEmailException(NoSuchUserEmailException exception) {
+        return getResponse(exception.getClass().getSimpleName(), exception.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<IncorrectData> notFoundException(NotFoundException exception) {
         return getResponse(exception.getClass().getSimpleName(), exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
