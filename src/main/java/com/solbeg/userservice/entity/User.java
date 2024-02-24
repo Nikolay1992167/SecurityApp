@@ -1,7 +1,6 @@
 package com.solbeg.userservice.entity;
 
 import com.solbeg.userservice.enums.Status;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
