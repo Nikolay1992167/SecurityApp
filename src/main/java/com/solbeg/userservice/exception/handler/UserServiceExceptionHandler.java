@@ -1,6 +1,6 @@
 package com.solbeg.userservice.exception.handler;
 
-import com.solbeg.userservice.exception.DeleteUserException;
+import com.solbeg.userservice.exception.InformationChangeStatusUserException;
 import com.solbeg.userservice.exception.NoSuchUserEmailException;
 import com.solbeg.userservice.exception.UniqueEmailException;
 import com.solbeg.userservice.exception.model.IncorrectData;
@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -21,9 +22,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceExceptionHandler {
 
-    @ExceptionHandler(DeleteUserException.class)
-    public ResponseEntity<IncorrectData> deleteUserException(DeleteUserException exception) {
+    @ExceptionHandler(InformationChangeStatusUserException.class)
+    public ResponseEntity<IncorrectData> informationChangeStatusUserException(InformationChangeStatusUserException exception) {
         return getResponse(exception.getClass().getSimpleName(), exception.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<IncorrectData> usernameNotFoundException(UsernameNotFoundException exception) {
+        return getResponse(exception.getClass().getSimpleName(), exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(NoSuchUserEmailException.class)

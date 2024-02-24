@@ -12,6 +12,5 @@ CREATE TABLE IF NOT EXISTS security.users (
     last_name    VARCHAR(50)        NOT NULL,
     password     VARCHAR(100) UNIQUE NOT NULL,
     email        VARCHAR(100) UNIQUE NOT NULL,
-    role         VARCHAR(10)        NOT NULL,
-    status       BOOLEAN            NOT NULL
+    status       VARCHAR(10)        NOT NULL
 );

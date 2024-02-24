@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,13 +13,9 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserResponse {
+public class UserRegisterResponse {
 
     private UUID id;
-    private UUID createdBy;
-    private UUID updatedBy;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private String firstName;
     private String lastName;
     private String password;
