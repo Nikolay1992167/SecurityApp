@@ -1,65 +1,59 @@
 package com.solbeg.userservice.controller;
 
-import com.solbeg.userservice.dto.request.UserAuthenticationRequest;
-import com.solbeg.userservice.dto.request.UserRegisterRequest;
 import com.solbeg.userservice.dto.request.UserUpdateRequest;
-import com.solbeg.userservice.dto.response.DeleteResponse;
-import com.solbeg.userservice.dto.response.TokenValidationResponse;
 import com.solbeg.userservice.dto.response.UserResponse;
 import com.solbeg.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/v1/auth", produces = "application/json")
+@RequestMapping(value = "/api/v1/users", produces = "application/json")
 public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/registerjournalist")
-    public ResponseEntity<UserResponse> registerJournalist(@RequestBody UserRegisterRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(userService.registerJournalist(request));
+    @PreAuthorize("hasRole('admin')")
+    @GetMapping
+    public ResponseEntity<Page<UserResponse>> findAll(@PageableDefault(15) Pageable pageable) {
+        Page<UserResponse> usersPage = userService.findAll(pageable);
+        return ResponseEntity.ok(usersPage);
     }
 
-    @PostMapping("/registersubscriber")
-    public ResponseEntity<UserResponse> registerSubscriber(@RequestBody UserRegisterRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(userService.registerSubscriber(request));
+    @GetMapping("/{uuid}")
+    public ResponseEntity<UserResponse> findById(@PathVariable UUID uuid) {
+        return ResponseEntity.ok(userService.findUserById(uuid));
     }
 
-    @PostMapping("/authenticate")
-    public ResponseEntity<UserResponse> authenticate(@RequestBody UserAuthenticationRequest request) {
-        return ResponseEntity.ok(userService.authenticate(request));
+    @PutMapping("/{uuid}")
+    public ResponseEntity<UserResponse> update(@PathVariable UUID uuid, @RequestBody UserUpdateRequest updateRequest) {
+        return ResponseEntity.ok(userService.update(uuid, updateRequest));
     }
 
-    @PostMapping("/validate")
-    public ResponseEntity<TokenValidationResponse> tokenValidationCheck(@RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false)
-                                                                        String token) {
-        return ResponseEntity.ok(userService.tokenValidationCheck(token));
+    @PatchMapping("/deactivate/{id}")
+    public ResponseEntity<?> deactivateUser(@PathVariable UUID id, @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token) {
+        userService.deactivateUser(id, token);
+        return ResponseEntity.ok().build();
     }
 
-    @PutMapping
-    public ResponseEntity<UserResponse> updateByToken(@RequestBody UserUpdateRequest request,
-                                                      @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false)
-                                                      String token) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(userService.updateByToken(request, token));
-    }
-
-    @DeleteMapping
-    public ResponseEntity<DeleteResponse> deleteByToken(@RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false)
-                                                        String token) {
-        return ResponseEntity.ok(userService.deleteByToken(token));
+    @PatchMapping("/delete/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable UUID id, @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token) {
+        userService.deleteUser(id, token);
+        return ResponseEntity.ok().build();
     }
 }

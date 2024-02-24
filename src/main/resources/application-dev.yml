@@ -14,12 +14,14 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        default_schema: security
     open-in-view: false
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 security:
   jwt:
-    secret-key: 9AA5DCAA036A417302A9FF0F6CE3F48265239A19B072129616E9C19364790186
-    expiration: 86400000 # 1 day (24 hours)
+    secret: 73357638792F423F4528482B4D6251655468576D5A7133743677397A24432646
+    access: 1
+    refresh: 30
 server:
   port: 8081

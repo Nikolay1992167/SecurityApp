@@ -1,24 +1,32 @@
 package com.solbeg.userservice.service;
 
-
-import com.solbeg.userservice.dto.request.UserAuthenticationRequest;
 import com.solbeg.userservice.dto.request.UserRegisterRequest;
 import com.solbeg.userservice.dto.request.UserUpdateRequest;
-import com.solbeg.userservice.dto.response.DeleteResponse;
-import com.solbeg.userservice.dto.response.TokenValidationResponse;
+import com.solbeg.userservice.dto.response.UserRegisterResponse;
 import com.solbeg.userservice.dto.response.UserResponse;
+import com.solbeg.userservice.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.util.UUID;
 
 public interface UserService {
 
-    UserResponse registerJournalist(UserRegisterRequest request);
+    UserRegisterResponse registerJournalist(UserRegisterRequest request);
 
-    UserResponse registerSubscriber(UserRegisterRequest request);
+    UserRegisterResponse registerSubscriber(UserRegisterRequest request);
 
-    UserResponse authenticate(UserAuthenticationRequest request);
+    Page<UserResponse> findAll(Pageable pageable);
 
-    TokenValidationResponse tokenValidationCheck(String token);
+    UserResponse findUserById(UUID uuid);
 
-    UserResponse updateByToken(UserUpdateRequest request, String token);
+    User findByUserEmail(String email);
 
-    DeleteResponse deleteByToken(String token);
+    User findById(UUID id);
+
+    UserResponse update(UUID uuid, UserUpdateRequest updateRequest);
+
+    void deactivateUser(UUID id, String token);
+
+    void deleteUser(UUID id, String token);
 }
