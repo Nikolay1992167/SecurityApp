@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +21,7 @@ public final class JwtUserFactory {
                 user.getPassword(),
                 user.getEmail(),
                 user.getStatus().equals(Status.ACTIVE),
-                mapToGrantedAuthorities(new ArrayList<>(user.getRoles()))
+                mapToGrantedAuthorities(user.getRoles())
         );
     }
 
