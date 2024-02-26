@@ -11,9 +11,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.FieldNameConstants;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -22,6 +25,7 @@ import java.util.List;
 @AllArgsConstructor
 @SuperBuilder
 @Entity
+@FieldNameConstants
 @EqualsAndHashCode(callSuper = true)
 @Table(schema = "security", name = "roles")
 public class Role extends BaseEntity {

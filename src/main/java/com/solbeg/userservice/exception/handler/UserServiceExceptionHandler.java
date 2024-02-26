@@ -7,18 +7,20 @@ import com.solbeg.userservice.exception.NoSuchUserEmailException;
 import com.solbeg.userservice.exception.NotFoundException;
 import com.solbeg.userservice.exception.UniqueEmailException;
 import com.solbeg.userservice.exception.model.IncorrectData;
-import com.solbeg.userservice.exception.model.ValidationErrorResponse;
-import com.solbeg.userservice.exception.model.Violation;
-import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.List;
+import java.security.SignatureException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
@@ -47,7 +49,13 @@ public class UserServiceExceptionHandler {
 
     @ExceptionHandler(NoSuchUserEmailException.class)
     public ResponseEntity<IncorrectData> noSuchUserEmailException(NoSuchUserEmailException exception) {
-        return getResponse(exception.getClass().getSimpleName(), exception.getMessage(), HttpStatus.NOT_FOUND);
+        return getResponse(exception.getClass().getSimpleName(), exception.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<IncorrectData> httpMessageNotReadableException(HttpMessageNotReadableException exception) {
+        return getResponse(exception.getClass().getSimpleName(), "Specify the correct status!", HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(NotFoundException.class)
@@ -60,19 +68,24 @@ public class UserServiceExceptionHandler {
         return getResponse(exception.getClass().getSimpleName(), exception.getMessage(), HttpStatus.NOT_ACCEPTABLE);
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ValidationErrorResponse> constraintValidationException(ConstraintViolationException exception) {
-        List<Violation> violations = exception.getConstraintViolations()
-                .stream()
-                .map(constraintViolation -> new Violation(constraintViolation.getPropertyPath().toString(),
-                        constraintViolation.getMessage()))
-                .toList();
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new ValidationErrorResponse(HttpStatus.CONFLICT.toString(), violations));
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<IncorrectData> handleValidationExceptions(MethodArgumentNotValidException exception) {
+        Map<String, String> errors = new LinkedHashMap<>();
+        exception.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return getResponse(exception.getClass().getSimpleName(), errors.toString(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(Throwable.class)
     public ResponseEntity<IncorrectData> handleThrowable(Throwable exception) {
+        return getResponse(exception.getClass().getSimpleName(), exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(SignatureException.class)
+    public ResponseEntity<IncorrectData> handleSignatureException(SignatureException exception) {
         return getResponse(exception.getClass().getSimpleName(), exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
