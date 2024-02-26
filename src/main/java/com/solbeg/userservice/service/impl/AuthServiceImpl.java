@@ -28,7 +28,7 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(), loginRequest.getPassword()));
         User user = userService.findByUserEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new NoSuchUserEmailException("User with email " + loginRequest.getEmail() + " is not exist"));;
+                .orElseThrow(() -> new NoSuchUserEmailException("User with email " + loginRequest.getEmail() + " is not exist"));
 
         jwtResponse.setId(user.getId());
         jwtResponse.setEmail(user.getEmail());

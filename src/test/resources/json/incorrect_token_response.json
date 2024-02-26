@@ -1,0 +1,5 @@
+{
+  "exception": "MethodArgumentNotValidException",
+  "error_message": "{refreshToken=должно соответствовать \"^[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+$\"}",
+  "error_code": "409 CONFLICT"
+}
