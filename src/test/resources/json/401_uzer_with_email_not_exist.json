@@ -1,0 +1,5 @@
+{
+  "exception": "NoSuchUserEmailException",
+  "error_message": "User with email nikolay@mail.by is not exist",
+  "error_code": "401 UNAUTHORIZED"
+}

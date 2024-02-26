@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    username: test
+    password: test
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default_schema: security
+    open-in-view: false
+security:
+  jwt:
+    secret: 73357638792F423F4528482B4D6251655468576D5A7133743677397A24432646
+    access: 1
+    refresh: 30

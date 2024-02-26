@@ -1,0 +1,5 @@
+{
+  "exception": "HttpMessageNotReadableException",
+  "error_message": "Specify the correct status!",
+  "error_code": "409 CONFLICT"
+}
