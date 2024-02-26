@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.FieldNameConstants;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.List;
 @AllArgsConstructor
 @SuperBuilder
 @Entity
+@FieldNameConstants
 @EqualsAndHashCode(callSuper = true)
 @Table(schema = "security", name = "users")
 public class User extends BaseEntity {

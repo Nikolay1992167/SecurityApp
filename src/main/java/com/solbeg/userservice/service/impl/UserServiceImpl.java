@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -98,11 +99,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public User findByUserEmail(String email) {
+    public Optional<User> findByUserEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NoSuchUserEmailException("User with email " + email + " is not exist"));
         log.info("IN findByUserEmail - user: {} found by email: {}", user, email);
-        return user;
+        return Optional.ofNullable(user);
     }
 
     @Override
@@ -115,18 +116,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserResponse update(UUID uuid, UserUpdateRequest updateRequest) {
-        User userToUpdate = userMapper.fromUpdateRequest(updateRequest);
         User userInDB = userRepository.findById(uuid)
                 .orElseThrow(() -> NotFoundException.of(User.class, uuid));
-        userToUpdate.setId(uuid);
-        userToUpdate.setCreatedAt(userInDB.getCreatedAt());
-        userToUpdate.setUpdatedAt(userInDB.getUpdatedAt());
-        userToUpdate.setCreatedBy(userInDB.getCreatedBy());
-        userToUpdate.setUpdatedBy(userInDB.getUpdatedBy());
-        userToUpdate.setStatus(userInDB.getStatus());
-        userToUpdate.setRoles(userInDB.getRoles());
-        User updatedUser = userRepository.persist(userToUpdate);
+        userInDB.setFirstName(updateRequest.getFirstName());
+        userInDB.setLastName(updateRequest.getLastName());
+        userInDB.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
+        userInDB.setEmail(updateRequest.getEmail());
+        User updatedUser = userRepository.persist(userInDB);
         UserResponse userResponse = userMapper.toResponse(updatedUser);
         log.info("IN update - user: {} with id: {}", userResponse, uuid);
         return userResponse;

@@ -60,4 +60,6 @@ public class ApplicationConfig {
                 .addFilterBefore(new JwtTokenFilter(tokenProvider, objectMapper), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+
+
 }

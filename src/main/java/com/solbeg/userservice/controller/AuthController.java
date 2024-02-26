@@ -7,6 +7,7 @@ import com.solbeg.userservice.dto.response.JwtResponse;
 import com.solbeg.userservice.dto.response.UserRegisterResponse;
 import com.solbeg.userservice.service.AuthService;
 import com.solbeg.userservice.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,19 +31,19 @@ public class AuthController {
     }
 
     @PostMapping("/registerjournalist")
-    public ResponseEntity<UserRegisterResponse> registerJournalist(@RequestBody UserRegisterRequest request) {
+    public ResponseEntity<UserRegisterResponse> registerJournalist(@Validated @RequestBody UserRegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(userService.registerJournalist(request));
     }
 
     @PostMapping("/registersubscriber")
-    public ResponseEntity<UserRegisterResponse> registerSubscriber(@RequestBody UserRegisterRequest request) {
+    public ResponseEntity<UserRegisterResponse> registerSubscriber(@Validated @RequestBody UserRegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(userService.registerSubscriber(request));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<JwtResponse> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+    public ResponseEntity<JwtResponse> refresh(@Validated @RequestBody RefreshTokenRequest refreshTokenRequest) {
         return ResponseEntity.ok(authService.refresh(refreshTokenRequest.getRefreshToken()));
     }
 }

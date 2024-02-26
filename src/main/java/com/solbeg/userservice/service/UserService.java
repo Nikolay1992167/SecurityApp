@@ -8,6 +8,7 @@ import com.solbeg.userservice.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
@@ -20,7 +21,7 @@ public interface UserService {
 
     UserResponse findUserById(UUID uuid);
 
-    User findByUserEmail(String email);
+    Optional<User> findByUserEmail(String email);
 
     User findById(UUID id);
 

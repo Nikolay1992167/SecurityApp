@@ -3,6 +3,7 @@ package com.solbeg.userservice.service.impl;
 import com.solbeg.userservice.dto.request.JwtRequest;
 import com.solbeg.userservice.dto.response.JwtResponse;
 import com.solbeg.userservice.entity.User;
+import com.solbeg.userservice.exception.NoSuchUserEmailException;
 import com.solbeg.userservice.security.jwt.JwtTokenProvider;
 import com.solbeg.userservice.service.AuthService;
 import com.solbeg.userservice.service.UserService;
@@ -26,7 +27,8 @@ public class AuthServiceImpl implements AuthService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(), loginRequest.getPassword()));
-        User user = userService.findByUserEmail(loginRequest.getEmail());
+        User user = userService.findByUserEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new NoSuchUserEmailException("User with email " + loginRequest.getEmail() + " is not exist"));;
 
         jwtResponse.setId(user.getId());
         jwtResponse.setEmail(user.getEmail());

@@ -1,6 +1,8 @@
 package com.solbeg.userservice.exception;
 
-public class NoSuchUserEmailException extends RuntimeException{
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
+
+public class NoSuchUserEmailException extends InternalAuthenticationServiceException {
 
     public NoSuchUserEmailException(String message) {
         super(message);
