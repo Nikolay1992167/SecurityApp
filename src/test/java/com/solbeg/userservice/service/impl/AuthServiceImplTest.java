@@ -10,11 +10,11 @@ import com.solbeg.userservice.util.testdata.JwtData;
 import com.solbeg.userservice.util.testdata.UserTestData;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.test.context.TestConstructor;
 
 import java.util.Optional;
 
@@ -24,7 +24,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class AuthServiceImplTest {
 
     @InjectMocks
@@ -94,7 +95,8 @@ class AuthServiceImplTest {
             JwtResponse expectedResponse = JwtData.builder()
                     .build()
                     .getJwtResponse();
-            when(jwtTokenProvider.refreshUserToken(refreshToken)).thenReturn(expectedResponse);
+            when(jwtTokenProvider.refreshUserToken(refreshToken))
+                    .thenReturn(expectedResponse);
 
             // when
             JwtResponse actualResponse = authService.refresh(refreshToken);

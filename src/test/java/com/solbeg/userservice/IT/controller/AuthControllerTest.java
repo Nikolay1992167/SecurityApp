@@ -29,6 +29,7 @@ import static com.solbeg.userservice.util.initdata.InitData.REFRESH_TOKEN;
 import static com.solbeg.userservice.util.initdata.InitData.SUBSCRIBER_FIRST_NAME;
 import static com.solbeg.userservice.util.initdata.InitData.SUBSCRIBER_LAST_NAME;
 import static com.solbeg.userservice.util.initdata.InitData.SUBSCRIBER_LIST_OF_ROLES;
+import static com.solbeg.userservice.util.initdata.InitData.URL_AUTH;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -68,7 +69,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                     .thenReturn(response);
 
             // when, then
-            mockMvc.perform(post("/api/v1/auth/authenticate")
+            mockMvc.perform(post(URL_AUTH + "/authenticate")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpectAll(
@@ -91,7 +92,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
             String json = UserJsonSupplier.getPatternEmailErrorResponse();
 
             // when, then
-            mockMvc.perform(post("/api/v1/auth/authenticate")
+            mockMvc.perform(post(URL_AUTH + "/authenticate")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isConflict())
@@ -109,7 +110,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
 //            String json = UserJsonSupplier.getNotFoundUserWithEmailResponse();
 //
 //            // when, then
-//            mockMvc.perform(post("/api/v1/auth/authenticate")
+//            mockMvc.perform(post(URL_AUTH + "/authenticate")
 //                            .contentType(MediaType.APPLICATION_JSON)
 //                            .content(objectMapper.writeValueAsString(request)))
 //                    .andExpect(status().isUnauthorized())
@@ -134,7 +135,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                     .thenReturn(response);
 
             // when, then
-            mockMvc.perform(post("/api/v1/auth/registerjournalist")
+            mockMvc.perform(post(URL_AUTH + "/registerjournalist")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpectAll(
@@ -160,7 +161,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
             String json = UserJsonSupplier.getNotValidFirstNameForRegistrationUser();
 
             // when, then
-            mockMvc.perform(post("/api/v1/auth/registerjournalist")
+            mockMvc.perform(post(URL_AUTH + "/registerjournalist")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isConflict())
@@ -177,7 +178,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
             String json = UserJsonSupplier.getNotValidLastNameForRegistrationUser();
 
             // when, then
-            mockMvc.perform(post("/api/v1/auth/registerjournalist")
+            mockMvc.perform(post(URL_AUTH + "/registerjournalist")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isConflict())
@@ -194,7 +195,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
             String json = UserJsonSupplier.getNotValidPasswordForRegistrationUser();
 
             // when, then
-            mockMvc.perform(post("/api/v1/auth/registerjournalist")
+            mockMvc.perform(post(URL_AUTH + "/registerjournalist")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isConflict())
@@ -211,7 +212,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
             String json = UserJsonSupplier.getNotValidEmailForRegistrationUser();
 
             // when, then
-            mockMvc.perform(post("/api/v1/auth/registerjournalist")
+            mockMvc.perform(post(URL_AUTH + "/registerjournalist")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isConflict())
@@ -225,7 +226,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
             String json = UserJsonSupplier.getNotValidStatusForRegistrationUser();
 
             // when, then
-            mockMvc.perform(post("/api/v1/auth/registerjournalist")
+            mockMvc.perform(post(URL_AUTH + "/registerjournalist")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isConflict())
@@ -259,7 +260,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                     .thenReturn(response);
 
             // when, then
-            mockMvc.perform(post("/api/v1/auth/registersubscriber")
+            mockMvc.perform(post(URL_AUTH + "/registersubscriber")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpectAll(
@@ -285,7 +286,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
             String json = UserJsonSupplier.getNotValidFirstNameForRegistrationUser();
 
             // when, then
-            mockMvc.perform(post("/api/v1/auth/registersubscriber")
+            mockMvc.perform(post(URL_AUTH + "/registersubscriber")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isConflict())
@@ -302,7 +303,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
             String json = UserJsonSupplier.getNotValidLastNameForRegistrationUser();
 
             // when, then
-            mockMvc.perform(post("/api/v1/auth/registersubscriber")
+            mockMvc.perform(post(URL_AUTH + "/registersubscriber")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isConflict())
@@ -319,7 +320,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
             String json = UserJsonSupplier.getNotValidPasswordForRegistrationUser();
 
             // when, then
-            mockMvc.perform(post("/api/v1/auth/registersubscriber")
+            mockMvc.perform(post(URL_AUTH + "/registersubscriber")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isConflict())
@@ -336,7 +337,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
             String json = UserJsonSupplier.getNotValidEmailForRegistrationUser();
 
             // when, then
-            mockMvc.perform(post("/api/v1/auth/registersubscriber")
+            mockMvc.perform(post(URL_AUTH + "/registersubscriber")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isConflict())
@@ -350,7 +351,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
             String json = UserJsonSupplier.getNotValidStatusForRegistrationUser();
 
             // when, then
-            mockMvc.perform(post("/api/v1/auth/registersubscriber")
+            mockMvc.perform(post(URL_AUTH + "/registersubscriber")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isConflict())
@@ -372,7 +373,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                     .thenReturn(response);
 
             // when, then
-            mockMvc.perform(post("/api/v1/auth/refresh")
+            mockMvc.perform(post(URL_AUTH + "/refresh")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(REFRESH_TOKEN)))
                     .andExpectAll(
@@ -395,7 +396,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
 //            String json = UserJsonSupplier.getIncorrectRefreshTokenResponse();
 //
 //            // when, then
-//            mockMvc.perform(post("/api/v1/auth/refresh")
+//            mockMvc.perform(post(URL_AUTH + "/refresh")
 //                            .contentType(MediaType.APPLICATION_JSON)
 //                            .content(objectMapper.writeValueAsString(request)))
 //                    .andExpect(status().isConflict())
@@ -412,7 +413,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
 //            String json = UserJsonSupplier.getRefreshTokenWithIncorrectJWTSignatureResponse();
 //
 //            // when, then
-//            mockMvc.perform(post("/api/v1/auth/refresh")
+//            mockMvc.perform(post(URL_AUTH + "/refresh")
 //                            .contentType(MediaType.APPLICATION_JSON)
 //                            .content(objectMapper.writeValueAsString(request)))
 //                    .andExpect(status().isInternalServerError())
