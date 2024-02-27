@@ -79,11 +79,6 @@ public class UserServiceExceptionHandler {
         return getResponse(exception.getClass().getSimpleName(), errors.toString(), HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(Throwable.class)
-    public ResponseEntity<IncorrectData> handleThrowable(Throwable exception) {
-        return getResponse(exception.getClass().getSimpleName(), exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
     @ExceptionHandler(SignatureException.class)
     public ResponseEntity<IncorrectData> handleSignatureException(SignatureException exception) {
         return getResponse(exception.getClass().getSimpleName(), exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

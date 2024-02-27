@@ -44,38 +44,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserRegisterResponse registerJournalist(UserRegisterRequest request) {
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new UniqueEmailException("Email " + request.getEmail()
-                                           + " is occupied! Another user is already registered by this email!");
-        }
-        User userToSave = userMapper.fromRequest(request);
-        List<Role> userRoles = new ArrayList<>();
-        Role journalistRole = roleRepository.findByName("JOURNALIST");
-        userRoles.add(journalistRole);
-        userToSave.setRoles(userRoles);
-        userToSave.setPassword(passwordEncoder.encode(userToSave.getPassword()));
-        User savedUser = userRepository.persist(userToSave);
-        UserRegisterResponse userResponse = userMapper.toRegisterResponse(savedUser);
-        log.info("IN registerJournalist user: {} successfully registered", userToSave);
-        return userResponse;
+        return registerUser(request, "JOURNALIST");
     }
 
     @Override
+    @Transactional
     public UserRegisterResponse registerSubscriber(UserRegisterRequest request) {
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new UniqueEmailException("Email " + request.getEmail()
-                                           + " is occupied! Another user is already registered by this email!");
-        }
-        User userToSave = userMapper.fromRequest(request);
-        List<Role> userRoles = new ArrayList<>();
-        Role subscriberRole = roleRepository.findByName("SUBSCRIBER");
-        userRoles.add(subscriberRole);
-        userToSave.setRoles(userRoles);
-        userToSave.setPassword(passwordEncoder.encode(userToSave.getPassword()));
-        User savedUser = userRepository.persist(userToSave);
-        UserRegisterResponse userResponse = userMapper.toRegisterResponse(savedUser);
-        log.info("IN registerSubscriber user: {} successfully registered", userToSave);
-        return userResponse;
+        return registerUser(request, "SUBSCRIBER");
     }
 
     @Override
@@ -88,6 +63,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserResponse findUserById(UUID uuid) {
         UserResponse userResponse = userRepository.findById(uuid)
                 .map(userMapper::toResponse)
@@ -118,6 +94,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse update(UUID uuid, UserUpdateRequest updateRequest) {
+        checkUniqueEmail(updateRequest.getEmail());
         User userInDB = userRepository.findById(uuid)
                 .orElseThrow(() -> NotFoundException.of(User.class, uuid));
         userInDB.setFirstName(updateRequest.getFirstName());
@@ -142,6 +119,27 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(UUID id, String token) {
         changeUserStatus(id, token, Status.DELETED);
         log.info("IN deleteUser - user with id: {} changed status: DELETED", id);
+    }
+
+    private UserRegisterResponse registerUser(UserRegisterRequest request, String roleName) {
+        checkUniqueEmail(request.getEmail());
+        User userToSave = userMapper.fromRequest(request);
+        List<Role> userRoles = new ArrayList<>();
+        Role role = roleRepository.findByName(roleName);
+        userRoles.add(role);
+        userToSave.setRoles(userRoles);
+        userToSave.setPassword(passwordEncoder.encode(userToSave.getPassword()));
+        User savedUser = userRepository.persist(userToSave);
+        UserRegisterResponse userResponse = userMapper.toRegisterResponse(savedUser);
+        log.info("IN registerUser user: {} successfully registered", userToSave);
+        return userResponse;
+    }
+
+    private void checkUniqueEmail(String email) {
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new UniqueEmailException("Email " + email
+                                           + " is occupied! Another user is already registered by this email!");
+        }
     }
 
     private void changeUserStatus(UUID id, String token, Status status) {
