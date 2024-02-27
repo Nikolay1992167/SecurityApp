@@ -1,5 +1,6 @@
 package com.solbeg.userservice.controller;
 
+import com.solbeg.userservice.controller.openapi.AuthOpenApi;
 import com.solbeg.userservice.dto.request.JwtRequest;
 import com.solbeg.userservice.dto.request.RefreshTokenRequest;
 import com.solbeg.userservice.dto.request.UserRegisterRequest;
@@ -19,28 +20,32 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthController implements AuthOpenApi {
 
     private final AuthService authService;
     private final UserService userService;
 
+    @Override
     @PostMapping("/authenticate")
     public ResponseEntity<JwtResponse> authenticate(@Validated @RequestBody JwtRequest loginRequest) {
         return ResponseEntity.ok(authService.login(loginRequest));
     }
 
+    @Override
     @PostMapping("/registerjournalist")
     public ResponseEntity<UserRegisterResponse> registerJournalist(@Validated @RequestBody UserRegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(userService.registerJournalist(request));
     }
 
+    @Override
     @PostMapping("/registersubscriber")
     public ResponseEntity<UserRegisterResponse> registerSubscriber(@Validated @RequestBody UserRegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(userService.registerSubscriber(request));
     }
 
+    @Override
     @PostMapping("/refresh")
     public ResponseEntity<JwtResponse> refresh(@Validated @RequestBody RefreshTokenRequest refreshTokenRequest) {
         return ResponseEntity.ok(authService.refresh(refreshTokenRequest.getRefreshToken()));
