@@ -3,14 +3,12 @@ package com.solbeg.userservice.security.jwt;
 import com.solbeg.userservice.entity.Role;
 import com.solbeg.userservice.entity.User;
 import com.solbeg.userservice.enums.Status;
-import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@NoArgsConstructor
 public final class JwtUserFactory {
 
     public static JwtUser create(User user) {

@@ -102,22 +102,6 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    private String getUsername(String token) {
-        return Jwts
-                .parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
-
-    private List<String> resolveRoles(List<Role> roles) {
-        return roles.stream()
-                .map(Role::getName)
-                .collect(Collectors.toList());
-    }
-
     public String getId(String token) {
         return Jwts
                 .parserBuilder()
@@ -141,5 +125,21 @@ public class JwtTokenProvider {
             throw new JwtParsingException("Error parsing the JWT token.", e);
         }
         return UUID.fromString((String) payloadMap.get("id"));
+    }
+
+    private String getUsername(String token) {
+        return Jwts
+                .parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
+
+    private List<String> resolveRoles(List<Role> roles) {
+        return roles.stream()
+                .map(Role::getName)
+                .collect(Collectors.toList());
     }
 }

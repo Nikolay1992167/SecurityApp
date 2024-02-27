@@ -28,6 +28,7 @@ import static com.solbeg.userservice.util.initdata.InitData.DEFAULT_PAGE_REQUEST
 import static com.solbeg.userservice.util.initdata.InitData.ID_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.ID_NOT_EXIST;
 import static com.solbeg.userservice.util.initdata.InitData.TOKEN_ADMIN;
+import static com.solbeg.userservice.util.initdata.InitData.URL_USERS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -71,7 +72,7 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
                     .thenReturn(page);
 
             // when, then
-            MvcResult mvcResult = mockMvc.perform(get("/api/v1/users" + "?page=0&size=15"))
+            MvcResult mvcResult = mockMvc.perform(get(URL_USERS + "?page=0&size=15"))
                     .andExpect(status().isOk())
                     .andReturn();
             MockHttpServletResponse response = mvcResult.getResponse();
@@ -97,7 +98,7 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
                     .thenReturn(page);
 
             // when, then
-            mockMvc.perform(get("/api/v1/users" + "?page=0&size=15"))
+            mockMvc.perform(get(URL_USERS + "?page=0&size=15"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content").isEmpty());
         }
@@ -118,7 +119,7 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
                     .thenReturn(userResponse);
 
             // when, then
-            mockMvc.perform(get("/api/v1/users" + "/" + userId))
+            mockMvc.perform(get(URL_USERS + "/" + userId))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id").value(userId.toString()));
         }
@@ -132,7 +133,7 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
                     .thenThrow(NotFoundException.of(User.class, userId));
 
             // when, then
-            mockMvc.perform(get("/api/v1/users" + "/" + userId))
+            mockMvc.perform(get(URL_USERS + "/" + userId))
                     .andExpect(status().isNotFound());
         }
     }
@@ -156,7 +157,7 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
 //                    .thenReturn(userResponse);
 //
 //            // when, then
-//            mockMvc.perform(put("/api/v1/users" + "/" + userId)
+//            mockMvc.perform(put(URL_USERS + "/" + userId)
 //                            .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 //                            .content(json))
 //                    .andExpect(status().isOk())
@@ -181,7 +182,7 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
 //            doNothing().when(userService).deactivateUser(userId, TOKEN_ADMIN);
 //
 //            // then
-//            mockMvc.perform(patch("/api/v1/users/deactivate/{id}", userId)
+//            mockMvc.perform(patch(URL_USERS + "/deactivate/{id}", userId)
 //                            .header(AUTHORIZATION, BEARER + TOKEN_ADMIN)
 //                            .contentType(APPLICATION_JSON))
 //                    .andExpect(status().isOk());
@@ -200,7 +201,7 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
 //                    .when(userService).deactivateUser(userId, BEARER + token);
 //
 //            // then
-//            mockMvc.perform(patch("/api/v1/users/deactivate/" + userId))
+//            mockMvc.perform(patch(URL_USERS + "/deactivate/" + userId))
 //                    .andExpect(status().isConflict());
 //        }
     }
@@ -218,7 +219,7 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
 //            doNothing().when(userService).deleteUser(userId, TOKEN_ADMIN);
 //
 //            // then
-//            mockMvc.perform(patch("/api/v1/users/delete/" + userId)
+//            mockMvc.perform(patch(URL_USERS + "/delete/" + userId)
 //                            .header(AUTHORIZATION, BEARER + TOKEN_ADMIN))
 //                    .andExpect(status().isOk());
 //
@@ -237,7 +238,7 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
 //                    .when(userService).deactivateUser(userId, token);
 //
 //            // then
-//            mockMvc.perform(patch("/api/v1/users/delete/" + userId))
+//            mockMvc.perform(patch(URL_USERS + "/delete/" + userId))
 //                    .andExpect(status().isConflict());
 //        }
     }

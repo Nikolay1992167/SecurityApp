@@ -31,19 +31,16 @@ public class JwtUser implements UserDetails {
         return email;
     }
 
-    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
-    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
-    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
         return true;

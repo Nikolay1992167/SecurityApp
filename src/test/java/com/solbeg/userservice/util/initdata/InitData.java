@@ -27,17 +27,16 @@ public class InitData {
     public static final String PASSWORD_INCORRECT = "1";
 
     public static final UUID ID_ADMIN = UUID.fromString("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11");
-    public static final UUID ID_JOURNALIST = UUID.fromString("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11");
-    public static final UUID ID_SUBSCRIBER = UUID.fromString("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11");
+    public static final UUID ID_JOURNALIST = UUID.fromString("b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12");
+    public static final UUID ID_SUBSCRIBER = UUID.fromString("c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13");
     public static final UUID ID_INCORRECT = UUID.fromString("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a45");
     public static final UUID ID_NOT_EXIST = UUID.fromString("ddcf4b2b-3ee4-4927-9466-953aa27c8785");
 
     public static final String ACCESS_TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdHJlbGluQG1haWwucnUiLCJpZCI6ImIwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMiIsInJvbGVzIjpbIkpPVVJOQUxJU1QiXSwiZXhwIjoxNzA4ODgwNDQ2fQ.BjnqDutQchHRwDAZJdXhzHKxXevhcaKgHX36OWbZTRmG_oeelnbvEXyYrtQ89CnDgygDkH5vgUcsHQccVEewYA";
     public static final String REFRESH_TOKEN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdHJlbGluQG1haWwucnUiLCJpZCI6ImIwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMiIsImV4cCI6MTcxMTQ2ODg0Nn0.dyEnMlSVVqCBb5oQFHXngGmu2l6jgn2o7rKXyB0jypb0DWCyRzcUbNWyCfW7if4OHUILT4AW0sbMpIVvQEUlFA";
-    public static final String INCCORECT_TOKEN = "jsdksdjfhksjhf";
+    public static final String INCORRECT_TOKEN = "1fhgdfhfdghfghfhdf.2fghdfhdfhdfghfghgfhfghfgh.3.lkdkg;dlskg;sld;gdfkgl;kdf;lgd;fklg;dslkg;ldkg;";
     public static final String REFRESH_TOKEN_INCORRECT_SIGNATURE = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsImV4cCI6MTcxMTUyOTU3NX0.kVQbhEbEptpqx7Ps10Dfp-LvKVYf5RXabAWTnfK-AlBENalCFQ83pGQh8pYLqBqGLuIoxMuSa47G";
     public static final String TOKEN_ADMIN = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsImV4cCI6MTcxMTU1MDg2MH0.qIhXeHWNVXxdMcTF6sjac5pQd4Wp2nBpF3d_f67Izla99p3QsiaiNf3Yj5xQGvIyNPmQOWp8g0d1XTtUJuOgNQ";
-
 
     public static final UUID CREATED_BY_JOURNALIST = null;
     public static final UUID UPDATED_BY_JOURNALIST = null;
@@ -61,4 +60,11 @@ public class InitData {
     public static final String ROLE_NAME_SUBSCRIBER = "SUBSCRIBER";
 
     public static final PageRequest DEFAULT_PAGE_REQUEST_FOR_IT = PageRequest.of(0, 15);
+
+    public static final String SECRET_TEST = "73357638792F423F4528482B4D6251655468576D5A7133743677397A24432646";
+    public static final Long ACCESS_TEST = 1L;
+    public static final Long REFRESH_TEST = 1L;
+
+    public static final String URL_AUTH = "/api/v1/auth";
+    public static final String URL_USERS = "/api/v1/users";
 }

@@ -11,7 +11,7 @@ import com.solbeg.userservice.exception.InformationChangeStatusUserException;
 import com.solbeg.userservice.exception.NoSuchUserEmailException;
 import com.solbeg.userservice.exception.NotFoundException;
 import com.solbeg.userservice.exception.UniqueEmailException;
-import com.solbeg.userservice.mapper.UserMapper;
+import com.solbeg.userservice.mapper.UserMapperImpl;
 import com.solbeg.userservice.repository.RoleRepository;
 import com.solbeg.userservice.repository.UserRepository;
 import com.solbeg.userservice.security.jwt.JwtTokenProvider;
@@ -19,14 +19,14 @@ import com.solbeg.userservice.util.testdata.RoleTestData;
 import com.solbeg.userservice.util.testdata.UserTestData;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.TestConstructor;
 
 import java.util.List;
 import java.util.Optional;
@@ -55,7 +55,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(classes = {UserMapperImpl.class})
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class UserServiceImplTest {
 
     @InjectMocks
@@ -63,9 +64,6 @@ class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
-
-    @Mock
-    private UserMapper userMapper;
 
     @Mock
     private RoleRepository roleRepository;
@@ -254,7 +252,8 @@ class UserServiceImplTest {
             UserResponse expectedResponse = UserTestData.builder()
                     .build()
                     .getUserResponse();
-            when(userRepository.findById(id)).thenReturn(Optional.of(user));
+            when(userRepository.findById(id))
+                    .thenReturn(Optional.of(user));
 
             // when
             UserResponse actualResponse = userService.findUserById(id);
@@ -267,10 +266,8 @@ class UserServiceImplTest {
         void shouldReturnThrowExceptionWhenUserNotFound() {
             // given
             UUID userId = ID_JOURNALIST;
-            User user = UserTestData.builder()
-                    .build()
-                    .getUser();
-            when(userRepository.findById(userId)).thenReturn(Optional.empty());
+            when(userRepository.findById(userId))
+                    .thenReturn(Optional.empty());
 
             // when, then
             assertThatThrownBy(() -> userService.findUserById(userId))
@@ -288,7 +285,8 @@ class UserServiceImplTest {
             User expectedUser = UserTestData.builder()
                     .build()
                     .getUser();
-            when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(expectedUser));
+            when(userRepository.findByEmail(userEmail))
+                    .thenReturn(Optional.of(expectedUser));
 
             // when
             Optional<User> actualUser = userService.findByUserEmail(userEmail);
@@ -302,7 +300,8 @@ class UserServiceImplTest {
         void shouldReturnThrowExceptionWhenUserNotFound() {
             // given
             String userEmail = EMAIL_JOURNALIST;
-            when(userRepository.findByEmail(userEmail)).thenReturn(Optional.empty());
+            when(userRepository.findByEmail(userEmail))
+                    .thenReturn(Optional.empty());
 
             // when, then
             assertThatThrownBy(() -> userService.findByUserEmail(userEmail))
@@ -320,7 +319,8 @@ class UserServiceImplTest {
             User expectedUser = UserTestData.builder()
                     .build()
                     .getUser();
-            when(userRepository.findById(id)).thenReturn(Optional.ofNullable(expectedUser));
+            when(userRepository.findById(id))
+                    .thenReturn(Optional.ofNullable(expectedUser));
 
             // when
             User actualResponse = userService.findById(id);
@@ -363,8 +363,10 @@ class UserServiceImplTest {
             UserResponse expectedResponse = UserTestData.builder()
                     .build()
                     .getUserResponse();
-            when(userRepository.findById(userId)).thenReturn(Optional.of(userInDB));
-            when(userRepository.persist(userInDB)).thenReturn(updatedUser);
+            when(userRepository.findById(userId))
+                    .thenReturn(Optional.of(userInDB));
+            when(userRepository.persist(userInDB))
+                    .thenReturn(updatedUser);
 
             // when
             UserResponse actualResponse = userService.update(userId, updateRequest);
@@ -380,7 +382,8 @@ class UserServiceImplTest {
             UserUpdateRequest updateRequest = UserTestData.builder()
                     .build()
                     .getUserUpdateRequest();
-            when(userRepository.findById(userId)).thenReturn(Optional.empty());
+            when(userRepository.findById(userId))
+                    .thenReturn(Optional.empty());
 
             // when, then
             assertThatThrownBy(() -> userService.update(userId, updateRequest))
@@ -400,8 +403,10 @@ class UserServiceImplTest {
                     .build()
                     .getUser();
 
-            when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-            when(jwtTokenProvider.getIdInFormatUUID(token)).thenReturn(userId);
+            when(userRepository.findById(userId))
+                    .thenReturn(Optional.of(user));
+            when(jwtTokenProvider.getIdInFormatUUID(token))
+                    .thenReturn(userId);
 
             // when
             userService.deactivateUser(userId, token);
@@ -422,7 +427,8 @@ class UserServiceImplTest {
                     .build()
                     .getUser();
 
-            when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+            when(userRepository.findById(userId))
+                    .thenReturn(Optional.of(user));
 
             // when, then
             assertThatThrownBy(() -> userService.deactivateUser(userId, TOKEN_ADMIN))
@@ -433,7 +439,8 @@ class UserServiceImplTest {
         void shouldThrowExceptionWhenUserNotFound() {
             // given
             UUID userId = ID_ADMIN;
-            when(userRepository.findById(userId)).thenReturn(Optional.empty());
+            when(userRepository.findById(userId))
+                    .thenReturn(Optional.empty());
 
             // when, then
             assertThatThrownBy(() -> userService.deactivateUser(userId, TOKEN_ADMIN))
@@ -447,7 +454,7 @@ class UserServiceImplTest {
         @Test
         void shouldDeactivateUser() {
             // given
-            UUID userId = UUID.randomUUID();
+            UUID userId = ID_JOURNALIST;
             String token = REFRESH_TOKEN;
             User user = UserTestData.builder()
                     .build()
