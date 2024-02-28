@@ -66,8 +66,14 @@ public interface AuthOpenApi {
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
                                                 "exception": "NoSuchUserEmailException",
-                                                "error_message": "User with email sergey@google.com is not exist",
+                                                "error_message": "User with email sergey@google.com is not exist or not active.",
                                                 "error_code": "401 UNAUTHORIZED"
+                                            }
+                                    """))),
+                    @ApiResponse(responseCode = "401", description = "Not Authenticated User because the user with status not active.",
+                            content = @Content(mediaType = "application/json", examples = @ExampleObject("""
+                                            {
+                                                Unauthorized.
                                             }
                                     """)))
             }
