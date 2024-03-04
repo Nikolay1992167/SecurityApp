@@ -1,5 +1,0 @@
-{
-  "exception": "MethodArgumentNotValidException",
-  "error_message": "{email=must be a well-formed email address}",
-  "error_code": "409 CONFLICT"
-}

@@ -1,6 +1,9 @@
 package com.solbeg.userservice.security.jwt;
 
 import com.solbeg.userservice.entity.User;
+import com.solbeg.userservice.enums.Status;
+import com.solbeg.userservice.enums.error_response.ErrorMessage;
+import com.solbeg.userservice.exception.UserStatusException;
 import com.solbeg.userservice.service.UserService;
 import com.solbeg.userservice.util.testdata.UserTestData;
 import org.junit.jupiter.api.Test;
@@ -33,7 +36,7 @@ class JwtUserDetailsServiceTest {
         String emailUser = EMAIL_JOURNALIST;
         User user = UserTestData.builder()
                 .build()
-                .getUser();
+                .getJournalist();
         JwtUser expectedJwtUser = JwtUserFactory.create(user);
         when(userService.findByUserEmail(emailUser))
                 .thenReturn(Optional.of(user));
@@ -54,6 +57,22 @@ class JwtUserDetailsServiceTest {
 
         // when, then
         assertThatThrownBy(() -> jwtUserDetailsService.loadUserByUsername(emailUser))
-                .isInstanceOf(UsernameNotFoundException.class);
+                .isInstanceOf(UsernameNotFoundException.class)
+                .hasMessageContaining(ErrorMessage.USER_NOT_FOUND.getMessage() + emailUser);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenStatusNotActiv() {
+        // given
+        User user = UserTestData.builder()
+                .withStatus(Status.NOT_ACTIVE)
+                .build()
+                .getJournalist();
+        when(userService.findByUserEmail(user.getEmail())).thenReturn(Optional.of(user));
+
+        // when, then
+        assertThatThrownBy(() -> jwtUserDetailsService.loadUserByUsername(user.getEmail()))
+                .isInstanceOf(UserStatusException.class)
+                .hasMessage(ErrorMessage.USER_NOT_ACTIVE.getMessage());
     }
 }

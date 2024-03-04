@@ -7,6 +7,7 @@ import com.solbeg.userservice.dto.response.UserResponse;
 import com.solbeg.userservice.entity.Role;
 import com.solbeg.userservice.entity.User;
 import com.solbeg.userservice.enums.Status;
+import com.solbeg.userservice.enums.error_response.ErrorMessage;
 import com.solbeg.userservice.exception.InformationChangeStatusUserException;
 import com.solbeg.userservice.exception.NoSuchUserEmailException;
 import com.solbeg.userservice.exception.NotFoundException;
@@ -15,7 +16,6 @@ import com.solbeg.userservice.mapper.UserMapperImpl;
 import com.solbeg.userservice.repository.RoleRepository;
 import com.solbeg.userservice.repository.UserRepository;
 import com.solbeg.userservice.security.jwt.JwtTokenProvider;
-import com.solbeg.userservice.util.testdata.RoleTestData;
 import com.solbeg.userservice.util.testdata.UserTestData;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -32,22 +32,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.solbeg.userservice.util.initdata.InitData.CREATED_AT_SUBSCRIBER;
-import static com.solbeg.userservice.util.initdata.InitData.CREATED_BY_SUBSCRIBER;
 import static com.solbeg.userservice.util.initdata.InitData.DEFAULT_PAGE_REQUEST_FOR_IT;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_JOURNALIST;
-import static com.solbeg.userservice.util.initdata.InitData.EMAIL_SUBSCRIBER;
 import static com.solbeg.userservice.util.initdata.InitData.ID_ADMIN;
 import static com.solbeg.userservice.util.initdata.InitData.ID_JOURNALIST;
-import static com.solbeg.userservice.util.initdata.InitData.ID_SUBSCRIBER;
-import static com.solbeg.userservice.util.initdata.InitData.PASSWORD_SUBSCRIBER;
 import static com.solbeg.userservice.util.initdata.InitData.REFRESH_TOKEN;
-import static com.solbeg.userservice.util.initdata.InitData.ROLE_NAME_SUBSCRIBER;
-import static com.solbeg.userservice.util.initdata.InitData.SUBSCRIBER_FIRST_NAME;
-import static com.solbeg.userservice.util.initdata.InitData.SUBSCRIBER_LAST_NAME;
 import static com.solbeg.userservice.util.initdata.InitData.TOKEN_ADMIN;
-import static com.solbeg.userservice.util.initdata.InitData.UPDATED_AT_SUBSCRIBER;
-import static com.solbeg.userservice.util.initdata.InitData.UPDATED_BY_SUBSCRIBER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -82,13 +72,13 @@ class UserServiceImplTest {
             // given
             UserRegisterRequest registerRequest = UserTestData.builder()
                     .build()
-                    .getUserRegisterRequest();
+                    .getRegisterRequestJournalist();
             User savedUser = UserTestData.builder()
                     .build()
-                    .getUser();
+                    .getJournalist();
             UserRegisterResponse expectedResponse = UserTestData.builder()
                     .build()
-                    .getUserRegisterResponse();
+                    .getRegisterResponseJournalist();
             when(userRepository.persist(any(User.class)))
                     .thenReturn(savedUser);
 
@@ -104,103 +94,61 @@ class UserServiceImplTest {
             // given
             UserRegisterRequest registerRequest = UserTestData.builder()
                     .build()
-                    .getUserRegisterRequest();
+                    .getRegisterRequestJournalist();
             User user = UserTestData.builder()
                     .build()
-                    .getUser();
+                    .getJournalist();
             when(userRepository.findByEmail(registerRequest.getEmail()))
                     .thenReturn(Optional.of(user));
 
             // when, then
             assertThatThrownBy(() -> userService.registerJournalist(registerRequest))
-                    .isInstanceOf(UniqueEmailException.class);
+                    .isInstanceOf(UniqueEmailException.class)
+                    .hasMessageContaining(ErrorMessage.UNIQUE_USER_EMAIL.getMessage() + registerRequest.getEmail());
         }
     }
 
     @Nested
     class RegisterSubscriber {
+    }
 
-        @Test
-        void shouldReturnExpectedUserRegisterResponse() {
-            // given
-            UserRegisterRequest registerRequest = UserTestData.builder()
-                    .withFirstName(SUBSCRIBER_FIRST_NAME)
-                    .withLastName(SUBSCRIBER_LAST_NAME)
-                    .withEmail(EMAIL_SUBSCRIBER)
-                    .withPassword(PASSWORD_SUBSCRIBER)
-                    .build()
-                    .getUserRegisterRequest();
-            User savedUser = UserTestData.builder()
-                    .withId(ID_SUBSCRIBER)
-                    .withCreatedBy(CREATED_BY_SUBSCRIBER)
-                    .withUpdatedBy(UPDATED_BY_SUBSCRIBER)
-                    .withCreatedAt(CREATED_AT_SUBSCRIBER)
-                    .withUpdatedAt(UPDATED_AT_SUBSCRIBER)
-                    .withFirstName(SUBSCRIBER_FIRST_NAME)
-                    .withLastName(SUBSCRIBER_LAST_NAME)
-                    .withEmail(EMAIL_SUBSCRIBER)
-                    .withPassword(PASSWORD_SUBSCRIBER)
-                    .withStatus(Status.ACTIVE)
-                    .withRolesUser(List.of(RoleTestData.builder()
-                            .withName(ROLE_NAME_SUBSCRIBER)
-                            .build()
-                            .getEntity()))
-                    .build()
-                    .getUser();
-            UserRegisterResponse expectedResponse = UserTestData.builder()
-                    .withId(ID_SUBSCRIBER)
-                    .withFirstName(SUBSCRIBER_FIRST_NAME)
-                    .withLastName(SUBSCRIBER_LAST_NAME)
-                    .withPassword(PASSWORD_SUBSCRIBER)
-                    .withEmail(EMAIL_SUBSCRIBER)
-                    .withRoles(List.of(ROLE_NAME_SUBSCRIBER))
-                    .withStatus(Status.ACTIVE)
-                    .build()
-                    .getUserRegisterResponse();
-            when(userRepository.persist(any(User.class)))
-                    .thenReturn(savedUser);
+    @Test
+    void shouldReturnExpectedUserRegisterResponse() {
+        // given
+        UserRegisterRequest registerRequest = UserTestData.builder()
+                .build()
+                .getRegisterRequestSubscriber();
+        User savedUser = UserTestData.builder()
+                .build().getSubscriber();
+        UserRegisterResponse expectedResponse = UserTestData.builder()
+                .build()
+                .getRegisterResponseSubscriber();
+        when(userRepository.persist(any(User.class)))
+                .thenReturn(savedUser);
 
-            // when
-            UserRegisterResponse actualResponse = userService.registerSubscriber(registerRequest);
+        // when
+        UserRegisterResponse actualResponse = userService.registerSubscriber(registerRequest);
 
-            // then
-            assertThat(actualResponse).isEqualTo(expectedResponse);
-        }
+        // then
+        assertThat(actualResponse).isEqualTo(expectedResponse);
+    }
 
-        @Test
-        void shouldReturnThrowExceptionWhenEmailIsNotFound() {
-            // given
-            UserRegisterRequest registerRequest = UserTestData.builder()
-                    .withFirstName(SUBSCRIBER_FIRST_NAME)
-                    .withLastName(SUBSCRIBER_LAST_NAME)
-                    .withEmail(EMAIL_SUBSCRIBER)
-                    .withPassword(PASSWORD_SUBSCRIBER)
-                    .build()
-                    .getUserRegisterRequest();
-            User user = UserTestData.builder()
-                    .withId(ID_SUBSCRIBER)
-                    .withCreatedBy(CREATED_BY_SUBSCRIBER)
-                    .withUpdatedBy(UPDATED_BY_SUBSCRIBER)
-                    .withCreatedAt(CREATED_AT_SUBSCRIBER)
-                    .withUpdatedAt(UPDATED_AT_SUBSCRIBER)
-                    .withFirstName(SUBSCRIBER_FIRST_NAME)
-                    .withLastName(SUBSCRIBER_LAST_NAME)
-                    .withEmail(EMAIL_SUBSCRIBER)
-                    .withPassword(PASSWORD_SUBSCRIBER)
-                    .withStatus(Status.ACTIVE)
-                    .withRolesUser(List.of(RoleTestData.builder()
-                            .withName(ROLE_NAME_SUBSCRIBER)
-                            .build()
-                            .getEntity()))
-                    .build()
-                    .getUser();
-            when(userRepository.findByEmail(registerRequest.getEmail()))
-                    .thenReturn(Optional.of(user));
+    @Test
+    void shouldReturnThrowExceptionWhenEmailIsNotFound() {
+        // given
+        UserRegisterRequest registerRequest = UserTestData.builder()
+                .build()
+                .getRegisterRequestSubscriber();
+        User user = UserTestData.builder()
+                .build()
+                .getSubscriber();
+        when(userRepository.findByEmail(registerRequest.getEmail()))
+                .thenReturn(Optional.of(user));
 
-            // when, then
-            assertThatThrownBy(() -> userService.registerSubscriber(registerRequest))
-                    .isInstanceOf(UniqueEmailException.class);
-        }
+        // when, then
+        assertThatThrownBy(() -> userService.registerSubscriber(registerRequest))
+                .isInstanceOf(UniqueEmailException.class)
+                .hasMessageContaining(ErrorMessage.UNIQUE_USER_EMAIL.getMessage() + registerRequest.getEmail());
     }
 
     @Nested
@@ -212,7 +160,7 @@ class UserServiceImplTest {
             int expectedSize = 1;
             List<User> usersList = List.of(UserTestData.builder()
                     .build()
-                    .getUser());
+                    .getJournalist());
             Page<User> page = new PageImpl<>(usersList);
             when(userRepository.findAll(any(PageRequest.class)))
                     .thenReturn(page);
@@ -248,7 +196,7 @@ class UserServiceImplTest {
             UUID id = ID_JOURNALIST;
             User user = UserTestData.builder()
                     .build()
-                    .getUser();
+                    .getJournalist();
             UserResponse expectedResponse = UserTestData.builder()
                     .build()
                     .getUserResponse();
@@ -271,7 +219,8 @@ class UserServiceImplTest {
 
             // when, then
             assertThatThrownBy(() -> userService.findUserById(userId))
-                    .isInstanceOf(NotFoundException.class);
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessageContaining(ErrorMessage.USER_NOT_FOUND.getMessage() + userId);
         }
     }
 
@@ -284,7 +233,7 @@ class UserServiceImplTest {
             String userEmail = EMAIL_JOURNALIST;
             User expectedUser = UserTestData.builder()
                     .build()
-                    .getUser();
+                    .getJournalist();
             when(userRepository.findByEmail(userEmail))
                     .thenReturn(Optional.of(expectedUser));
 
@@ -305,7 +254,8 @@ class UserServiceImplTest {
 
             // when, then
             assertThatThrownBy(() -> userService.findByUserEmail(userEmail))
-                    .isInstanceOf(NoSuchUserEmailException.class);
+                    .isInstanceOf(NoSuchUserEmailException.class)
+                    .hasMessageContaining(ErrorMessage.USER_NOT_EXIST.getMessage() + userEmail);
         }
     }
 
@@ -318,7 +268,7 @@ class UserServiceImplTest {
             UUID id = ID_JOURNALIST;
             User expectedUser = UserTestData.builder()
                     .build()
-                    .getUser();
+                    .getJournalist();
             when(userRepository.findById(id))
                     .thenReturn(Optional.ofNullable(expectedUser));
 
@@ -335,12 +285,13 @@ class UserServiceImplTest {
             UUID userId = ID_JOURNALIST;
             User user = UserTestData.builder()
                     .build()
-                    .getUser();
+                    .getJournalist();
             when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
             // when, then
             assertThatThrownBy(() -> userService.findById(userId))
-                    .isInstanceOf(NotFoundException.class);
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessageContaining(ErrorMessage.USER_NOT_FOUND.getMessage() + userId);
         }
     }
 
@@ -356,10 +307,10 @@ class UserServiceImplTest {
                     .getUserUpdateRequest();
             User userInDB = UserTestData.builder()
                     .build()
-                    .getUser();
+                    .getJournalist();
             User updatedUser = UserTestData.builder()
                     .build()
-                    .getUser();
+                    .getJournalist();
             UserResponse expectedResponse = UserTestData.builder()
                     .build()
                     .getUserResponse();
@@ -387,7 +338,8 @@ class UserServiceImplTest {
 
             // when, then
             assertThatThrownBy(() -> userService.update(userId, updateRequest))
-                    .isInstanceOf(NotFoundException.class);
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessageContaining(ErrorMessage.USER_NOT_FOUND.getMessage() + userId);
         }
     }
 
@@ -397,11 +349,11 @@ class UserServiceImplTest {
         @Test
         void shouldDeactivateUser() {
             // given
-            UUID userId = UUID.randomUUID();
+            UUID userId = ID_JOURNALIST;
             String token = REFRESH_TOKEN;
             User user = UserTestData.builder()
                     .build()
-                    .getUser();
+                    .getJournalist();
 
             when(userRepository.findById(userId))
                     .thenReturn(Optional.of(user));
@@ -425,7 +377,7 @@ class UserServiceImplTest {
             User user = UserTestData.builder()
                     .withRolesUser(List.of(adminRole))
                     .build()
-                    .getUser();
+                    .getJournalist();
 
             when(userRepository.findById(userId))
                     .thenReturn(Optional.of(user));
@@ -444,7 +396,8 @@ class UserServiceImplTest {
 
             // when, then
             assertThatThrownBy(() -> userService.deactivateUser(userId, TOKEN_ADMIN))
-                    .isInstanceOf(NotFoundException.class);
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessageContaining(ErrorMessage.USER_NOT_FOUND.getMessage() + userId);
         }
     }
 
@@ -458,7 +411,7 @@ class UserServiceImplTest {
             String token = REFRESH_TOKEN;
             User user = UserTestData.builder()
                     .build()
-                    .getUser();
+                    .getJournalist();
 
             when(userRepository.findById(userId)).thenReturn(Optional.of(user));
             when(jwtTokenProvider.getIdInFormatUUID(token)).thenReturn(userId);

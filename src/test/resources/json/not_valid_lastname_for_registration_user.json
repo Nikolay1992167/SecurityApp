@@ -1,5 +1,0 @@
-{
-  "exception": "MethodArgumentNotValidException",
-  "error_message": "{lastName=size must be between 2 and 50}",
-  "error_code": "409 CONFLICT"
-}

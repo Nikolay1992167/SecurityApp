@@ -1,8 +1,10 @@
 package com.solbeg.userservice.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.solbeg.userservice.exception.model.IncorrectData;
 import com.solbeg.userservice.security.jwt.JwtTokenFilter;
 import com.solbeg.userservice.security.jwt.JwtTokenProvider;
+import com.solbeg.userservice.security.jwt.JwtUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +22,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.time.LocalDateTime;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -28,6 +32,9 @@ public class ApplicationConfig {
 
     private final JwtTokenProvider tokenProvider;
     private final ObjectMapper objectMapper;
+    private final JwtUserDetailsService userDetailsService;
+    private final JwtTokenFilter jwtTokenFilter;
+    private final ObjectMapper mapper;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -42,7 +49,6 @@ public class ApplicationConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity.csrf(AbstractHttpConfigurer::disable)
-
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers(
                                 "/api/v1/auth/**",
@@ -51,13 +57,19 @@ public class ApplicationConfig {
                         .permitAll()
                         .anyRequest()
                         .authenticated())
-                .exceptionHandling(exception -> exception.authenticationEntryPoint((request, response, authException) -> {
-                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                    response.getWriter().write("Unauthorized.");
-                }))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) ->
+                        jwtTokenFilter.handleException(response, authException))
+                        .accessDeniedHandler((request, response, authException) -> {
+                            int status = HttpStatus.FORBIDDEN.value();
+                            response.setCharacterEncoding("utf-8");
+                            response.setStatus(status);
+                            response.getWriter()
+                                    .write(mapper.writeValueAsString(new IncorrectData(LocalDateTime.now(), authException.getMessage(), status)));
+                        }))
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new JwtTokenFilter(tokenProvider, objectMapper), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtTokenFilter(tokenProvider, objectMapper, userDetailsService), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 }

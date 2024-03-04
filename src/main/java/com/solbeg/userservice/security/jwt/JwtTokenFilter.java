@@ -1,13 +1,11 @@
 package com.solbeg.userservice.security.jwt;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.solbeg.userservice.exception.NoSuchUserEmailException;
 import com.solbeg.userservice.exception.model.IncorrectData;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,37 +14,52 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
+import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.security.sasl.AuthenticationException;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class JwtTokenFilter extends GenericFilterBean {
+public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
+    private final JwtUserDetailsService userDetailsService;
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
         try {
-            String bearerToken = ((HttpServletRequest) servletRequest).getHeader("Authorization");
-            if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-                bearerToken = bearerToken.substring(7);
+            String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+            String jwt;
+            String userEmail;
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                filterChain.doFilter(request, response);
+                return;
             }
-            if (bearerToken != null && jwtTokenProvider.validateToken(bearerToken)) {
-                Authentication authentication = jwtTokenProvider.getAuthentication(bearerToken);
-                if (authentication != null) {
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+            jwt = authHeader.substring(7);
+            userEmail = jwtTokenProvider.getUsername(jwt);
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
+                if (Boolean.TRUE.equals(jwtTokenProvider.validateToken(jwt))) {
+                    UsernamePasswordAuthenticationToken authenticationToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
             }
-            filterChain.doFilter(servletRequest, servletResponse);
-        } catch (JwtException | AuthenticationException e) {
-            handleException((HttpServletResponse) servletResponse, e);
+            filterChain.doFilter(request, response);
+        } catch (JwtException | AuthenticationException | NoSuchUserEmailException e) {
+            handleException(response, e);
         }
     }
 
@@ -55,9 +68,9 @@ public class JwtTokenFilter extends GenericFilterBean {
         response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
         response.setCharacterEncoding("utf-8");
         IncorrectData incorrectData = new IncorrectData(
-                exception.getClass().getSimpleName(),
+                LocalDateTime.now(),
                 exception.getMessage(),
-                HttpStatus.UNAUTHORIZED.toString());
+                HttpStatus.UNAUTHORIZED.value());
         String responseMessage = objectMapper.writeValueAsString(incorrectData);
         log.error(incorrectData.toString());
         response.getWriter().write(responseMessage);
