@@ -1,5 +1,0 @@
-{
-  "exception": "SignatureException",
-  "error_message": "JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.",
-  "error_code": "500 INTERNAL_SERVER_ERROR"
-}

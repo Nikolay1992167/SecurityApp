@@ -46,34 +46,37 @@ public interface AuthOpenApi {
                                             {
                                                 "id": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
                                                 "email": "ivan@google.com",
-                                                "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsInJvbGVzIjpbIkFETUlOIl0sImV4cCI6MTcwOTA3NTcyOX0.qBkGro_Bz-hLMniW__5OzVuGjgqfdNfPQ8_YHGHuIUQ4jfjnLttC5T6u-QsovcN2ViIuJ2PtHYrrm-mZOlZVPg",
-                                                "refreshToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsImV4cCI6MTcxMTY2NDEyOX0.IycHdxvvWqEMsPU5LXXzENgiSG5hDrLuexBrMAKGs-mPwoyOYz6-rcCpELMd6jGukBxGi33Id_KT7bfQGe1h7w"
+                                                "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsInJvbGVzIjpbIkFETUlOIl0sImV4cCI6MTcwOTQ4MTQ5NH0.iTsgestQ0Udfll9RmVwHVRam-MLqrZ9qWWaruJsad7uAzs-Id9DFONSA3bGLoQXRQE5BzLeKnsNB5T6PIqYGWg",
+                                                "refreshToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsImV4cCI6MTcxMjA2OTg5NH0.Bype1oc2qs72GVRqCP3cuZ__MmT0kZvjZog6djxD-UO0eCPe-wdY2Pak-_SmvH3tDM6o8jqb9uMGuJ07M7gA0Q"
                                             }
                                             """)
                             )
                     ),
-                    @ApiResponse(responseCode = "409", description = "The endpoint has not been completed when an invalid email is entered.",
+                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed when an invalid email is entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "MethodArgumentNotValidException",
+                                                "timestamp": "2024-03-03T17:58:39.1950805",
                                                 "error_message": "{email=должно иметь формат адреса электронной почты}",
-                                                "error_code": "409 CONFLICT"
+                                                "error_status": 400
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User because the user with this email does not exist.",
+                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed because the user with this email does not exist.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "NoSuchUserEmailException",
-                                                "error_message": "User with email sergey@google.com is not exist or not active.",
-                                                "error_code": "401 UNAUTHORIZED"
+                                                "timestamp": "2024-03-03T18:00:37.0128514",
+                                                "error_message": "User is not exist with grom@google.com",
+                                                "error_status": 400
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User because the user with status not active.",
-                            content = @Content(mediaType = "application/json", examples = @ExampleObject("""
+                    @ApiResponse(responseCode = "401", description = "The endpoint has not been completed because the user with status not active.",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                Unauthorized.
+                                                "timestamp": "2024-03-03T18:04:10.6152098",
+                                                "error_message": "User is not active!",
+                                                "error_status": 401
                                             }
                                     """)))
             }
@@ -108,15 +111,15 @@ public interface AuthOpenApi {
                                     schema = @Schema(implementation = UserRegisterResponse.class),
                                     examples = @ExampleObject("""
                                             {
-                                                "id": "41d96d57-21c6-4e8e-87b4-f43cc1db778e",
+                                                "id": "6fb84089-80d5-40a6-a33e-f1ecf0c2cf95",
                                                 "firstName": "Pasha",
-                                                "lastName": "Grom",
-                                                "password": "$2a$10$3YUCNK8WXGb3z3JL16nwPuN.zH2ZnRoUbcv1xZNOHpe6UPxyPGPqO",
-                                                "email": "grom@grom.com",
+                                                "lastName": "Gromov",
+                                                "password": "$2a$10$Vc6cGda9YXePlti3OI/.6OzQx8a39cPajFSpH4Hhr8g6lCposgX5.",
+                                                "email": "gromov@google.com",
                                                 "roles": [
                                                     "JOURNALIST"
                                                 ],
-                                                "status": "ACTIVE"
+                                                "status": "NOT_ACTIVE"
                                             }
                                             """)
                             )
@@ -125,27 +128,27 @@ public interface AuthOpenApi {
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "UniqueEmailException",
-                                                "error_message": "Email grom@grom.com is occupied! Another user is already registered by this email!",
-                                                "error_code": "406 NOT_ACCEPTABLE"
+                                                "timestamp": "2024-03-03T18:06:30.1734508",
+                                                "error_message": "Email is occupied! Another user is already registered by this gromov@google.com",
+                                                "error_status": 406
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "409", description = "The endpoint has not been completed because an status is wrong.",
+                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed because an status is wrong.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "HttpMessageNotReadableException",
+                                                "timestamp": "2024-03-03T18:09:13.5697486",
                                                 "error_message": "Specify the correct status!",
-                                                "error_code": "409 CONFLICT"
+                                                "error_status": 400
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "409", description = "The endpoint has not been completed because the request arguments are not validated.",
+                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed because the request arguments are not validated.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "MethodArgumentNotValidException",
-                                                "error_message": "{firstName=размер должен находиться в диапазоне от 2 до 40, lastName=размер должен находиться в диапазоне от 2 до 50, email=должно иметь формат адреса электронной почты}",
-                                                "error_code": "409 CONFLICT"
+                                                "timestamp": "2024-03-03T18:10:22.8635364",
+                                                "error_message": "{firstName=размер должен находиться в диапазоне от 2 до 40, email=должно иметь формат адреса электронной почты, lastName=размер должен находиться в диапазоне от 2 до 50}",
+                                                "error_status": 400
                                             }
                                     """)))
             }
@@ -197,27 +200,27 @@ public interface AuthOpenApi {
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "UniqueEmailException",
-                                                "error_message": "Email dron@mail.ru is occupied! Another user is already registered by this email!",
-                                                "error_code": "406 NOT_ACCEPTABLE"
+                                                "timestamp": "2024-03-03T18:11:58.3443861",
+                                                "error_message": "Email is occupied! Another user is already registered by this popova@email.com",
+                                                "error_status": 406
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "409", description = "The endpoint has not been completed because an status is wrong.",
+                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed because an status is wrong.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "HttpMessageNotReadableException",
+                                                "timestamp": "2024-03-03T18:12:36.3800917",
                                                 "error_message": "Specify the correct status!",
-                                                "error_code": "409 CONFLICT"
+                                                "error_status": 400
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "409", description = "The endpoint has not been completed because the request arguments are not validated.",
+                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed because the request arguments are not validated.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "MethodArgumentNotValidException",
+                                                "timestamp": "2024-03-03T18:13:14.5884612",
                                                 "error_message": "{firstName=размер должен находиться в диапазоне от 2 до 40, lastName=размер должен находиться в диапазоне от 2 до 50, email=должно иметь формат адреса электронной почты}",
-                                                "error_code": "409 CONFLICT"
+                                                "error_status": 400
                                             }
                                     """)))
             }
@@ -256,17 +259,22 @@ public interface AuthOpenApi {
                                             """)
                             )
                     ),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not active.",
-                            content = @Content(mediaType = "application/json", examples = @ExampleObject("""
-                                    Unauthorized.
+                    @ApiResponse(responseCode = "401", description = "The endpoint has not been completed because the token is not active.",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
+                                    {
+                                        "timestamp": "2024-03-04T01:33:11.6330552",
+                                        "error_message": "Full authentication is required to access this resource",
+                                        "error_status": 401
+                                    }
                                     """))),
-                    @ApiResponse(responseCode = "409", description = "The endpoint has not been completed because the token is not valid.",
+                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed because the token is not valid.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "MethodArgumentNotValidException",
+                                                "timestamp": "2024-03-04T01:55:32.2846064",
                                                 "error_message": "{refreshToken=должно соответствовать \\"^[a-zA-Z0-9_-]+\\\\.[a-zA-Z0-9_-]+\\\\.[a-zA-Z0-9_-]+$\\"}",
-                                                "error_code": "409 CONFLICT"
+                                                "error_status": 400
                                             }
                                     """)))
             }

@@ -20,15 +20,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_INCORRECT;
-import static com.solbeg.userservice.util.initdata.InitData.EMAIL_SUBSCRIBER;
 import static com.solbeg.userservice.util.initdata.InitData.FIRST_NAME_INCORRECT;
 import static com.solbeg.userservice.util.initdata.InitData.LAST_NAME_INCORRECT;
 import static com.solbeg.userservice.util.initdata.InitData.PASSWORD_INCORRECT;
-import static com.solbeg.userservice.util.initdata.InitData.PASSWORD_SUBSCRIBER;
 import static com.solbeg.userservice.util.initdata.InitData.REFRESH_TOKEN;
-import static com.solbeg.userservice.util.initdata.InitData.SUBSCRIBER_FIRST_NAME;
-import static com.solbeg.userservice.util.initdata.InitData.SUBSCRIBER_LAST_NAME;
-import static com.solbeg.userservice.util.initdata.InitData.SUBSCRIBER_LIST_OF_ROLES;
 import static com.solbeg.userservice.util.initdata.InitData.URL_AUTH;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -83,38 +78,38 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
         }
 
         @Test
-        void shouldReturnThrowExceptionAndStatus409() throws Exception {
+        void shouldReturnThrowExceptionAndStatus400WhenEmailIncorrect() throws Exception {
             // given
             JwtRequest request = JwtData.builder()
                     .withEmail(EMAIL_INCORRECT)
                     .build()
                     .getJwtRequest();
-            String json = UserJsonSupplier.getPatternEmailErrorResponse();
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/authenticate")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isConflict())
-                    .andExpect(content().json(json));
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.error_message").value("{email=must be a well-formed email address}"));
         }
 
 //        @Test
-//        void shouldReturnThrowExceptionAndStatus401() throws Exception {
+//        void shouldReturnThrowExceptionAndStatus400WhenEmailNotExist() throws Exception {
 //            // given
 //            JwtRequest request = JwtData.builder()
 //                    .withEmail(EMAIL_NOT_EXIST)
-//                    .withPassword(PASSWORD_JOURNALIST)
 //                    .build()
 //                    .getJwtRequest();
-//            String json = UserJsonSupplier.getNotFoundUserWithEmailResponse();
+//
+//            when(userService.findByUserEmail(request.getEmail()))
+//                    .thenThrow(NoSuchUserEmailException.class);
 //
 //            // when, then
 //            mockMvc.perform(post(URL_AUTH + "/authenticate")
 //                            .contentType(MediaType.APPLICATION_JSON)
 //                            .content(objectMapper.writeValueAsString(request)))
-//                    .andExpect(status().isUnauthorized())
-//                    .andExpect(content().json(json));
+//                    .andExpect(status().isBadRequest())
+//                    .andExpect(jsonPath("$.error_message").value("User is not exist with grom@google.com"));
 //        }
     }
 
@@ -126,10 +121,10 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
             // given
             UserRegisterRequest request = UserTestData.builder()
                     .build()
-                    .getUserRegisterRequest();
+                    .getRegisterRequestJournalist();
             UserRegisterResponse response = UserTestData.builder()
                     .build()
-                    .getUserRegisterResponse();
+                    .getRegisterResponseJournalist();
 
             when(userService.registerJournalist(request))
                     .thenReturn(response);
@@ -152,85 +147,80 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
         }
 
         @Test
-        void shouldReturnReturnThrowExceptionAndStatus409WithNotValidFirstName() throws Exception {
+        void shouldReturnReturnThrowExceptionAndStatus400WithNotValidFirstName() throws Exception {
             // given
             UserRegisterRequest request = UserTestData.builder()
                     .withFirstName(FIRST_NAME_INCORRECT)
                     .build()
-                    .getUserRegisterRequest();
-            String json = UserJsonSupplier.getNotValidFirstNameForRegistrationUser();
+                    .getRegisterRequestJournalist();
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/registerjournalist")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isConflict())
-                    .andExpect(content().json(json));
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.error_message").value("{firstName=size must be between 2 and 40}"));
         }
 
         @Test
-        void shouldReturnReturnThrowExceptionAndStatus409WithNotValidLastName() throws Exception {
+        void shouldReturnReturnThrowExceptionAndStatus400WithNotValidLastName() throws Exception {
             // given
             UserRegisterRequest request = UserTestData.builder()
                     .withLastName(LAST_NAME_INCORRECT)
                     .build()
-                    .getUserRegisterRequest();
-            String json = UserJsonSupplier.getNotValidLastNameForRegistrationUser();
+                    .getRegisterRequestJournalist();
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/registerjournalist")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isConflict())
-                    .andExpect(content().json(json));
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.error_message").value("{lastName=size must be between 2 and 50}"));
         }
 
         @Test
-        void shouldReturnReturnThrowExceptionAndStatus409WithNotValidPassword() throws Exception {
+        void shouldReturnReturnThrowExceptionAndStatus400WithNotValidPassword() throws Exception {
             // given
             UserRegisterRequest request = UserTestData.builder()
                     .withPassword(PASSWORD_INCORRECT)
                     .build()
-                    .getUserRegisterRequest();
-            String json = UserJsonSupplier.getNotValidPasswordForRegistrationUser();
+                    .getRegisterRequestJournalist();
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/registerjournalist")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isConflict())
-                    .andExpect(content().json(json));
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.error_message").value("{password=size must be between 3 and 100}"));
         }
 
         @Test
-        void shouldReturnReturnThrowExceptionAndStatus409WithNotValidEmail() throws Exception {
+        void shouldReturnReturnThrowExceptionAndStatus400WithNotValidEmail() throws Exception {
             // given
             UserRegisterRequest request = UserTestData.builder()
                     .withEmail(EMAIL_INCORRECT)
                     .build()
-                    .getUserRegisterRequest();
-            String json = UserJsonSupplier.getNotValidEmailForRegistrationUser();
+                    .getRegisterRequestJournalist();
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/registerjournalist")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isConflict())
-                    .andExpect(content().json(json));
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.error_message").value("{email=must be a well-formed email address}"));
         }
 
         @Test
-        void shouldReturnReturnThrowExceptionAndStatus409WithNotValidStatus() throws Exception {
+        void shouldReturnReturnThrowExceptionAndStatus400WithNotValidStatus() throws Exception {
             // given
             String request = UserJsonSupplier.getRequestJsonWithNotValidStatusForRegistrationUser();
-            String json = UserJsonSupplier.getNotValidStatusForRegistrationUser();
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/registerjournalist")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isConflict())
-                    .andExpect(content().json(json));
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.error_message").value("Specify the correct status!"));
         }
     }
 
@@ -241,20 +231,11 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
         void shouldReturnExpectedJsonAndStatus201() throws Exception {
             // given
             UserRegisterRequest request = UserTestData.builder()
-                    .withFirstName(SUBSCRIBER_FIRST_NAME)
-                    .withLastName(SUBSCRIBER_LAST_NAME)
-                    .withEmail(EMAIL_SUBSCRIBER)
-                    .withPassword(PASSWORD_SUBSCRIBER)
                     .build()
-                    .getUserRegisterRequest();
+                    .getRegisterRequestSubscriber();
             UserRegisterResponse response = UserTestData.builder()
-                    .withFirstName(SUBSCRIBER_FIRST_NAME)
-                    .withLastName(SUBSCRIBER_LAST_NAME)
-                    .withEmail(EMAIL_SUBSCRIBER)
-                    .withPassword(PASSWORD_SUBSCRIBER)
-                    .withRoles(SUBSCRIBER_LIST_OF_ROLES)
                     .build()
-                    .getUserRegisterResponse();
+                    .getRegisterResponseSubscriber();
 
             when(userService.registerSubscriber(request))
                     .thenReturn(response);
@@ -277,85 +258,80 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
         }
 
         @Test
-        void shouldReturnReturnThrowExceptionAndStatus409WithNotValidFirstName() throws Exception {
+        void shouldReturnReturnThrowExceptionAndStatus400WithNotValidFirstName() throws Exception {
             // given
             UserRegisterRequest request = UserTestData.builder()
                     .withFirstName(FIRST_NAME_INCORRECT)
                     .build()
-                    .getUserRegisterRequest();
-            String json = UserJsonSupplier.getNotValidFirstNameForRegistrationUser();
+                    .getRegisterRequestJournalist();
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/registersubscriber")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isConflict())
-                    .andExpect(content().json(json));
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.error_message").value("{firstName=size must be between 2 and 40}"));
         }
 
         @Test
-        void shouldReturnReturnThrowExceptionAndStatus409WithNotValidLastName() throws Exception {
+        void shouldReturnReturnThrowExceptionAndStatus400WithNotValidLastName() throws Exception {
             // given
             UserRegisterRequest request = UserTestData.builder()
                     .withLastName(LAST_NAME_INCORRECT)
                     .build()
-                    .getUserRegisterRequest();
-            String json = UserJsonSupplier.getNotValidLastNameForRegistrationUser();
+                    .getRegisterRequestJournalist();
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/registersubscriber")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isConflict())
-                    .andExpect(content().json(json));
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.error_message").value("{lastName=size must be between 2 and 50}"));
         }
 
         @Test
-        void shouldReturnReturnThrowExceptionAndStatus409WithNotValidPassword() throws Exception {
+        void shouldReturnReturnThrowExceptionAndStatus400WithNotValidPassword() throws Exception {
             // given
             UserRegisterRequest request = UserTestData.builder()
                     .withPassword(PASSWORD_INCORRECT)
                     .build()
-                    .getUserRegisterRequest();
-            String json = UserJsonSupplier.getNotValidPasswordForRegistrationUser();
+                    .getRegisterRequestJournalist();
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/registersubscriber")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isConflict())
-                    .andExpect(content().json(json));
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.error_message").value("{password=size must be between 3 and 100}"));
         }
 
         @Test
-        void shouldReturnReturnThrowExceptionAndStatus409WithNotValidEmail() throws Exception {
+        void shouldReturnReturnThrowExceptionAndStatus400WithNotValidEmail() throws Exception {
             // given
             UserRegisterRequest request = UserTestData.builder()
                     .withEmail(EMAIL_INCORRECT)
                     .build()
-                    .getUserRegisterRequest();
-            String json = UserJsonSupplier.getNotValidEmailForRegistrationUser();
+                    .getRegisterRequestJournalist();
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/registersubscriber")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isConflict())
-                    .andExpect(content().json(json));
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.error_message").value("{email=must be a well-formed email address}"));
         }
 
         @Test
-        void shouldReturnReturnThrowExceptionAndStatus409WithNotValidStatus() throws Exception {
+        void shouldReturnReturnThrowExceptionAndStatus400WithNotValidStatus() throws Exception {
             // given
             String request = UserJsonSupplier.getRequestJsonWithNotValidStatusForRegistrationUser();
-            String json = UserJsonSupplier.getNotValidStatusForRegistrationUser();
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/registersubscriber")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isConflict())
-                    .andExpect(content().json(json));
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.error_message").value("Specify the correct status!"));
         }
     }
 
@@ -387,37 +363,33 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
         }
 
 //        @Test
-//        void shouldReturnReturnThrowExceptionAndStatus409WithNotValidRefreshToken() throws Exception {
+//        void shouldReturnReturnThrowExceptionAndStatus401WithNotValidRefreshToken() throws Exception {
 //            // given
 //            RefreshTokenRequest request = JwtData.builder()
-//                    .withRefreshToken(INCCORECT_TOKEN)
+//                    .withRefreshToken(INCORRECT_TOKEN)
 //                    .build()
 //                    .getRefreshTokenRequest();
-//            String json = UserJsonSupplier.getIncorrectRefreshTokenResponse();
 //
 //            // when, then
 //            mockMvc.perform(post(URL_AUTH + "/refresh")
 //                            .contentType(MediaType.APPLICATION_JSON)
 //                            .content(objectMapper.writeValueAsString(request)))
-//                    .andExpect(status().isConflict())
-//                    .andExpect(content().json(json));
+//                    .andExpect(status().isUnauthorized());
 //        }
-
+//
 //        @Test
-//        void shouldReturnReturnThrowExceptionAndStatus500WithIncorrectJWTSignature() throws Exception {
+//        void shouldReturnReturnThrowExceptionAndStatus401WithIncorrectJWTSignature() throws Exception {
 //            // given
 //            RefreshTokenRequest request = JwtData.builder()
-//                    .withRefreshToken(REFRESH_TOKEN_INCORRECT_SIGNATURE)
+//                    .withRefreshToken(TOKEN_INCORRECT_SIGNATURE)
 //                    .build()
 //                    .getRefreshTokenRequest();
-//            String json = UserJsonSupplier.getRefreshTokenWithIncorrectJWTSignatureResponse();
 //
 //            // when, then
 //            mockMvc.perform(post(URL_AUTH + "/refresh")
 //                            .contentType(MediaType.APPLICATION_JSON)
 //                            .content(objectMapper.writeValueAsString(request)))
-//                    .andExpect(status().isInternalServerError())
-//                    .andExpect(content().json(json));
+//                    .andExpect(status().isUnauthorized());
 //        }
     }
 }

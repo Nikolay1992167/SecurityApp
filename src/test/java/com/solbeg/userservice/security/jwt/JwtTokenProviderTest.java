@@ -3,13 +3,16 @@ package com.solbeg.userservice.security.jwt;
 import com.solbeg.userservice.dto.response.JwtResponse;
 import com.solbeg.userservice.entity.Role;
 import com.solbeg.userservice.entity.User;
+import com.solbeg.userservice.enums.error_response.ErrorMessage;
 import com.solbeg.userservice.exception.JwtParsingException;
 import com.solbeg.userservice.security.props.JwtProperties;
 import com.solbeg.userservice.service.UserService;
 import com.solbeg.userservice.util.testdata.UserTestData;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +30,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.solbeg.userservice.util.initdata.InitData.ACCESS_TEST;
-import static com.solbeg.userservice.util.initdata.InitData.ACCESS_TOKEN;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.ID_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.INCORRECT_TOKEN;
@@ -35,6 +37,7 @@ import static com.solbeg.userservice.util.initdata.InitData.REFRESH_TEST;
 import static com.solbeg.userservice.util.initdata.InitData.ROLE_NAME_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.ROLE_NAME_SUBSCRIBER;
 import static com.solbeg.userservice.util.initdata.InitData.SECRET_TEST;
+import static com.solbeg.userservice.util.initdata.InitData.TOKEN_ADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -101,7 +104,7 @@ class JwtTokenProviderTest {
         String userEmail = EMAIL_JOURNALIST;
         User user = UserTestData.builder()
                 .build()
-                .getUser();
+                .getJournalist();
         when(userService.findById(userId))
                 .thenReturn(user);
 
@@ -133,45 +136,71 @@ class JwtTokenProviderTest {
 
         // when, then
         assertThatThrownBy(() -> jwtTokenProvider.validateToken(expiredToken))
-                .isInstanceOf(io.jsonwebtoken.JwtException.class);
+                .isInstanceOf(JwtException.class);
     }
 
     @Test
-    void shouldReturnFalseWhenTokenIsExpired() {
+    void shouldReturnTrueWhenTokenIsValid() {
         // given
-        Role role = new Role();
-        role.setName(ROLE_NAME_SUBSCRIBER);
-        Claims claims = Jwts.claims().setSubject(EMAIL_JOURNALIST);
-        claims.put("id", ID_JOURNALIST);
-        claims.put("roles", Collections.singletonList(role.getName()));
-        Instant now = Instant.now();
-        Instant expired = now.plusSeconds(3600);
-        String expiredToken = Jwts.builder()
+        String token = TOKEN_ADMIN;
+
+        // when
+        boolean actual = jwtTokenProvider.validateToken(token);
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldReturnExpectedUUIDWhenTokenIsValid() {
+        // given
+        UUID expectedId = ID_JOURNALIST;
+        String expectedUsername = EMAIL_JOURNALIST;
+        Claims claims = Jwts.claims().setSubject(expectedUsername);
+        claims.put("id", expectedId);
+        Instant validity = Instant.now()
+                .plus(jwtProperties.getRefresh(), ChronoUnit.DAYS);
+        String token = Jwts.builder()
                 .setClaims(claims)
-                .setExpiration(Date.from(expired))
+                .setExpiration(Date.from(validity))
                 .signWith(key)
                 .compact();
 
         // when
-        boolean isValid = jwtTokenProvider.validateToken(expiredToken);
+        UUID actualId = jwtTokenProvider.getIdInFormatUUID(token);
 
         // then
-        assertThat(isValid).isTrue();
+        assertThat(actualId).isEqualTo(expectedId);
     }
 
     @Test
-    void shouldReturnIdWhenTokenIsValid() {
-        // given, when
-        UUID actualId = jwtTokenProvider.getIdInFormatUUID(ACCESS_TOKEN);
-
-        // then
-        assertThat(actualId).isEqualTo(ID_JOURNALIST);
-    }
-
-    @Test
-    void shouldThrowJwtParsingExceptionWhenTokenIsInvalid() {
+    void shouldThrowJwtParsingExceptionWhenTokenIsIncorrect() {
 
         assertThatThrownBy(() -> jwtTokenProvider.getIdInFormatUUID(INCORRECT_TOKEN))
-                .isInstanceOf(JwtParsingException.class);
+                .isInstanceOf(JwtParsingException.class)
+                .hasMessageContaining(ErrorMessage.ERROR_PARSING.getMessage());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldReturnExpectedEmailWhenTokenIsValid() {
+        // given
+        UUID userId = ID_JOURNALIST;
+        String expectedUsername = EMAIL_JOURNALIST;
+        Claims claims = Jwts.claims().setSubject(expectedUsername);
+        claims.put("id", userId);
+        Instant validity = Instant.now()
+                .plus(jwtProperties.getRefresh(), ChronoUnit.DAYS);
+        String token = Jwts.builder()
+                .setClaims(claims)
+                .setExpiration(Date.from(validity))
+                .signWith(key)
+                .compact();
+
+        // when
+        String actualUsername = jwtTokenProvider.getUsername(token);
+
+        // then
+        assertThat(actualUsername).isEqualTo(expectedUsername);
     }
 }

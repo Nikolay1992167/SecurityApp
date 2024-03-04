@@ -34,14 +34,18 @@ public class JwtData {
     private String password = PASSWORD_JOURNALIST;
 
     public JwtRequest getJwtRequest() {
-        return new JwtRequest(email, password);
+        return JwtRequest.builder()
+                .email(email)
+                .password(password)
+                .build();
     }
 
     public JwtResponse getJwtResponse() {
-        return new JwtResponse(id, email, accessToken, refreshToken);
-    }
-
-    public RefreshTokenRequest getRefreshTokenRequest() {
-        return new RefreshTokenRequest(accessToken);
+        return JwtResponse.builder()
+                .id(id)
+                .email(email)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 }

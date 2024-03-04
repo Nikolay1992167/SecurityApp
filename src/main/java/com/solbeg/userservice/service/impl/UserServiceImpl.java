@@ -7,6 +7,7 @@ import com.solbeg.userservice.dto.response.UserResponse;
 import com.solbeg.userservice.entity.Role;
 import com.solbeg.userservice.entity.User;
 import com.solbeg.userservice.enums.Status;
+import com.solbeg.userservice.enums.error_response.ErrorMessage;
 import com.solbeg.userservice.exception.InformationChangeStatusUserException;
 import com.solbeg.userservice.exception.NoSuchUserEmailException;
 import com.solbeg.userservice.exception.NotFoundException;
@@ -44,13 +45,33 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserRegisterResponse registerJournalist(UserRegisterRequest request) {
-        return registerUser(request, "JOURNALIST");
+        checkUniqueEmail(request.getEmail());
+        User userToSave = userMapper.fromRequest(request);
+        List<Role> userRoles = new ArrayList<>();
+        Role journalistRole = roleRepository.findByName("JOURNALIST");
+        userRoles.add(journalistRole);
+        userToSave.setRoles(userRoles);
+        userToSave.setPassword(passwordEncoder.encode(userToSave.getPassword()));
+        userToSave.setStatus(Status.NOT_ACTIVE);
+        User savedUser = userRepository.persist(userToSave);
+        UserRegisterResponse userResponse = userMapper.toRegisterResponse(savedUser);
+        log.info("IN registerJournalist user: {} successfully registered", userToSave);
+        return userResponse;
     }
 
     @Override
-    @Transactional
     public UserRegisterResponse registerSubscriber(UserRegisterRequest request) {
-        return registerUser(request, "SUBSCRIBER");
+        checkUniqueEmail(request.getEmail());
+        User userToSave = userMapper.fromRequest(request);
+        List<Role> userRoles = new ArrayList<>();
+        Role subscriberRole = roleRepository.findByName("SUBSCRIBER");
+        userRoles.add(subscriberRole);
+        userToSave.setRoles(userRoles);
+        userToSave.setPassword(passwordEncoder.encode(userToSave.getPassword()));
+        User savedUser = userRepository.persist(userToSave);
+        UserRegisterResponse userResponse = userMapper.toRegisterResponse(savedUser);
+        log.info("IN registerSubscriber user: {} successfully registered", userToSave);
+        return userResponse;
     }
 
     @Override
@@ -67,7 +88,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse findUserById(UUID uuid) {
         UserResponse userResponse = userRepository.findById(uuid)
                 .map(userMapper::toResponse)
-                .orElseThrow(() -> NotFoundException.of(User.class, uuid));
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + uuid));
         log.info("IN findUserById - user: {} found by id: {}", userResponse, uuid);
 
         return userResponse;
@@ -77,7 +98,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public Optional<User> findByUserEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NoSuchUserEmailException("User with email " + email + " is not exist"));
+                .orElseThrow(() -> new NoSuchUserEmailException(ErrorMessage.USER_NOT_EXIST.getMessage() + email));
         log.info("IN findByUserEmail - user: {} found by email: {}", user, email);
         return Optional.ofNullable(user);
     }
@@ -86,7 +107,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public User findById(UUID id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> NotFoundException.of(User.class, id));
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + id));
         log.info("IN findById - user: {} found by id: {}", user, id);
         return user;
     }
@@ -96,7 +117,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse update(UUID uuid, UserUpdateRequest updateRequest) {
         checkUniqueEmail(updateRequest.getEmail());
         User userInDB = userRepository.findById(uuid)
-                .orElseThrow(() -> NotFoundException.of(User.class, uuid));
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + uuid));
         userInDB.setFirstName(updateRequest.getFirstName());
         userInDB.setLastName(updateRequest.getLastName());
         userInDB.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
@@ -121,24 +142,9 @@ public class UserServiceImpl implements UserService {
         log.info("IN deleteUser - user with id: {} changed status: DELETED", id);
     }
 
-    private UserRegisterResponse registerUser(UserRegisterRequest request, String roleName) {
-        checkUniqueEmail(request.getEmail());
-        User userToSave = userMapper.fromRequest(request);
-        List<Role> userRoles = new ArrayList<>();
-        Role role = roleRepository.findByName(roleName);
-        userRoles.add(role);
-        userToSave.setRoles(userRoles);
-        userToSave.setPassword(passwordEncoder.encode(userToSave.getPassword()));
-        User savedUser = userRepository.persist(userToSave);
-        UserRegisterResponse userResponse = userMapper.toRegisterResponse(savedUser);
-        log.info("IN registerUser user: {} successfully registered", userToSave);
-        return userResponse;
-    }
-
     private void checkUniqueEmail(String email) {
         if (userRepository.findByEmail(email).isPresent()) {
-            throw new UniqueEmailException("Email " + email
-                                           + " is occupied! Another user is already registered by this email!");
+            throw new UniqueEmailException(ErrorMessage.UNIQUE_USER_EMAIL.getMessage() + email);
         }
     }
 
@@ -146,11 +152,11 @@ public class UserServiceImpl implements UserService {
         User userInDB = userRepository.findById(id)
                 .map(user -> {
                     if (user.getRoles().stream().anyMatch(role -> role.getName().equals("ADMIN"))) {
-                        throw new InformationChangeStatusUserException("You cannot change the status of a user with the ADMIN role.");
+                        throw new InformationChangeStatusUserException(ErrorMessage.CHANGE_STATUS.getMessage());
                     }
                     return user;
                 })
-                .orElseThrow(() -> NotFoundException.of(User.class, id));
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + id));
         userInDB.setStatus(status);
         UUID uuid = jwtTokenProvider.getIdInFormatUUID(token);
         userInDB.setUpdatedBy(uuid);

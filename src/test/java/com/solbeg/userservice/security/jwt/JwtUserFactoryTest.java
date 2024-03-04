@@ -23,7 +23,7 @@ class JwtUserFactoryTest {
         // given
         User user = UserTestData.builder()
                 .build()
-                .getUser();
+                .getJournalist();
         Role role1 = new Role();
         role1.setName(ROLE_NAME_SUBSCRIBER);
         Role role2 = new Role();

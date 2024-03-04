@@ -19,6 +19,6 @@ security:
   jwt:
     secret: 73357638792F423F4528482B4D6251655468576D5A7133743677397A24432646
     access: 1
-    refresh: 30
+    refresh: 2
 server:
   port: 8081

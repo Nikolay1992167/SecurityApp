@@ -3,6 +3,7 @@ package com.solbeg.userservice.service.impl;
 import com.solbeg.userservice.dto.request.JwtRequest;
 import com.solbeg.userservice.dto.response.JwtResponse;
 import com.solbeg.userservice.entity.User;
+import com.solbeg.userservice.enums.error_response.ErrorMessage;
 import com.solbeg.userservice.exception.NoSuchUserEmailException;
 import com.solbeg.userservice.security.jwt.JwtTokenProvider;
 import com.solbeg.userservice.service.UserService;
@@ -51,7 +52,7 @@ class AuthServiceImplTest {
                     .getJwtRequest();
             User user = UserTestData.builder()
                     .build()
-                    .getUser();
+                    .getJournalist();
             JwtResponse expectedResponse = JwtData.builder()
                     .build()
                     .getJwtResponse();
@@ -81,7 +82,8 @@ class AuthServiceImplTest {
 
             // when, then
             assertThatThrownBy(() -> authService.login(loginRequest))
-                    .isExactlyInstanceOf(NoSuchUserEmailException.class);
+                    .isExactlyInstanceOf(NoSuchUserEmailException.class)
+                    .hasMessageContaining(ErrorMessage.USER_NOT_EXIST_OR_NOT_ACTIVE.getMessage() + loginRequest.getEmail());
         }
     }
 

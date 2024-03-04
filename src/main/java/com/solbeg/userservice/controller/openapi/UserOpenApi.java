@@ -101,35 +101,39 @@ public interface UserOpenApi {
                             )
                     ),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
-                            content = @Content(mediaType = "application/json", examples = @ExampleObject("""
-                                    Unauthorized.
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
+                                    {
+                                        "timestamp": "2024-03-03T20:15:31.7881304",
+                                        "error_message": "Full authentication is required to access this resource",
+                                        "error_status": 401
+                                    }
                                     """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when an expired token is entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "ExpiredJwtException",
-                                                "error_message": "JWT expired at 2024-02-25T17:00:46Z. Current time: 2024-02-27T19:36:34Z, a difference of 182148885 milliseconds.  Allowed clock skew: 0 milliseconds.",
-                                                "error_code": "401 UNAUTHORIZED"
+                                                "timestamp": "2024-03-03T21:07:49.848746",
+                                                "error_message": "JWT expired at 2024-02-25T17:00:46Z. Current time: 2024-03-03T18:07:49Z, a difference of 608823848 milliseconds.  Allowed clock skew: 0 milliseconds.",
+                                                "error_status": 401
                                             }
                                     """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when an invalid token is entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "SignatureException",
+                                                "timestamp": "2024-03-03T21:08:13.1738829",
                                                 "error_message": "JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.",
-                                                "error_code": "401 UNAUTHORIZED"
+                                                "error_status": 401
                                             }
                                     """))),
                     @ApiResponse(responseCode = "403", description = "Not Authenticated User if a token with a non-admin role is entered",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "timestamp": "2024-02-27T20:32:40.560+00:00",
-                                                "status": 403,
-                                                "error": "Forbidden",
-                                                "path": "/api/v1/users"
+                                                "timestamp": "2024-03-03T20:38:59.6169887",
+                                                "error_message": "Access Denied",
+                                                "error_status": 403
                                             }
                                     """)))
             }
@@ -169,37 +173,50 @@ public interface UserOpenApi {
                             )
                     ),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
-                            content = @Content(mediaType = "application/json", examples = @ExampleObject("""
-                                    Unauthorized.
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
+                                    {
+                                        "timestamp": "2024-03-03T20:41:58.7865553",
+                                        "error_message": "Full authentication is required to access this resource",
+                                        "error_status": 401
+                                    }
                                     """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when an expired token is entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "ExpiredJwtException",
-                                                "error_message": "JWT expired at 2024-02-25T17:00:46Z. Current time: 2024-02-27T21:02:24Z, a difference of 187298859 milliseconds.  Allowed clock skew: 0 milliseconds.",
-                                                "error_code": "401 UNAUTHORIZED"
+                                                "timestamp": "2024-03-03T21:08:47.8864875",
+                                                "error_message": "JWT expired at 2024-02-25T17:00:46Z. Current time: 2024-03-03T18:08:47Z, a difference of 608881885 milliseconds.  Allowed clock skew: 0 milliseconds.",
+                                                "error_status": 401
                                             }
                                     """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when an invalid token is entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "SignatureException",
+                                                "timestamp": "2024-03-03T21:09:04.1926719",
                                                 "error_message": "JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.",
-                                                "error_code": "401 UNAUTHORIZED"
+                                                "error_status": 401
                                             }
                                     """))),
                     @ApiResponse(responseCode = "403", description = "The endpoint has not been completed if a token with a non-admin role is entered",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "timestamp": "2024-02-27T21:04:12.254+00:00",
-                                                "status": 403,
-                                                "error": "Forbidden",
-                                                "path": "/api/v1/users/c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13"
+                                                "timestamp": "2024-03-03T20:45:26.1894423",
+                                                "error_message": "Access Denied",
+                                                "error_status": 403
                                             }
-                                    """)))
+                                    """))),
+                    @ApiResponse(responseCode = "404", description = "The user not found when entered not existent uuid.",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
+                                            {
+                                                "timestamp": "2024-03-03T21:11:33.2154937",
+                                                "error_message": "User with c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15 not found!",
+                                                "error_status": 404
+                                            }
+                                    """))),
             }
     )
     ResponseEntity<UserResponse> findById(UUID uuid);
@@ -254,59 +271,63 @@ public interface UserOpenApi {
                     @ApiResponse(responseCode = "400", description = "The endpoint has not been completed when an invalid uuid is entered.",
                             content = @Content(mediaType = "application/json", examples = @ExampleObject("""
                                             {
-                                                "timestamp": "2024-02-27T21:12:01.059+00:00",
-                                                "status": 400,
-                                                "error": "Bad Request",
-                                                "path": "/api/v1/users/c"
+                                                "timestamp": "2024-03-03T21:04:33.3089845",
+                                                "error_message": "UUID was entered incorrectly!",
+                                                "error_status": 400
                                             }
                                     """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
-                            content = @Content(mediaType = "application/json", examples = @ExampleObject("""
-                                    Unauthorized.
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = IncorrectData.class),  examples = @ExampleObject("""
+                                    {
+                                        "timestamp": "2024-03-03T21:05:16.3651964",
+                                        "error_message": "Full authentication is required to access this resource",
+                                        "error_status": 401
+                                    }
                                     """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when an expired token is entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "ExpiredJwtException",
-                                                "error_message": "JWT expired at 2024-02-25T17:00:46Z. Current time: 2024-02-27T21:27:34Z, a difference of 188808512 milliseconds.  Allowed clock skew: 0 milliseconds.",
-                                                "error_code": "401 UNAUTHORIZED"
+                                                "timestamp": "2024-03-03T21:10:03.6470458",
+                                                "error_message": "JWT expired at 2024-02-25T17:00:46Z. Current time: 2024-03-03T18:10:03Z, a difference of 608957647 milliseconds.  Allowed clock skew: 0 milliseconds.",
+                                                "error_status": 401
                                             }
                                     """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when an invalid token is entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "SignatureException",
+                                                "timestamp": "2024-03-03T21:10:25.6642296",
                                                 "error_message": "JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.",
-                                                "error_code": "401 UNAUTHORIZED"
+                                                "error_status": 401
                                             }
                                     """))),
                     @ApiResponse(responseCode = "404", description = "The user not found when entered not existent uuid.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "NotFoundException",
-                                                "error_message": "User with c0eebc99-9c0b-4ef8-bb6d-00000006bb9b not found!",
-                                                "error_code": "404 NOT_FOUND"
+                                                "timestamp": "2024-03-03T21:13:39.1105685",
+                                                "error_message": "User with c0eebc99-9c0b-4ef8-bb6d-00000006bb15 not found!",
+                                                "error_status": 404
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "409", description = "The endpoint has not been completed when entered not existent uuid.",
+                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed when entered not existent uuid.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "MethodArgumentNotValidException",
-                                                "error_message": "{firstName=размер должен находиться в диапазоне от 2 до 40, email=должно иметь формат адреса электронной почты, lastName=размер должен находиться в диапазоне от 2 до 50}",
-                                                "error_code": "409 CONFLICT"
+                                                "timestamp": "2024-03-03T21:14:31.5823614",
+                                                "error_message": "{lastName=размер должен находиться в диапазоне от 2 до 50, firstName=размер должен находиться в диапазоне от 2 до 40, email=должно иметь формат адреса электронной почты}",
+                                                "error_status": 400
                                             }
                                     """))),
                     @ApiResponse(responseCode = "406", description = "The endpoint has not been completed when the email of UserUpdateRequest is exist in BD.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "UniqueEmailException",
-                                                "error_message": "Email nikolayv@example.com is occupied! Another user is already registered by this email!",
-                                                "error_code": "406 NOT_ACCEPTABLE"
+                                                "timestamp": "2024-03-03T21:15:04.0445334",
+                                                "error_message": "Email is occupied! Another user is already registered by this nikolayv@example.com",
+                                                "error_status": 406
                                             }
                                     """)))
             }
@@ -327,49 +348,53 @@ public interface UserOpenApi {
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "NotFoundException",
-                                                "error_message": "User with c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15 not found!",
-                                                "error_code": "404 NOT_FOUND"
+                                                "timestamp": "2024-03-03T21:16:40.4767385",
+                                                "error_message": "User with c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a18 not found!",
+                                                "error_status": 404
                                             }
                                     """))),
                     @ApiResponse(responseCode = "400", description = "The endpoint has not been completed when an invalid uuid is entered.",
                             content = @Content(mediaType = "application/json", examples = @ExampleObject("""
                                             {
-                                                "timestamp": "2024-02-27T22:19:46.837+00:00",
-                                                "status": 400,
-                                                "error": "Bad Request",
-                                                "path": "/api/v1/users/deactivate/12"
+                                                "timestamp": "2024-03-03T21:17:09.5058146",
+                                                "error_message": "UUID was entered incorrectly!",
+                                                "error_status": 400
                                             }
                                     """))),
                     @ApiResponse(responseCode = "409", description = "You cannot change the status of a user with the role ADMIN.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "InformationChangeStatusUserException",
+                                                "timestamp": "2024-03-03T21:17:42.2449021",
                                                 "error_message": "You cannot change the status of a user with the ADMIN role.",
-                                                "error_code": "409 CONFLICT"
+                                                "error_status": 409
                                             }
                                     """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
-                            content = @Content(mediaType = "application/json", examples = @ExampleObject("""
-                                    Unauthorized.
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
+                                    {
+                                        "timestamp": "2024-03-03T21:18:03.3175993",
+                                        "error_message": "Full authentication is required to access this resource",
+                                        "error_status": 401
+                                    }
                                     """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when an expired token is entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "ExpiredJwtException",
-                                                "error_message": "JWT expired at 2024-02-25T17:00:46Z. Current time: 2024-02-27T22:24:19Z, a difference of 192213453 milliseconds.  Allowed clock skew: 0 milliseconds.",
-                                                "error_code": "401 UNAUTHORIZED"
+                                                "timestamp": "2024-03-03T21:18:36.2612456",
+                                                "error_message": "JWT expired at 2024-02-25T17:00:46Z. Current time: 2024-03-03T18:18:36Z, a difference of 609470261 milliseconds.  Allowed clock skew: 0 milliseconds.",
+                                                "error_status": 401
                                             }
                                     """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when an invalid token is entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "SignatureException",
+                                                "timestamp": "2024-03-03T21:18:52.4644725",
                                                 "error_message": "JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.",
-                                                "error_code": "401 UNAUTHORIZED"
+                                                "error_status": 401
                                             }
                                     """)))
             }
@@ -390,49 +415,54 @@ public interface UserOpenApi {
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "NotFoundException",
-                                                "error_message": "User with c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a18 not found!",
-                                                "error_code": "404 NOT_FOUND"
+                                                "timestamp": "2024-03-03T21:19:45.6832412",
+                                                "error_message": "User with a0eebc99-9c0b-4ef8-bb6d-6bb9bd380154 not found!",
+                                                "error_status": 404
                                             }
                                     """))),
                     @ApiResponse(responseCode = "400", description = "The endpoint has not been completed when an invalid uuid is entered.",
-                            content = @Content(mediaType = "application/json", examples = @ExampleObject("""
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "timestamp": "2024-02-27T22:26:56.666+00:00",
-                                                "status": 400,
-                                                "error": "Bad Request",
-                                                "path": "/api/v1/users/delete/11"
+                                                "timestamp": "2024-03-03T21:20:10.2958205",
+                                                "error_message": "UUID was entered incorrectly!",
+                                                "error_status": 400
                                             }
                                     """))),
                     @ApiResponse(responseCode = "409", description = "You cannot change the status of a user with the role ADMIN.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "InformationChangeStatusUserException",
+                                                "timestamp": "2024-03-03T21:20:43.5178811",
                                                 "error_message": "You cannot change the status of a user with the ADMIN role.",
-                                                "error_code": "409 CONFLICT"
+                                                "error_status": 409
                                             }
                                     """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
-                            content = @Content(mediaType = "application/json", examples = @ExampleObject("""
-                                    Unauthorized.
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
+                                    {
+                                        "timestamp": "2024-03-03T21:21:01.5391987",
+                                        "error_message": "Full authentication is required to access this resource",
+                                        "error_status": 401
+                                    }
                                     """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when an expired token is entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "ExpiredJwtException",
-                                                "error_message": "JWT expired at 2024-02-25T17:00:46Z. Current time: 2024-02-27T22:28:31Z, a difference of 192465784 milliseconds.  Allowed clock skew: 0 milliseconds.",
-                                                "error_code": "401 UNAUTHORIZED"
+                                                "timestamp": "2024-03-03T21:21:30.5794483",
+                                                "error_message": "JWT expired at 2024-02-25T17:00:46Z. Current time: 2024-03-03T18:21:30Z, a difference of 609644579 milliseconds.  Allowed clock skew: 0 milliseconds.",
+                                                "error_status": 401
                                             }
                                     """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when an invalid token is entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
-                                                "exception": "SignatureException",
+                                                "timestamp": "2024-03-03T21:21:45.4513425",
                                                 "error_message": "JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.",
-                                                "error_code": "401 UNAUTHORIZED"
+                                                "error_status": 401
                                             }
                                     """)))
             }

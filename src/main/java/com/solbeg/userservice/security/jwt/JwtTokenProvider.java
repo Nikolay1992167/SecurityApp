@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.solbeg.userservice.dto.response.JwtResponse;
 import com.solbeg.userservice.entity.Role;
 import com.solbeg.userservice.entity.User;
-import com.solbeg.userservice.exception.AccessDeniedException;
+import com.solbeg.userservice.enums.error_response.ErrorMessage;
 import com.solbeg.userservice.exception.JwtParsingException;
 import com.solbeg.userservice.security.props.JwtProperties;
 import com.solbeg.userservice.service.UserService;
@@ -16,10 +16,6 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -38,7 +34,6 @@ import java.util.stream.Collectors;
 public class JwtTokenProvider {
 
     private final JwtProperties jwtProperties;
-    private final UserDetailsService userDetailsService;
     private final UserService userService;
 
     private Key key;
@@ -75,9 +70,6 @@ public class JwtTokenProvider {
 
     public JwtResponse refreshUserToken(String refreshToken) {
         JwtResponse jwtResponse = new JwtResponse();
-        if (!validateToken(refreshToken)) {
-            throw new AccessDeniedException();
-        }
         UUID userId = UUID.fromString(getId(refreshToken));
         User user = userService.findById(userId);
         jwtResponse.setId(userId);
@@ -96,12 +88,6 @@ public class JwtTokenProvider {
         return !claims.getBody().getExpiration().before(new Date());
     }
 
-    public Authentication getAuthentication(String token) {
-        String username = getUsername(token);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-    }
-
     public String getId(String token) {
         return Jwts
                 .parserBuilder()
@@ -118,16 +104,16 @@ public class JwtTokenProvider {
         String payload = parts[1];
         String decodedPayload = new String(Base64.getUrlDecoder().decode(payload), StandardCharsets.UTF_8);
         ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, Object> payloadMap = null;
+        Map<String, Object> payloadMap;
         try {
             payloadMap = objectMapper.readValue(decodedPayload, Map.class);
         } catch (JsonProcessingException e) {
-            throw new JwtParsingException("Error parsing the JWT token.", e);
+            throw new JwtParsingException(ErrorMessage.ERROR_PARSING.getMessage(), e);
         }
         return UUID.fromString((String) payloadMap.get("id"));
     }
 
-    private String getUsername(String token) {
+    public String getUsername(String token) {
         return Jwts
                 .parserBuilder()
                 .setSigningKey(key)
