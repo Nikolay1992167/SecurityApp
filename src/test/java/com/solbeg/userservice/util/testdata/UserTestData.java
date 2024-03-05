@@ -113,14 +113,12 @@ public class UserTestData {
                 .build();
     }
 
-
     public UserRegisterRequest getRegisterRequestJournalist() {
         return UserRegisterRequest.builder()
                 .firstName(firstName)
                 .lastName(lastName)
                 .email(email)
                 .password(password)
-                .status(status)
                 .build();
     }
 
@@ -130,10 +128,8 @@ public class UserTestData {
                 .lastName(LAST_NAME_SUBSCRIBER)
                 .email(EMAIL_SUBSCRIBER)
                 .password(PASSWORD_SUBSCRIBER)
-                .status(Status.ACTIVE)
                 .build();
     }
-
 
     public UserUpdateRequest getUserUpdateRequest() {
         return UserUpdateRequest.builder()

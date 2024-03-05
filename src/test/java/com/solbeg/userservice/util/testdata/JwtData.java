@@ -1,7 +1,6 @@
 package com.solbeg.userservice.util.testdata;
 
 import com.solbeg.userservice.dto.request.JwtRequest;
-import com.solbeg.userservice.dto.request.RefreshTokenRequest;
 import com.solbeg.userservice.dto.response.JwtResponse;
 import lombok.Builder;
 import lombok.Data;
@@ -10,8 +9,10 @@ import java.util.UUID;
 
 import static com.solbeg.userservice.util.initdata.InitData.ACCESS_TOKEN;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_JOURNALIST;
+import static com.solbeg.userservice.util.initdata.InitData.EMAIL_JOURNALIST_FOR_IT;
 import static com.solbeg.userservice.util.initdata.InitData.ID_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.PASSWORD_JOURNALIST;
+import static com.solbeg.userservice.util.initdata.InitData.PASSWORD_JOURNALIST_FOR_IT;
 import static com.solbeg.userservice.util.initdata.InitData.REFRESH_TOKEN;
 
 @Data
@@ -37,6 +38,13 @@ public class JwtData {
         return JwtRequest.builder()
                 .email(email)
                 .password(password)
+                .build();
+    }
+
+    public JwtRequest getJwtRequestForIT() {
+        return JwtRequest.builder()
+                .email(EMAIL_JOURNALIST_FOR_IT)
+                .password(PASSWORD_JOURNALIST_FOR_IT)
                 .build();
     }
 

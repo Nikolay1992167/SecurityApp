@@ -1,11 +1,8 @@
 package com.solbeg.userservice.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.solbeg.userservice.security.jwt.JwtTokenProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -27,15 +24,6 @@ class ApplicationConfigTest {
 
     @InjectMocks
     private ApplicationConfig config;
-
-    @Mock
-    private JwtTokenProvider tokenProvider;
-
-    @Mock
-    private HttpSecurity httpSecurity;
-
-    @Mock
-    private ObjectMapper objectMapper;
 
     @Test
     void shouldReturnExpectedInstanceOfBCryptPasswordEncoder() {

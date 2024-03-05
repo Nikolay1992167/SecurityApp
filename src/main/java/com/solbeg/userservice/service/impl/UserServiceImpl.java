@@ -68,6 +68,7 @@ public class UserServiceImpl implements UserService {
         userRoles.add(subscriberRole);
         userToSave.setRoles(userRoles);
         userToSave.setPassword(passwordEncoder.encode(userToSave.getPassword()));
+        userToSave.setStatus(Status.ACTIVE);
         User savedUser = userRepository.persist(userToSave);
         UserRegisterResponse userResponse = userMapper.toRegisterResponse(savedUser);
         log.info("IN registerSubscriber user: {} successfully registered", userToSave);

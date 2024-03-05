@@ -3,7 +3,7 @@ package com.solbeg.userservice.IT.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.solbeg.userservice.dto.request.UserUpdateRequest;
 import com.solbeg.userservice.dto.response.UserResponse;
-import com.solbeg.userservice.exception.NotFoundException;
+import com.solbeg.userservice.enums.error_response.ErrorMessage;
 import com.solbeg.userservice.service.impl.UserServiceImpl;
 import com.solbeg.userservice.util.PostgresSqlContainerInitializer;
 import com.solbeg.userservice.util.testdata.UserTestData;
@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -26,14 +26,16 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.solbeg.userservice.util.initdata.InitData.DEFAULT_PAGE_REQUEST_FOR_IT;
-import static com.solbeg.userservice.util.initdata.InitData.ID_JOURNALIST;
+import static com.solbeg.userservice.util.initdata.InitData.ID_ADMIN;
+import static com.solbeg.userservice.util.initdata.InitData.ID_JOURNALIST_FOR_IT;
 import static com.solbeg.userservice.util.initdata.InitData.ID_NOT_EXIST;
-import static com.solbeg.userservice.util.initdata.InitData.ID_SUBSCRIBER;
+import static com.solbeg.userservice.util.initdata.InitData.ID_SUBSCRIBER_FOR_IT;
 import static com.solbeg.userservice.util.initdata.InitData.TOKEN_ADMIN;
 import static com.solbeg.userservice.util.initdata.InitData.URL_USERS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.cloud.openfeign.security.OAuth2AccessTokenInterceptor.BEARER;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -50,7 +52,7 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @SpyBean
     private UserServiceImpl userService;
 
     @Nested
@@ -59,27 +61,13 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
         @Test
         @WithMockUser(authorities = "ADMIN")
         void shouldReturnExpectedJsonAndStatus200() throws Exception {
-            // given
-            PageRequest pageRequest = DEFAULT_PAGE_REQUEST_FOR_IT;
-            UserResponse userResponse = UserTestData.builder()
-                    .build()
-                    .getUserResponse();
-            List<UserResponse> usersList = List.of(userResponse);
-            Page<UserResponse> page = PageableExecutionUtils.getPage(
-                    usersList,
-                    pageRequest,
-                    usersList::size);
-            when(userService.findAll(pageRequest))
-                    .thenReturn(page);
-
-            // when, then
             MvcResult mvcResult = mockMvc.perform(get(URL_USERS + "?page=0&size=15"))
                     .andExpect(status().isOk())
                     .andReturn();
             MockHttpServletResponse response = mvcResult.getResponse();
             JSONObject jsonObject = new JSONObject(response.getContentAsString());
             assertThat(jsonObject.get("totalPages")).isEqualTo(1);
-            assertThat(jsonObject.get("totalElements")).isEqualTo(1);
+            assertThat(jsonObject.get("totalElements")).isEqualTo(3);
             assertThat(jsonObject.get("number")).isEqualTo(0);
             assertThat(jsonObject.get("size")).isEqualTo(15);
             assertThat(jsonObject.get("content")).isNotNull();
@@ -112,12 +100,7 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
         @WithMockUser(authorities = "ADMIN")
         void shouldReturnExpectedJsonAndStatus200() throws Exception {
             // given
-            UUID userId = ID_JOURNALIST;
-            UserResponse userResponse = UserTestData.builder()
-                    .build()
-                    .getUserResponse();
-            when(userService.findUserById(userId))
-                    .thenReturn(userResponse);
+            UUID userId = ID_JOURNALIST_FOR_IT;
 
             // when, then
             mockMvc.perform(get(URL_USERS + "/" + userId))
@@ -126,16 +109,25 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
         }
 
         @Test
+        void shouldReturnThrowExceptionAndStatus401() throws Exception {
+            mockMvc.perform(get(URL_USERS + "/" + ID_JOURNALIST_FOR_IT))
+                    .andExpect(status().isUnauthorized());
+        }
+
+        @Test
         @WithMockUser(authorities = "ADMIN")
         void shouldReturnThrowExceptionAndStatus404() throws Exception {
-            // given
-            UUID userId = ID_NOT_EXIST;
-            when(userService.findUserById(userId))
-                    .thenThrow(NotFoundException.class);
+            mockMvc.perform(get(URL_USERS + "/" + ID_NOT_EXIST))
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.error_message")
+                            .value(ErrorMessage.USER_NOT_FOUND.getMessage() + ID_NOT_EXIST));
+        }
 
-            // when, then
-            mockMvc.perform(get(URL_USERS + "/" + userId))
-                    .andExpect(status().isNotFound());
+        @Test
+        @WithMockUser(authorities = "USER")
+        void shouldReturnThrowExceptionAndStatus403() throws Exception {
+            mockMvc.perform(get(URL_USERS + "/" + ID_JOURNALIST_FOR_IT))
+                    .andExpect(status().isForbidden());
         }
     }
 
@@ -146,17 +138,11 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
         @WithMockUser(authorities = "ADMIN")
         void shouldReturnExpectedJsonAndStatus200() throws Exception {
             // given
-            UUID userId = ID_JOURNALIST;
+            UUID userId = ID_JOURNALIST_FOR_IT;
             UserUpdateRequest updateRequest = UserTestData.builder()
                     .build()
                     .getUserUpdateRequest();
-            UserResponse userResponse = UserTestData.builder()
-                    .build()
-                    .getUserResponse();
             String json = objectMapper.writeValueAsString(updateRequest);
-
-            when(userService.update(userId, updateRequest))
-                    .thenReturn(userResponse);
 
             // when, then
             mockMvc.perform(put(URL_USERS + "/" + userId)
@@ -164,9 +150,9 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
                             .contentType(APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andExpectAll(jsonPath("$.id").value(userId.toString()),
-                            jsonPath("$.firstName").value(userResponse.getFirstName()),
-                            jsonPath("$.lastName").value(userResponse.getLastName()),
-                            jsonPath("$.email").value(userResponse.getEmail()));
+                            jsonPath("$.firstName").value(updateRequest.getFirstName()),
+                            jsonPath("$.lastName").value(updateRequest.getLastName()),
+                            jsonPath("$.email").value(updateRequest.getEmail()));
         }
     }
 
@@ -177,33 +163,20 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
         @Test
         @WithMockUser(authorities = "ADMIN")
         void shouldDeactivateUser() throws Exception {
-            // given
-            UUID userId = ID_JOURNALIST;
-
-            // when
-            doNothing().when(userService).deactivateUser(userId, TOKEN_ADMIN);
-
-            // then
-            mockMvc.perform(patch(URL_USERS + "/deactivate/{id}", userId)
+            mockMvc.perform(patch(URL_USERS + "/deactivate/{id}", ID_JOURNALIST_FOR_IT)
+                            .header(AUTHORIZATION, BEARER + TOKEN_ADMIN)
                             .contentType(APPLICATION_JSON))
                     .andExpect(status().isOk());
         }
 
-//        @Test
-//        @WithMockUser(authorities = "ADMIN")
-//        void shouldThrowExceptionWhenDeactivateAdminUser() throws Exception {
-//            // given
-//            UUID userId = ID_ADMIN;
-//            String token = TOKEN_ADMIN;
-//
-//            // when
-//            doThrow(new InformationChangeStatusUserException(ErrorMessage.CHANGE_STATUS.getMessage()))
-//                    .when(userService).deactivateUser(userId, token);
-//
-//            // then
-//            mockMvc.perform(patch(URL_USERS + "/deactivate/" + userId))
-//                    .andExpect(status().isConflict());
-//        }
+        @Test
+        @WithMockUser(authorities = "ADMIN")
+        void shouldThrowExceptionWhenDeactivateAdminUser() throws Exception {
+            mockMvc.perform(patch(URL_USERS + "/deactivate/" + ID_ADMIN))
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.error_message")
+                            .value(ErrorMessage.CHANGE_STATUS.getMessage()));
+        }
     }
 
     @Nested
@@ -212,32 +185,19 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
         @Test
         @WithMockUser(authorities = "ADMIN")
         void shouldDeleteUser() throws Exception {
-            // given
-            UUID userId = ID_SUBSCRIBER;
-
-            // when
-            doNothing().when(userService).deleteUser(userId, TOKEN_ADMIN);
-
-            // then
-            mockMvc.perform(patch(URL_USERS + "/delete/" + userId)
+            mockMvc.perform(patch(URL_USERS + "/delete/" + ID_SUBSCRIBER_FOR_IT)
+                            .header(AUTHORIZATION, BEARER + TOKEN_ADMIN)
                             .contentType(APPLICATION_JSON))
                     .andExpect(status().isOk());
         }
 
-//        @Test
-//        @WithMockUser(authorities = "ADMIN")
-//        void shouldThrowExceptionWhenDeactivateAdminUser() throws Exception {
-//            // given
-//            UUID userId = ID_ADMIN;
-//            String token = TOKEN_ADMIN;
-//
-//            // when
-//            doThrow(new InformationChangeStatusUserException(ErrorMessage.CHANGE_STATUS.getMessage()))
-//                    .when(userService).deactivateUser(userId, token);
-//
-//            // then
-//            mockMvc.perform(patch(URL_USERS + "/delete/" + userId))
-//                    .andExpect(status().isConflict());
-//        }
+        @Test
+        @WithMockUser(authorities = "ADMIN")
+        void shouldThrowExceptionWhenDeactivateAdminUser() throws Exception {
+            mockMvc.perform(patch(URL_USERS + "/delete/" + ID_ADMIN))
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.error_message")
+                            .value(ErrorMessage.CHANGE_STATUS.getMessage()));
+        }
     }
 }

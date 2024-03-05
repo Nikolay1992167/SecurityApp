@@ -68,7 +68,8 @@ class JwtUserDetailsServiceTest {
                 .withStatus(Status.NOT_ACTIVE)
                 .build()
                 .getJournalist();
-        when(userService.findByUserEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userService.findByUserEmail(user.getEmail()))
+                .thenReturn(Optional.of(user));
 
         // when, then
         assertThatThrownBy(() -> jwtUserDetailsService.loadUserByUsername(user.getEmail()))

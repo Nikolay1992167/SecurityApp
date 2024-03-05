@@ -35,7 +35,6 @@ import static com.solbeg.userservice.util.initdata.InitData.ID_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.INCORRECT_TOKEN;
 import static com.solbeg.userservice.util.initdata.InitData.REFRESH_TEST;
 import static com.solbeg.userservice.util.initdata.InitData.ROLE_NAME_JOURNALIST;
-import static com.solbeg.userservice.util.initdata.InitData.ROLE_NAME_SUBSCRIBER;
 import static com.solbeg.userservice.util.initdata.InitData.SECRET_TEST;
 import static com.solbeg.userservice.util.initdata.InitData.TOKEN_ADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -123,7 +122,7 @@ class JwtTokenProviderTest {
     void shouldReturnThrowExceptionWhenTokenIsExpired() {
         // given
         Role role = new Role();
-        role.setName(ROLE_NAME_SUBSCRIBER);
+        role.setName(ROLE_NAME_JOURNALIST);
         Claims claims = Jwts.claims().setSubject(EMAIL_JOURNALIST);
         claims.put("id", ID_JOURNALIST);
         claims.put("roles", Collections.singletonList(role.getName()));
@@ -175,7 +174,6 @@ class JwtTokenProviderTest {
 
     @Test
     void shouldThrowJwtParsingExceptionWhenTokenIsIncorrect() {
-
         assertThatThrownBy(() -> jwtTokenProvider.getIdInFormatUUID(INCORRECT_TOKEN))
                 .isInstanceOf(JwtParsingException.class)
                 .hasMessageContaining(ErrorMessage.ERROR_PARSING.getMessage());
