@@ -28,14 +28,19 @@ ext {
 	openapiVersion = '2.1.0'
 	jjwtVersion = '0.11.5'
 	mapstructVersion = '1.5.3.Final'
+	hypersistenceVersion = '3.7.3'
+	postgresqlContainersVersion = '1.19.3'
+	assertJVersion = '3.24.2'
 }
 
 dependencies {
-	implementation "io.hypersistence:hypersistence-utils-hibernate-60:${hipersistenceVersion}"
+	implementation "io.hypersistence:hypersistence-utils-hibernate-62:${hypersistenceVersion}"
 	implementation "org.springframework.boot:spring-boot-starter-validation"
+	implementation "org.springframework.boot:spring-boot-starter-data-jpa"
 	implementation "org.springframework.boot:spring-boot-starter-web"
 	implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
 	implementation "org.springframework.boot:spring-boot-starter-security"
+	implementation "org.springframework.boot:spring-boot-configuration-processor"
 	implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${openapiVersion}"
 	implementation "org.liquibase:liquibase-core"
 	implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
@@ -49,6 +54,9 @@ dependencies {
 	runtimeOnly "org.postgresql:postgresql"
 
 	testImplementation "org.springframework.boot:spring-boot-starter-test"
+	testImplementation "org.springframework.security:spring-security-test"
+	testImplementation "org.testcontainers:postgresql:${postgresqlContainersVersion}"
+	testImplementation "org.assertj:assertj-core:${assertJVersion}"
 }
 
 dependencyManagement {
