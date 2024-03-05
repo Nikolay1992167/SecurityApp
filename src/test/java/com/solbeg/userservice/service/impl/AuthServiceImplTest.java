@@ -56,7 +56,6 @@ class AuthServiceImplTest {
             JwtResponse expectedResponse = JwtData.builder()
                     .build()
                     .getJwtResponse();
-
             when(userService.findByUserEmail(loginRequest.getEmail()))
                     .thenReturn(Optional.of(user));
             when(jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), user.getRoles()))

@@ -1,6 +1,5 @@
 package com.solbeg.userservice.dto.request;
 
-import com.solbeg.userservice.enums.Status;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -33,7 +32,4 @@ public class UserRegisterRequest {
     @NotBlank
     @Size(min = 3, max = 100)
     private String password;
-
-    @Builder.Default
-    private Status status = Status.ACTIVE;
 }

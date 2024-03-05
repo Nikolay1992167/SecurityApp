@@ -97,8 +97,7 @@ public interface AuthOpenApi {
                                         "firstName": "Pasha",
                                         "lastName": "Grom",
                                         "email": "grom@grom.com",
-                                        "password": "63524178",
-                                        "status": "ACTIVE"
+                                        "password": "63524178"
                                     }
                                     """)
                     )
@@ -133,15 +132,6 @@ public interface AuthOpenApi {
                                                 "error_status": 406
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed because an status is wrong.",
-                            content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
-                                            {
-                                                "timestamp": "2024-03-03T18:09:13.5697486",
-                                                "error_message": "Specify the correct status!",
-                                                "error_status": 400
-                                            }
-                                    """))),
                     @ApiResponse(responseCode = "400", description = "The endpoint has not been completed because the request arguments are not validated.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
@@ -169,8 +159,7 @@ public interface AuthOpenApi {
                                         "firstName": "Olga",
                                         "lastName": "Popova",
                                         "email": "popova@email.com",
-                                        "password": "9652314",
-                                        "status": "ACTIVE"
+                                        "password": "9652314"
                                     }
                                     """)
                     )
@@ -203,15 +192,6 @@ public interface AuthOpenApi {
                                                 "timestamp": "2024-03-03T18:11:58.3443861",
                                                 "error_message": "Email is occupied! Another user is already registered by this popova@email.com",
                                                 "error_status": 406
-                                            }
-                                    """))),
-                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed because an status is wrong.",
-                            content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
-                                            {
-                                                "timestamp": "2024-03-03T18:12:36.3800917",
-                                                "error_message": "Specify the correct status!",
-                                                "error_status": 400
                                             }
                                     """))),
                     @ApiResponse(responseCode = "400", description = "The endpoint has not been completed because the request arguments are not validated.",

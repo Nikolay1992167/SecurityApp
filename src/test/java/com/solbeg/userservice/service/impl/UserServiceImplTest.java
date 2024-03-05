@@ -283,9 +283,6 @@ class UserServiceImplTest {
         void shouldReturnThrowExceptionWhenUserNotFound() {
             // given
             UUID userId = ID_JOURNALIST;
-            User user = UserTestData.builder()
-                    .build()
-                    .getJournalist();
             when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
             // when, then
@@ -354,7 +351,6 @@ class UserServiceImplTest {
             User user = UserTestData.builder()
                     .build()
                     .getJournalist();
-
             when(userRepository.findById(userId))
                     .thenReturn(Optional.of(user));
             when(jwtTokenProvider.getIdInFormatUUID(token))
@@ -378,7 +374,6 @@ class UserServiceImplTest {
                     .withRolesUser(List.of(adminRole))
                     .build()
                     .getJournalist();
-
             when(userRepository.findById(userId))
                     .thenReturn(Optional.of(user));
 
@@ -412,9 +407,10 @@ class UserServiceImplTest {
             User user = UserTestData.builder()
                     .build()
                     .getJournalist();
-
-            when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-            when(jwtTokenProvider.getIdInFormatUUID(token)).thenReturn(userId);
+            when(userRepository.findById(userId))
+                    .thenReturn(Optional.of(user));
+            when(jwtTokenProvider.getIdInFormatUUID(token))
+                    .thenReturn(userId);
 
             // when
             userService.deleteUser(userId, token);
