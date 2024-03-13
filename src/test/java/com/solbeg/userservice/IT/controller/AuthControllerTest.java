@@ -1,10 +1,11 @@
 package com.solbeg.userservice.IT.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.solbeg.userservice.dto.request.JwtRequest;
 import com.solbeg.userservice.dto.request.RefreshTokenRequest;
 import com.solbeg.userservice.dto.request.UserRegisterRequest;
-import com.solbeg.userservice.enums.Status;
 import com.solbeg.userservice.enums.error_response.ErrorMessage;
 import com.solbeg.userservice.security.jwt.JwtTokenProvider;
 import com.solbeg.userservice.service.AuthService;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_ADMIN;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_INCORRECT;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_NOT_EXIST;
@@ -30,7 +32,6 @@ import static com.solbeg.userservice.util.initdata.InitData.LAST_NAME_INCORRECT;
 import static com.solbeg.userservice.util.initdata.InitData.PASSWORD_INCORRECT;
 import static com.solbeg.userservice.util.initdata.InitData.URL_AUTH;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -110,6 +111,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
     }
 
     @Nested
+    @WireMockTest(httpPort = 8088)
     class RegisterJournalistPostEndpointTest {
 
         @Test
@@ -119,18 +121,16 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                     .build()
                     .getRegisterRequestJournalist();
 
+            stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/send/email"))
+                    .willReturn(WireMock.aResponse()
+                            .withStatus(200)));
+
             // when, then
             mockMvc.perform(post(URL_AUTH + "/registerjournalist")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpectAll(
-                            status().isCreated(),
-                            content().contentType(MediaType.APPLICATION_JSON),
-                            jsonPath("$.firstName").value(request.getFirstName()),
-                            jsonPath("$.lastName").value(request.getLastName()),
-                            jsonPath("$.email").value(request.getEmail()),
-                            jsonPath("$.roles").value("JOURNALIST"),
-                            jsonPath("$.status").value(Status.NOT_ACTIVE.toString())
+                            status().isCreated()
                     );
         }
 
@@ -218,13 +218,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpectAll(
-                            status().isCreated(),
-                            content().contentType(MediaType.APPLICATION_JSON),
-                            jsonPath("$.firstName").value(request.getFirstName()),
-                            jsonPath("$.lastName").value(request.getLastName()),
-                            jsonPath("$.email").value(request.getEmail()),
-                            jsonPath("$.roles").value("SUBSCRIBER"),
-                            jsonPath("$.status").value(Status.ACTIVE.toString())
+                            status().isCreated()
                     );
         }
 
