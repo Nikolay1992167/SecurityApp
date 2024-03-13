@@ -58,7 +58,7 @@ public class UserTokenServiceImpl implements UserTokenService {
         tokenRepository.findByToken(token).ifPresentOrElse(
                 activationLink -> tokenRepository.deleteByToken(token),
                 () -> {
-                    throw new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + token);
+                    throw new NotFoundException(ErrorMessage.USERTOKEN_NOT_FOUND.getMessage() + token);
                 }
         );
         log.info("IN deleteUserToken - deleted UserToken with token {}", token);

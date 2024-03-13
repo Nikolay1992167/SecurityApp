@@ -1,2 +1,0 @@
-INSERT INTO security.links(id, email, created_at, first_name, last_name, type_message)
-VALUES ('511a084f-6065-44cd-b7b7-a21acf2eb77a', 'popov@google.com', '2024-03-10T12:00:00.000', 'Oleg', 'Popov', 'USER_ACTIVATE');
