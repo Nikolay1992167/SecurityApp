@@ -4,6 +4,8 @@ import com.solbeg.userservice.exception.InformationChangeStatusUserException;
 import com.solbeg.userservice.exception.JwtParsingException;
 import com.solbeg.userservice.exception.NoSuchUserEmailException;
 import com.solbeg.userservice.exception.NotFoundException;
+import com.solbeg.userservice.exception.SendDataException;
+import com.solbeg.userservice.exception.TokenExpirationException;
 import com.solbeg.userservice.exception.UniqueEmailException;
 import com.solbeg.userservice.exception.UserStatusException;
 import com.solbeg.userservice.exception.model.IncorrectData;
@@ -27,6 +29,16 @@ import java.util.Map;
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class UserServiceExceptionHandler {
+
+    @ExceptionHandler(TokenExpirationException.class)
+    public ResponseEntity<IncorrectData> TokenExpirationException(TokenExpirationException exception) {
+        return getResponse(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(SendDataException.class)
+    public ResponseEntity<IncorrectData> sendDataException(SendDataException exception) {
+        return getResponse(exception.getMessage(), HttpStatus.CONFLICT);
+    }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<IncorrectData> methodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {

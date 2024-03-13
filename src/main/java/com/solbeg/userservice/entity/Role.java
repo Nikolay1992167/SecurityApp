@@ -18,12 +18,12 @@ import java.util.List;
 
 @Getter
 @Setter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-@SuperBuilder
 @Entity
+@ToString
+@SuperBuilder
+@NoArgsConstructor
 @FieldNameConstants
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table(schema = "security", name = "roles")
 public class Role extends BaseEntity {
