@@ -2,7 +2,6 @@ package com.solbeg.userservice.service;
 
 import com.solbeg.userservice.dto.request.UserRegisterRequest;
 import com.solbeg.userservice.dto.request.UserUpdateRequest;
-import com.solbeg.userservice.dto.response.UserRegisterResponse;
 import com.solbeg.userservice.dto.response.UserResponse;
 import com.solbeg.userservice.entity.User;
 import org.springframework.data.domain.Page;
@@ -13,9 +12,9 @@ import java.util.UUID;
 
 public interface UserService {
 
-    UserRegisterResponse registerJournalist(UserRegisterRequest request);
+    void registerJournalist(UserRegisterRequest request);
 
-    UserRegisterResponse registerSubscriber(UserRegisterRequest request);
+    void registerSubscriber(UserRegisterRequest request);
 
     Page<UserResponse> findAll(Pageable pageable);
 
@@ -26,6 +25,8 @@ public interface UserService {
     User findById(UUID id);
 
     UserResponse update(UUID uuid, UserUpdateRequest updateRequest);
+
+    void activateJournalistAccount(String email, String token);
 
     void deactivateUser(UUID id, String token);
 

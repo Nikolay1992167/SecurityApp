@@ -23,11 +23,11 @@ import java.util.List;
 
 @Getter
 @Setter
+@Entity
 @ToString
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
-@Entity
 @FieldNameConstants
 @EqualsAndHashCode(callSuper = true)
 @Table(schema = "security", name = "users")

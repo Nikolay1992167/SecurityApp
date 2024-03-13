@@ -5,7 +5,6 @@ import com.solbeg.userservice.dto.request.JwtRequest;
 import com.solbeg.userservice.dto.request.RefreshTokenRequest;
 import com.solbeg.userservice.dto.request.UserRegisterRequest;
 import com.solbeg.userservice.dto.response.JwtResponse;
-import com.solbeg.userservice.dto.response.UserRegisterResponse;
 import com.solbeg.userservice.service.AuthService;
 import com.solbeg.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -33,16 +32,16 @@ public class AuthController implements AuthOpenApi {
 
     @Override
     @PostMapping("/registerjournalist")
-    public ResponseEntity<UserRegisterResponse> registerJournalist(@Validated @RequestBody UserRegisterRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(userService.registerJournalist(request));
+    public ResponseEntity<?> registerJournalist(@Validated @RequestBody UserRegisterRequest request) {
+        userService.registerJournalist(request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Override
     @PostMapping("/registersubscriber")
-    public ResponseEntity<UserRegisterResponse> registerSubscriber(@Validated @RequestBody UserRegisterRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(userService.registerSubscriber(request));
+    public ResponseEntity<?> registerSubscriber(@Validated @RequestBody UserRegisterRequest request) {
+        userService.registerSubscriber(request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Override

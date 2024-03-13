@@ -1,7 +1,4 @@
 spring:
-  cloud:
-    config:
-      enabled: false
   datasource:
     url: jdbc:postgresql://localhost:5432/users_security
     username: postgres
@@ -22,3 +19,5 @@ security:
     refresh: 2
 server:
   port: 8081
+base:
+  url: http://localhost:8088/
