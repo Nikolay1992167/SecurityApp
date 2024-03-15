@@ -1,4 +1,4 @@
-package com.solbeg.userservice.dto.request;
+package com.solbeg.userservice.entity;
 
 import com.solbeg.userservice.enums.EmailType;
 import lombok.AllArgsConstructor;

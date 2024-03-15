@@ -1,6 +1,6 @@
 package com.solbeg.userservice.service;
 
-import com.solbeg.userservice.dto.request.EmailRequest;
+import com.solbeg.userservice.entity.EmailRequest;
 import com.solbeg.userservice.entity.User;
 import com.solbeg.userservice.entity.UserToken;
 import com.solbeg.userservice.enums.EmailType;
