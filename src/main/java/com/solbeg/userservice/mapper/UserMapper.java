@@ -1,9 +1,6 @@
 package com.solbeg.userservice.mapper;
 
 import com.solbeg.userservice.dto.request.UserRegisterRequest;
-
-import com.solbeg.userservice.dto.request.UserUpdateRequest;
-import com.solbeg.userservice.dto.response.UserRegisterResponse;
 import com.solbeg.userservice.dto.response.UserResponse;
 import com.solbeg.userservice.entity.Role;
 import com.solbeg.userservice.entity.User;
@@ -19,11 +16,6 @@ import java.util.stream.Collectors;
 public interface UserMapper {
 
     User fromRequest(UserRegisterRequest userRegisterRequest);
-
-    User fromUpdateRequest(UserUpdateRequest updateRequest);
-
-    @Mapping(target = "roles", expression = "java(user.getRoles().stream().map(Role::getName).toList())")
-    UserRegisterResponse toRegisterResponse(User user);
 
     @Mapping(target = "roles", expression = "java(user.getRoles().stream().map(Role::getName).toList())")
     UserResponse toResponse(User user);

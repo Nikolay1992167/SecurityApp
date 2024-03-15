@@ -1,6 +1,8 @@
 package com.solbeg.userservice.IT.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.solbeg.userservice.dto.request.UserUpdateRequest;
 import com.solbeg.userservice.dto.response.UserResponse;
 import com.solbeg.userservice.enums.error_response.ErrorMessage;
@@ -25,16 +27,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.solbeg.userservice.util.initdata.InitData.DEFAULT_PAGE_REQUEST_FOR_IT;
 import static com.solbeg.userservice.util.initdata.InitData.ID_ADMIN;
 import static com.solbeg.userservice.util.initdata.InitData.ID_JOURNALIST_FOR_IT;
 import static com.solbeg.userservice.util.initdata.InitData.ID_NOT_EXIST;
 import static com.solbeg.userservice.util.initdata.InitData.ID_SUBSCRIBER_FOR_IT;
 import static com.solbeg.userservice.util.initdata.InitData.TOKEN_ADMIN;
+import static com.solbeg.userservice.util.initdata.InitData.TOKEN_USERTOKEN;
+import static com.solbeg.userservice.util.initdata.InitData.TOKEN_USERTOKEN_NOT_EXIST;
 import static com.solbeg.userservice.util.initdata.InitData.URL_USERS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static org.springframework.cloud.openfeign.security.OAuth2AccessTokenInterceptor.BEARER;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -56,6 +60,24 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
     private UserServiceImpl userService;
 
     @Nested
+    class FindAllUserTokensGetEndpointTest {
+
+        @Test
+        @WithMockUser(authorities = "ADMIN")
+        void shouldReturnExpectedJsonAndStatus200() throws Exception {
+            MvcResult mvcResult = mockMvc.perform(get(URL_USERS + "/tokens" + "?page=0&size=15"))
+                    .andExpect(status().isOk())
+                    .andReturn();
+            MockHttpServletResponse response = mvcResult.getResponse();
+            JSONObject jsonObject = new JSONObject(response.getContentAsString());
+            assertThat(jsonObject.get("totalPages")).isEqualTo(1);
+            assertThat(jsonObject.get("totalElements")).isEqualTo(1);
+            assertThat(jsonObject.get("number")).isEqualTo(0);
+            assertThat(jsonObject.get("size")).isEqualTo(15);
+        }
+    }
+
+    @Nested
     class FindAllGetEndpointTest {
 
         @Test
@@ -67,7 +89,7 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
             MockHttpServletResponse response = mvcResult.getResponse();
             JSONObject jsonObject = new JSONObject(response.getContentAsString());
             assertThat(jsonObject.get("totalPages")).isEqualTo(1);
-            assertThat(jsonObject.get("totalElements")).isEqualTo(3);
+            assertThat(jsonObject.get("totalElements")).isEqualTo(4);
             assertThat(jsonObject.get("number")).isEqualTo(0);
             assertThat(jsonObject.get("size")).isEqualTo(15);
             assertThat(jsonObject.get("content")).isNotNull();
@@ -158,13 +180,42 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
 
 
     @Nested
+    @WireMockTest(httpPort = 8088)
+    class ActivateUserJournalistPathEndpointTest {
+
+        @Test
+        @WithMockUser(authorities = "ADMIN")
+        void shouldActivateUserJournalist() throws Exception {
+            stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/send/email"))
+                    .willReturn(WireMock.aResponse()
+                            .withStatus(200)));
+
+            mockMvc.perform(patch(URL_USERS + "/activation")
+                            .param("userToken", TOKEN_USERTOKEN)
+                            .header(AUTHORIZATION, TOKEN_ADMIN)
+                            .contentType(APPLICATION_JSON))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @WithMockUser(authorities = "ADMIN")
+        void shouldThrowExceptionWhenUserTokenNotFound() throws Exception {
+            mockMvc.perform(patch(URL_USERS + "/activation")
+                            .param("userToken", TOKEN_USERTOKEN_NOT_EXIST))
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.error_message")
+                            .value(ErrorMessage.USERTOKEN_NOT_FOUND.getMessage() + TOKEN_USERTOKEN_NOT_EXIST));
+        }
+    }
+
+    @Nested
     class DeactivateUserPathEndpointTest {
 
         @Test
         @WithMockUser(authorities = "ADMIN")
         void shouldDeactivateUser() throws Exception {
             mockMvc.perform(patch(URL_USERS + "/deactivate/{id}", ID_JOURNALIST_FOR_IT)
-                            .header(AUTHORIZATION, BEARER + TOKEN_ADMIN)
+                            .header(AUTHORIZATION, TOKEN_ADMIN)
                             .contentType(APPLICATION_JSON))
                     .andExpect(status().isOk());
         }
@@ -186,7 +237,7 @@ class UserControllerTest extends PostgresSqlContainerInitializer {
         @WithMockUser(authorities = "ADMIN")
         void shouldDeleteUser() throws Exception {
             mockMvc.perform(patch(URL_USERS + "/delete/" + ID_SUBSCRIBER_FOR_IT)
-                            .header(AUTHORIZATION, BEARER + TOKEN_ADMIN)
+                            .header(AUTHORIZATION, TOKEN_ADMIN)
                             .contentType(APPLICATION_JSON))
                     .andExpect(status().isOk());
         }

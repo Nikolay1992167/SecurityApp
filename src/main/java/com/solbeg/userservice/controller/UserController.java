@@ -3,7 +3,9 @@ package com.solbeg.userservice.controller;
 import com.solbeg.userservice.controller.openapi.UserOpenApi;
 import com.solbeg.userservice.dto.request.UserUpdateRequest;
 import com.solbeg.userservice.dto.response.UserResponse;
+import com.solbeg.userservice.entity.UserToken;
 import com.solbeg.userservice.service.UserService;
+import com.solbeg.userservice.service.UserTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
@@ -30,6 +33,14 @@ import java.util.UUID;
 public class UserController implements UserOpenApi {
 
     private final UserService userService;
+    private final UserTokenService tokenService;
+
+    @Override
+    @GetMapping("/tokens")
+    public ResponseEntity<Page<UserToken>> findAllUserTokens(@PageableDefault(15) Pageable pageable) {
+        Page<UserToken> userTokens = tokenService.getAll(pageable);
+        return ResponseEntity.ok(userTokens);
+    }
 
     @Override
     @GetMapping
@@ -48,6 +59,13 @@ public class UserController implements UserOpenApi {
     @PutMapping("/{uuid}")
     public ResponseEntity<UserResponse> update(@PathVariable UUID uuid, @Validated @RequestBody UserUpdateRequest updateRequest) {
         return ResponseEntity.ok(userService.update(uuid, updateRequest));
+    }
+
+    @Override
+    @PatchMapping("/activation")
+    public ResponseEntity<?> activateUserJournalist(@RequestParam String userToken, @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token) {
+        userService.activateJournalistAccount(userToken, token);
+        return ResponseEntity.ok().build();
     }
 
     @Override

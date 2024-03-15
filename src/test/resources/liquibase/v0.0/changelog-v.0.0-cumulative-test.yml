@@ -6,8 +6,12 @@ databaseChangeLog:
   - include:
       file: liquibase/v0.0/ddl/2024-03-01--03-create-user_roles-table.sql
   - include:
+      file: liquibase/v0.0/ddl/2024-03-12--04-create-user_tokens-table.sql
+  - include:
       file: liquibase/v0.0/dml/2024-03-01--01-insert-users-table.sql
   - include:
       file: liquibase/v0.0/dml/2024-03-01--02-insert-roles-table.sql
   - include:
       file: liquibase/v0.0/dml/2024-03-01--03-insert-user_roles-table.sql
+  - include:
+      file: liquibase/v0.0/dml/2024-03-11--04-insert-user_tokens-table.sql

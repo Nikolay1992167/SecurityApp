@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -24,6 +25,18 @@ class ApplicationConfigTest {
 
     @InjectMocks
     private ApplicationConfig config;
+
+    @Test
+    void shouldReturnExpectedInstanceOfWebclient() {
+        // given
+        Class<WebClient> expectedClass = WebClient.class;
+
+        // when
+        WebClient actualClass = config.webClient();
+
+        // then
+        assertThat(actualClass).isInstanceOf(expectedClass);
+    }
 
     @Test
     void shouldReturnExpectedInstanceOfBCryptPasswordEncoder() {

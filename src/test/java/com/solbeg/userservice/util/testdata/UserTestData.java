@@ -2,7 +2,6 @@ package com.solbeg.userservice.util.testdata;
 
 import com.solbeg.userservice.dto.request.UserRegisterRequest;
 import com.solbeg.userservice.dto.request.UserUpdateRequest;
-import com.solbeg.userservice.dto.response.UserRegisterResponse;
 import com.solbeg.userservice.dto.response.UserResponse;
 import com.solbeg.userservice.entity.Role;
 import com.solbeg.userservice.entity.User;
@@ -30,7 +29,6 @@ import static com.solbeg.userservice.util.initdata.InitData.LAST_NAME_SUBSCRIBER
 import static com.solbeg.userservice.util.initdata.InitData.PASSWORD_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.PASSWORD_SUBSCRIBER;
 import static com.solbeg.userservice.util.initdata.InitData.ROLE_NAME_SUBSCRIBER;
-import static com.solbeg.userservice.util.initdata.InitData.SUBSCRIBER_LIST_OF_ROLES;
 import static com.solbeg.userservice.util.initdata.InitData.UPDATED_AT_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.UPDATED_AT_SUBSCRIBER;
 import static com.solbeg.userservice.util.initdata.InitData.UPDATED_BY_JOURNALIST;
@@ -153,30 +151,6 @@ public class UserTestData {
                 .email(email)
                 .roles(roles)
                 .status(status)
-                .build();
-    }
-
-    public UserRegisterResponse getRegisterResponseJournalist() {
-        return UserRegisterResponse.builder()
-                .id(id)
-                .firstName(firstName)
-                .lastName(lastName)
-                .password(password)
-                .email(email)
-                .roles(roles)
-                .status(status)
-                .build();
-    }
-
-    public UserRegisterResponse getRegisterResponseSubscriber() {
-        return UserRegisterResponse.builder()
-                .id(ID_SUBSCRIBER)
-                .firstName(FIRST_NAME_SUBSCRIBER)
-                .lastName(LAST_NAME_SUBSCRIBER)
-                .password(PASSWORD_SUBSCRIBER)
-                .email(EMAIL_SUBSCRIBER)
-                .roles(SUBSCRIBER_LIST_OF_ROLES)
-                .status(Status.ACTIVE)
                 .build();
     }
 }

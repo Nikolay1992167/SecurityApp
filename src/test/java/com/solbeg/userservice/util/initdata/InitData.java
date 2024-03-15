@@ -10,6 +10,8 @@ import java.util.UUID;
 @UtilityClass
 public class InitData {
 
+    public static String NAME_ROLE_JOURNALIST = "JOURNALIST";
+    public static String NAME_ROLE_SUBSCRIBER = "SUBSCRIBER";
     public static String FIRST_NAME_JOURNALIST = "Vlad";
     public static String FIRST_NAME_SUBSCRIBER = "Olga";
     public static String FIRST_NAME_INCORRECT = "P";
@@ -51,8 +53,8 @@ public class InitData {
     public static LocalDateTime CREATED_AT_SUBSCRIBER = LocalDateTime.of(2024, 1, 4, 12, 0, 0);
     public static LocalDateTime UPDATED_AT_SUBSCRIBER = LocalDateTime.of(2024, 1, 5, 12, 0, 0);
 
-    public static List<String> JOURNALIST_LIST_OF_ROLES = List.of("JOURNALIST");
-    public static List<String> SUBSCRIBER_LIST_OF_ROLES = List.of("SUBSCRIBER");
+    public static List<String> JOURNALIST_LIST_OF_ROLES = List.of(NAME_ROLE_JOURNALIST);
+    public static List<String> SUBSCRIBER_LIST_OF_ROLES = List.of(NAME_ROLE_SUBSCRIBER);
 
     public static UUID ID_ROLE = UUID.fromString("2512c298-6a1d-48d7-a12d-b51069aceb08");
     public static UUID CREATED_BY_ROLE = null;
@@ -70,4 +72,12 @@ public class InitData {
 
     public static String URL_AUTH = "/api/v1/auth";
     public static String URL_USERS = "/api/v1/users";
+
+    public static UUID ID_USERTOKEN = UUID.fromString("b0c47e3f-152e-4c04-bfbb-8ac1fcef8c31");
+    public static UUID CREATED_BY_USERTOKEN = UUID.fromString("f2361e91-718e-41ad-9ddc-4be05ebc09b5");
+    public static LocalDateTime EXPIRATION_AT_USERTOKEN = LocalDateTime.now().plusDays(3);
+    public static LocalDateTime EXPIRED_AT_USERTOKEN = LocalDateTime.now().minusDays(1);
+    public static String TOKEN_USERTOKEN = "e6bf32a9-22cc-44ec-85eb-4f7632dabfd1";
+    public static String TOKEN_USERTOKEN_NOT_EXIST = "b0c47e3f-152e-4c04-bfbb-8ac46546";
+    public static String BASE_URL = "http://localhost:8081/api/v1/users/activation?userToken=";
 }

@@ -2,6 +2,7 @@ package com.solbeg.userservice.controller.openapi;
 
 import com.solbeg.userservice.dto.request.UserUpdateRequest;
 import com.solbeg.userservice.dto.response.UserResponse;
+import com.solbeg.userservice.entity.UserToken;
 import com.solbeg.userservice.exception.model.IncorrectData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,11 +15,102 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
 @Tag(name = "User", description = "The User Api")
 public interface UserOpenApi {
+
+    @Operation(
+            method = "GET",
+            tags = "User",
+            description = "Get page of users",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = UserResponse.class),
+                                    examples = @ExampleObject("""
+                                            {
+                                                "content": [
+                                                    {
+                                                        "id": "e4313010-16a1-4cd2-bbdc-5fe77ec211d8",
+                                                        "createdBy": "8127e85b-99a2-4bdb-9d9f-d260ee4ebe25",
+                                                        "expirationAt": "2024-03-16T09:22:22.83435",
+                                                        "token": "0c5b8c16-5c4a-4d2d-a176-0d53dae0c7ee",
+                                                        "tokenType": "ACTIVATION"
+                                                    }
+                                                ],
+                                                "pageable": {
+                                                    "pageNumber": 0,
+                                                    "pageSize": 15,
+                                                    "sort": {
+                                                        "empty": true,
+                                                        "sorted": false,
+                                                        "unsorted": true
+                                                    },
+                                                    "offset": 0,
+                                                    "unpaged": false,
+                                                    "paged": true
+                                                },
+                                                "last": true,
+                                                "totalPages": 1,
+                                                "totalElements": 1,
+                                                "size": 15,
+                                                "number": 0,
+                                                "sort": {
+                                                    "empty": true,
+                                                    "sorted": false,
+                                                    "unsorted": true
+                                                },
+                                                "first": true,
+                                                "numberOfElements": 1,
+                                                "empty": false
+                                            }
+                                            """)
+                            )
+                    ),
+                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
+                                    {
+                                        "timestamp": "2024-03-13T09:31:50.0882906",
+                                        "error_message": "Full authentication is required to access this resource",
+                                        "error_status": 401
+                                    }
+                                    """))),
+                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when an expired token is entered.",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
+                                            {
+                                                "timestamp": "2024-03-13T09:32:58.0095695",
+                                                "error_message": "JWT expired at 2024-02-25T17:00:46Z. Current time: 2024-03-13T06:32:58Z, a difference of 1431132008 milliseconds.  Allowed clock skew: 0 milliseconds.",
+                                                "error_status": 401
+                                            }
+                                    """))),
+                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when an invalid token is entered.",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
+                                            {
+                                                "timestamp": "2024-03-13T09:33:33.2754548",
+                                                "error_message": "JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.",
+                                                "error_status": 401
+                                            }
+                                    """))),
+                    @ApiResponse(responseCode = "403", description = "Not Authenticated User if a token with a non-admin role is entered",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
+                                            {
+                                                "timestamp": "2024-03-13T09:35:10.6540453",
+                                                "error_message": "Access Denied",
+                                                "error_status": 403
+                                            }
+                                    """)))
+            }
+    )
+    ResponseEntity<Page<UserToken>> findAllUserTokens(Pageable pageable);
 
     @Operation(
             method = "GET",
@@ -278,7 +370,7 @@ public interface UserOpenApi {
                                     """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = IncorrectData.class),  examples = @ExampleObject("""
+                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                     {
                                         "timestamp": "2024-03-03T21:05:16.3651964",
                                         "error_message": "Full authentication is required to access this resource",
@@ -333,6 +425,56 @@ public interface UserOpenApi {
             }
     )
     ResponseEntity<UserResponse> update(UUID uuid, @Parameter(hidden = true) UserUpdateRequest updateRequest);
+
+    @Operation(
+            method = "PATCH",
+            tags = "User",
+            description = "Changing the user's status to NOT_ACTIVE",
+            parameters = {
+                    @Parameter(name = "userToken", description = "Token of UserToken", example = "0c5b8c16-5c4a-4d2d-a176-0d53dae0c7ee")
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200", description = "The endpoint has been completed."),
+                    @ApiResponse(responseCode = "404", description = "The user not found when entered not existent uuid.",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
+                                            {
+                                                "timestamp": "2024-03-13T09:50:03.5977589",
+                                                "error_message": "UserToken not found with token 0c5b8c16-5c4a-4d2d-a176-0d53dae0c7dg",
+                                                "error_status": 404
+                                            }
+                                    """))),
+                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
+                                    {
+                                        "timestamp": "2024-03-13T09:51:09.2570088",
+                                        "error_message": "Full authentication is required to access this resource",
+                                        "error_status": 401
+                                    }
+                                    """))),
+                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when an expired token is entered.",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
+                                            {
+                                                "timestamp": "2024-03-13T09:51:54.2371641",
+                                                "error_message": "JWT expired at 2024-02-25T17:00:46Z. Current time: 2024-03-13T06:51:54Z, a difference of 1432268235 milliseconds.  Allowed clock skew: 0 milliseconds.",
+                                                "error_status": 401
+                                            }
+                                    """))),
+                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when an invalid token is entered.",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
+                                            {
+                                                "timestamp": "2024-03-13T09:52:11.2677856",
+                                                "error_message": "JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.",
+                                                "error_status": 401
+                                            }
+                                    """)))
+            }
+    )
+    ResponseEntity<?> activateUserJournalist(@RequestParam String userToken, @Parameter(hidden = true) String token);
 
     @Operation(
             method = "PATCH",
