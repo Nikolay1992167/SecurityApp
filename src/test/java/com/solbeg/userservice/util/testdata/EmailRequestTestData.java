@@ -1,6 +1,6 @@
 package com.solbeg.userservice.util.testdata;
 
-import com.solbeg.userservice.dto.request.EmailRequest;
+import com.solbeg.userservice.entity.EmailRequest;
 import com.solbeg.userservice.enums.EmailType;
 import lombok.Builder;
 import lombok.Data;

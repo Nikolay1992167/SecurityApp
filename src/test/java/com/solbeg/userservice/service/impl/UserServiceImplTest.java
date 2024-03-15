@@ -1,6 +1,6 @@
 package com.solbeg.userservice.service.impl;
 
-import com.solbeg.userservice.dto.request.EmailRequest;
+import com.solbeg.userservice.entity.EmailRequest;
 import com.solbeg.userservice.dto.request.UserRegisterRequest;
 import com.solbeg.userservice.dto.request.UserUpdateRequest;
 import com.solbeg.userservice.dto.response.UserResponse;
