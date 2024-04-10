@@ -1,0 +1,12 @@
+package com.solbeg.userservice.config;
+
+import io.hypersistence.utils.spring.repository.BaseJpaRepositoryImpl;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+@Configuration
+@EnableJpaRepositories(
+        value = "com.solbeg.userservice.repository",
+        repositoryBaseClass = BaseJpaRepositoryImpl.class)
+public class JpaConfig {
+}
