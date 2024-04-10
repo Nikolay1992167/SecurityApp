@@ -49,6 +49,7 @@ public class UserController implements UserOpenApi {
         return ResponseEntity.ok(usersPage);
     }
 
+    @PreAuthorize("hasAuthority('JOURNALIST')")
     @Override
     @GetMapping("/{uuid}")
     public ResponseEntity<UserResponse> findById(@PathVariable UUID uuid) {

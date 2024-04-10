@@ -51,6 +51,16 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
+    @Transactional(readOnly = true)
+    public UserResponse findUserByToken(String token) {
+        UUID userId = jwtTokenProvider.getIdInFormatUUID(token);
+        UserResponse userResponse = userRepository.findById(userId).map(userMapper::toResponse)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + userId));
+        log.info("IN findUserByToken - user: {} found by id: {}", userResponse, userId);
+        return userResponse;
+    }
+
+    @Override
     @Transactional
     public void registerJournalist(UserRegisterRequest request) {
         checkUniqueEmail(request.getEmail());
@@ -78,7 +88,7 @@ public class UserServiceImpl implements UserService {
         userToSave.setRoles(userRoles);
         userToSave.setPassword(passwordEncoder.encode(userToSave.getPassword()));
         userToSave.setStatus(Status.ACTIVE);
-        userRepository.persist(userToSave);
+        userRepository.persistAndFlush(userToSave);
         log.info("IN registerSubscriber user: {} successfully registered", userToSave);
     }
 
@@ -130,7 +140,7 @@ public class UserServiceImpl implements UserService {
         userInDB.setLastName(updateRequest.getLastName());
         userInDB.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
         userInDB.setEmail(updateRequest.getEmail());
-        User updatedUser = userRepository.persist(userInDB);
+        User updatedUser = userRepository.persistAndFlush(userInDB);
         UserResponse userResponse = userMapper.toResponse(updatedUser);
         log.info("IN update - user: {} with id: {}", userResponse, uuid);
         return userResponse;
