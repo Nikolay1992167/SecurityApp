@@ -24,7 +24,13 @@ import static org.mockito.Mockito.when;
 class ApplicationConfigTest {
 
     @InjectMocks
-    private ApplicationConfig config;
+    private WebClientConfig webClientConfig;
+
+    @InjectMocks
+    private ApplicationConfig applicationConfig;
+
+    @InjectMocks
+    private SecurityConfig securityConfig;
 
     @Test
     void shouldReturnExpectedInstanceOfWebclient() {
@@ -32,7 +38,7 @@ class ApplicationConfigTest {
         Class<WebClient> expectedClass = WebClient.class;
 
         // when
-        WebClient actualClass = config.webClient();
+        WebClient actualClass = webClientConfig.webClient();
 
         // then
         assertThat(actualClass).isInstanceOf(expectedClass);
@@ -44,7 +50,7 @@ class ApplicationConfigTest {
         Class<BCryptPasswordEncoder> expecteClass = BCryptPasswordEncoder.class;
 
         // when
-        PasswordEncoder actualClass = config.passwordEncoder();
+        PasswordEncoder actualClass = applicationConfig.passwordEncoder();
 
         // then
         assertThat(actualClass).isInstanceOf(expecteClass);
@@ -61,7 +67,7 @@ class ApplicationConfigTest {
                 .getAuthenticationManager();
 
         // when
-        AuthenticationManager actualValue = config.authenticationManager(configuration);
+        AuthenticationManager actualValue = securityConfig.authenticationManager(configuration);
 
         // then
         assertThat(actualValue).isEqualTo(expectedValue);
@@ -82,7 +88,7 @@ class ApplicationConfigTest {
         when(httpSecurityWhen.build()).thenReturn(expectedValue);
 
         // when
-        SecurityFilterChain actualValue = config.securityFilterChain(httpSecurity);
+        SecurityFilterChain actualValue = securityConfig.securityFilterChain(httpSecurity);
 
         // then
         assertThat(actualValue).isEqualTo(expectedValue);
