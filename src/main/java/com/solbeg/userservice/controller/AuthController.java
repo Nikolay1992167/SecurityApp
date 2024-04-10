@@ -5,6 +5,7 @@ import com.solbeg.userservice.dto.request.JwtRequest;
 import com.solbeg.userservice.dto.request.RefreshTokenRequest;
 import com.solbeg.userservice.dto.request.UserRegisterRequest;
 import com.solbeg.userservice.dto.response.JwtResponse;
+import com.solbeg.userservice.dto.response.UserResponse;
 import com.solbeg.userservice.service.AuthService;
 import com.solbeg.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -48,5 +49,11 @@ public class AuthController implements AuthOpenApi {
     @PostMapping("/refresh")
     public ResponseEntity<JwtResponse> refresh(@Validated @RequestBody RefreshTokenRequest refreshTokenRequest) {
         return ResponseEntity.ok(authService.refresh(refreshTokenRequest.getRefreshToken()));
+    }
+
+    @Override
+    @PostMapping("/detailsuser")
+    public ResponseEntity<UserResponse> getUserData(@RequestBody String token) {
+        return ResponseEntity.ok(userService.findUserByToken(token));
     }
 }

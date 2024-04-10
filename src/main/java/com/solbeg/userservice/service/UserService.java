@@ -12,6 +12,8 @@ import java.util.UUID;
 
 public interface UserService {
 
+    UserResponse findUserByToken(String token);
+
     void registerJournalist(UserRegisterRequest request);
 
     void registerSubscriber(UserRegisterRequest request);

@@ -23,7 +23,6 @@ repositories {
 }
 
 ext {
-	set('springCloudVersion', "2023.0.0")
 	hipersistenceVersion ='3.5.1'
 	openapiVersion = '2.1.0'
 	jjwtVersion = '0.11.5'
@@ -60,12 +59,6 @@ dependencies {
 	testImplementation "org.springframework.security:spring-security-test"
 	testImplementation "org.testcontainers:postgresql:${postgresqlContainersVersion}"
 	testImplementation "org.assertj:assertj-core:${assertJVersion}"
-}
-
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
 }
 
 tasks.named('test') {

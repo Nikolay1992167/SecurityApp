@@ -14,7 +14,7 @@ public enum ErrorMessage {
     USER_NOT_ACTIVE("User is not active!"),
 
     USERTOKEN_NOT_FOUND("UserToken not found with token "),
-    ERROR_SEND_DATA("Failed to send user data to mail-service."),
+    ERROR_SEND_DATA("Failed to send data to mail-service."),
     TOKEN_EXPIRED("Token expired!");
 
     private final String message;
