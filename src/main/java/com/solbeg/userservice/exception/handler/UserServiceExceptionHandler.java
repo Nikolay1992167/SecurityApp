@@ -4,11 +4,11 @@ import com.solbeg.userservice.exception.InformationChangeStatusUserException;
 import com.solbeg.userservice.exception.JwtParsingException;
 import com.solbeg.userservice.exception.NoSuchUserEmailException;
 import com.solbeg.userservice.exception.NotFoundException;
+import com.solbeg.userservice.exception.SendDataException;
+import com.solbeg.userservice.exception.TokenExpirationException;
 import com.solbeg.userservice.exception.UniqueEmailException;
 import com.solbeg.userservice.exception.UserStatusException;
 import com.solbeg.userservice.exception.model.IncorrectData;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,15 +18,34 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@Slf4j
 @RestControllerAdvice
-@RequiredArgsConstructor
 public class UserServiceExceptionHandler {
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<IncorrectData> webClientRequestException(IllegalArgumentException exception) {
+        return getResponse(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(WebClientRequestException.class)
+    public ResponseEntity<IncorrectData> webClientRequestException(WebClientRequestException exception) {
+        return getResponse("Failed to connect to the sending service.", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(TokenExpirationException.class)
+    public ResponseEntity<IncorrectData> TokenExpirationException(TokenExpirationException exception) {
+        return getResponse(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(SendDataException.class)
+    public ResponseEntity<IncorrectData> sendDataException(SendDataException exception) {
+        return getResponse(exception.getMessage(), HttpStatus.CONFLICT);
+    }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<IncorrectData> methodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {

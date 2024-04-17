@@ -4,7 +4,6 @@ import com.solbeg.userservice.dto.request.JwtRequest;
 import com.solbeg.userservice.dto.request.RefreshTokenRequest;
 import com.solbeg.userservice.dto.request.UserRegisterRequest;
 import com.solbeg.userservice.dto.response.JwtResponse;
-import com.solbeg.userservice.dto.response.UserRegisterResponse;
 import com.solbeg.userservice.exception.model.IncorrectData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,7 +13,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ResponseEntity;
 
 @Tag(name = "Authentication", description = "The Authentication Api")
 public interface AuthOpenApi {
@@ -78,10 +76,19 @@ public interface AuthOpenApi {
                                                 "error_message": "User is not active!",
                                                 "error_status": 401
                                             }
+                                    """))),
+                    @ApiResponse(responseCode = "401", description = "The endpoint has not been completed because the password not correct.",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
+                                            {
+                                                "timestamp": "2024-03-12T17:34:16.543065",
+                                                "error_message": "Неверные учетные данные пользователя",
+                                                "error_status": 401
+                                            }
                                     """)))
             }
     )
-    ResponseEntity<JwtResponse> authenticate(@Parameter(hidden = true) JwtRequest loginRequest);
+    JwtResponse authenticate(@Parameter(hidden = true) JwtRequest loginRequest);
 
     @Operation(
             method = "POST",
@@ -104,25 +111,7 @@ public interface AuthOpenApi {
             ),
             responses = {
                     @ApiResponse(
-                            responseCode = "201",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = UserRegisterResponse.class),
-                                    examples = @ExampleObject("""
-                                            {
-                                                "id": "6fb84089-80d5-40a6-a33e-f1ecf0c2cf95",
-                                                "firstName": "Pasha",
-                                                "lastName": "Gromov",
-                                                "password": "$2a$10$Vc6cGda9YXePlti3OI/.6OzQx8a39cPajFSpH4Hhr8g6lCposgX5.",
-                                                "email": "gromov@google.com",
-                                                "roles": [
-                                                    "JOURNALIST"
-                                                ],
-                                                "status": "NOT_ACTIVE"
-                                            }
-                                            """)
-                            )
-                    ),
+                            responseCode = "201", description = "The endpoint has been completed."),
                     @ApiResponse(responseCode = "406", description = "The endpoint has not been completed because an email is exist in DB.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
@@ -143,7 +132,7 @@ public interface AuthOpenApi {
                                     """)))
             }
     )
-    ResponseEntity<UserRegisterResponse> registerJournalist(UserRegisterRequest request);
+    void registerJournalist(UserRegisterRequest request);
 
     @Operation(
             method = "POST",
@@ -166,25 +155,7 @@ public interface AuthOpenApi {
             ),
             responses = {
                     @ApiResponse(
-                            responseCode = "201",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = UserRegisterResponse.class),
-                                    examples = @ExampleObject("""
-                                            {
-                                                "id": "33df42aa-223b-47cc-b31b-e8683e2dfa5d",
-                                                "firstName": "Olga",
-                                                "lastName": "Popova",
-                                                "password": "$2a$10$koIMR/n4Ro9UdE1eZ7Xo8O.7DsmUXwDyPnnqwYWuOrBUITR8Nv2vS",
-                                                "email": "popova@email.com",
-                                                "roles": [
-                                                    "SUBSCRIBER"
-                                                ],
-                                                "status": "ACTIVE"
-                                            }
-                                            """)
-                            )
-                    ),
+                            responseCode = "201", description = "The endpoint has been completed."),
                     @ApiResponse(responseCode = "406", description = "The endpoint has not been completed because an email is exist in DB.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
@@ -205,7 +176,7 @@ public interface AuthOpenApi {
                                     """)))
             }
     )
-    ResponseEntity<UserRegisterResponse> registerSubscriber(UserRegisterRequest request);
+    void registerSubscriber(UserRegisterRequest request);
 
     @Operation(
             method = "POST",
@@ -259,5 +230,5 @@ public interface AuthOpenApi {
                                     """)))
             }
     )
-    ResponseEntity<JwtResponse> refresh(RefreshTokenRequest refreshTokenRequest);
+    JwtResponse refresh(RefreshTokenRequest refreshTokenRequest);
 }

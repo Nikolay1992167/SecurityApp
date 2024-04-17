@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class JwtUserDetailsService implements UserDetailsService {
-
     private final UserService userService;
 
     @Override

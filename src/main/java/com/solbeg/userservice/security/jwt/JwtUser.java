@@ -11,7 +11,6 @@ import java.util.UUID;
 @Data
 @RequiredArgsConstructor
 public class JwtUser implements UserDetails {
-
     private final UUID id;
     private final String firstName;
     private final String lastName;

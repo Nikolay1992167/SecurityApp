@@ -29,7 +29,6 @@ import java.time.LocalDateTime;
 @Configuration
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
-
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
     private final JwtUserDetailsService userDetailsService;

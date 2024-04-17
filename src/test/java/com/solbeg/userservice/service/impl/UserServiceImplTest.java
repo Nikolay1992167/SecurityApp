@@ -1,22 +1,31 @@
 package com.solbeg.userservice.service.impl;
 
+import com.solbeg.userservice.dto.request.EmailRequest;
 import com.solbeg.userservice.dto.request.UserRegisterRequest;
 import com.solbeg.userservice.dto.request.UserUpdateRequest;
-import com.solbeg.userservice.dto.response.UserRegisterResponse;
 import com.solbeg.userservice.dto.response.UserResponse;
 import com.solbeg.userservice.entity.Role;
 import com.solbeg.userservice.entity.User;
+import com.solbeg.userservice.entity.UserToken;
+import com.solbeg.userservice.enums.EmailType;
 import com.solbeg.userservice.enums.Status;
 import com.solbeg.userservice.enums.error_response.ErrorMessage;
 import com.solbeg.userservice.exception.InformationChangeStatusUserException;
 import com.solbeg.userservice.exception.NoSuchUserEmailException;
 import com.solbeg.userservice.exception.NotFoundException;
+import com.solbeg.userservice.exception.TokenExpirationException;
 import com.solbeg.userservice.exception.UniqueEmailException;
 import com.solbeg.userservice.mapper.UserMapperImpl;
 import com.solbeg.userservice.repository.RoleRepository;
 import com.solbeg.userservice.repository.UserRepository;
 import com.solbeg.userservice.security.jwt.JwtTokenProvider;
+import com.solbeg.userservice.service.SendingDataService;
+import com.solbeg.userservice.service.UserIdentityService;
+import com.solbeg.userservice.service.UserTokenService;
+import com.solbeg.userservice.util.testdata.EmailRequestTestData;
+import com.solbeg.userservice.util.testdata.RoleTestData;
 import com.solbeg.userservice.util.testdata.UserTestData;
+import com.solbeg.userservice.util.testdata.UserTokenTestData;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -32,12 +41,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.solbeg.userservice.util.initdata.InitData.ACCESS_TOKEN;
 import static com.solbeg.userservice.util.initdata.InitData.DEFAULT_PAGE_REQUEST_FOR_IT;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_JOURNALIST;
+import static com.solbeg.userservice.util.initdata.InitData.EXPIRED_AT_USERTOKEN;
 import static com.solbeg.userservice.util.initdata.InitData.ID_ADMIN;
 import static com.solbeg.userservice.util.initdata.InitData.ID_JOURNALIST;
+import static com.solbeg.userservice.util.initdata.InitData.NAME_ROLE_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.REFRESH_TOKEN;
 import static com.solbeg.userservice.util.initdata.InitData.TOKEN_ADMIN;
+import static com.solbeg.userservice.util.initdata.InitData.TOKEN_USERTOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,7 +66,16 @@ class UserServiceImplTest {
     private UserServiceImpl userService;
 
     @Mock
+    private UserTokenService tokenService;
+
+    @Mock
+    private SendingDataService sendingDataService;
+
+    @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private UserIdentityService userIdentityService;
 
     @Mock
     private RoleRepository roleRepository;
@@ -65,32 +87,77 @@ class UserServiceImplTest {
     private JwtTokenProvider jwtTokenProvider;
 
     @Nested
+    class FindUserByToken {
+
+        @Test
+        void shouldReturnExpectedValue() {
+            // given
+            String userToken = ACCESS_TOKEN;
+            User user = UserTestData.builder()
+                    .build()
+                    .getJournalist();
+            UserResponse expected = UserTestData.builder()
+                    .build()
+                    .getUserResponse();
+            when(userIdentityService.getIdInFormatUUID(userToken))
+                    .thenReturn(ID_JOURNALIST);
+            when(userRepository.findById(ID_JOURNALIST))
+                    .thenReturn(Optional.ofNullable(user));
+
+            // when
+            UserResponse userByToken = userService.findUserByToken(ACCESS_TOKEN);
+
+            // then
+            assertThat(userByToken).isEqualTo(expected);
+        }
+
+        @Test
+        void shouldReturnThrowExceptionWhenUserNotFound() {
+            // given
+            String userToken = ACCESS_TOKEN;
+            when(userIdentityService.getIdInFormatUUID(userToken))
+                    .thenReturn(ID_JOURNALIST);
+            when(userRepository.findById(ID_JOURNALIST))
+                    .thenReturn(Optional.empty());
+
+            // when, then
+            assertThatThrownBy(() -> userService.findUserByToken(userToken))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessageContaining(ErrorMessage.USER_NOT_FOUND.getMessage() + ID_JOURNALIST);
+        }
+    }
+
+    @Nested
     class RegisterJournalist {
 
         @Test
-        void shouldReturnExpectedUserRegisterResponse() {
+        void shouldCheckSuccessRegistration() {
             // given
             UserRegisterRequest registerRequest = UserTestData.builder()
                     .build()
                     .getRegisterRequestJournalist();
-            User savedUser = UserTestData.builder()
+            User expectedUser = UserTestData.builder()
+                    .withStatus(Status.NOT_ACTIVE)
                     .build()
                     .getJournalist();
-            UserRegisterResponse expectedResponse = UserTestData.builder()
+            Role role = RoleTestData.builder()
                     .build()
-                    .getRegisterResponseJournalist();
-            when(userRepository.persist(any(User.class)))
-                    .thenReturn(savedUser);
+                    .getEntity();
+            when(roleRepository.findByName(NAME_ROLE_JOURNALIST))
+                    .thenReturn(role);
+            when(userRepository.persistAndFlush(any(User.class)))
+                    .thenReturn(expectedUser);
 
             // when
-            UserRegisterResponse actualResponse = userService.registerJournalist(registerRequest);
+            userService.registerJournalist(registerRequest);
 
             // then
-            assertThat(actualResponse).isEqualTo(expectedResponse);
+            verify(userRepository, times(1)).persistAndFlush(any(User.class));
+            verify(tokenService, times(1)).createActivationToken(expectedUser.getId());
         }
 
         @Test
-        void shouldReturnThrowExceptionWhenEmailIsNotFound() {
+        void shouldReturnThrowExceptionWhenEmailIsFound() {
             // given
             UserRegisterRequest registerRequest = UserTestData.builder()
                     .build()
@@ -110,45 +177,42 @@ class UserServiceImplTest {
 
     @Nested
     class RegisterSubscriber {
-    }
 
-    @Test
-    void shouldReturnExpectedUserRegisterResponse() {
-        // given
-        UserRegisterRequest registerRequest = UserTestData.builder()
-                .build()
-                .getRegisterRequestSubscriber();
-        User savedUser = UserTestData.builder()
-                .build().getSubscriber();
-        UserRegisterResponse expectedResponse = UserTestData.builder()
-                .build()
-                .getRegisterResponseSubscriber();
-        when(userRepository.persist(any(User.class)))
-                .thenReturn(savedUser);
+        @Test
+        void shouldCheckSuccessRegistration() {
+            // given
+            UserRegisterRequest registerRequest = UserTestData.builder()
+                    .build()
+                    .getRegisterRequestSubscriber();
+            User savedUser = UserTestData.builder()
+                    .build().getSubscriber();
+            when(userRepository.persistAndFlush(any(User.class)))
+                    .thenReturn(savedUser);
 
-        // when
-        UserRegisterResponse actualResponse = userService.registerSubscriber(registerRequest);
+            // when
+            userService.registerSubscriber(registerRequest);
 
-        // then
-        assertThat(actualResponse).isEqualTo(expectedResponse);
-    }
+            // then
+            verify(userRepository, times(1)).persistAndFlush(any(User.class));
+        }
 
-    @Test
-    void shouldReturnThrowExceptionWhenEmailIsNotFound() {
-        // given
-        UserRegisterRequest registerRequest = UserTestData.builder()
-                .build()
-                .getRegisterRequestSubscriber();
-        User user = UserTestData.builder()
-                .build()
-                .getSubscriber();
-        when(userRepository.findByEmail(registerRequest.getEmail()))
-                .thenReturn(Optional.of(user));
+        @Test
+        void shouldReturnThrowExceptionWhenEmailIsFound() {
+            // given
+            UserRegisterRequest registerRequest = UserTestData.builder()
+                    .build()
+                    .getRegisterRequestSubscriber();
+            User user = UserTestData.builder()
+                    .build()
+                    .getSubscriber();
+            when(userRepository.findByEmail(registerRequest.getEmail()))
+                    .thenReturn(Optional.of(user));
 
-        // when, then
-        assertThatThrownBy(() -> userService.registerSubscriber(registerRequest))
-                .isInstanceOf(UniqueEmailException.class)
-                .hasMessageContaining(ErrorMessage.UNIQUE_USER_EMAIL.getMessage() + registerRequest.getEmail());
+            // when, then
+            assertThatThrownBy(() -> userService.registerSubscriber(registerRequest))
+                    .isInstanceOf(UniqueEmailException.class)
+                    .hasMessageContaining(ErrorMessage.UNIQUE_USER_EMAIL.getMessage() + registerRequest.getEmail());
+        }
     }
 
     @Nested
@@ -313,7 +377,7 @@ class UserServiceImplTest {
                     .getUserResponse();
             when(userRepository.findById(userId))
                     .thenReturn(Optional.of(userInDB));
-            when(userRepository.persist(userInDB))
+            when(userRepository.persistAndFlush(userInDB))
                     .thenReturn(updatedUser);
 
             // when
@@ -341,6 +405,78 @@ class UserServiceImplTest {
     }
 
     @Nested
+    class ActivateJournalistAccount {
+
+        @Test
+        void shouldActivateUserJournalist() {
+            // given
+            String tokenUser = TOKEN_USERTOKEN;
+            String tokenAdmin = TOKEN_ADMIN;
+            User user = UserTestData.builder()
+                    .build()
+                    .getJournalist();
+            UserToken userToken = UserTokenTestData.builder()
+                    .build()
+                    .getUserToken();
+            EmailRequest emailRequest = EmailRequestTestData.builder()
+                    .build()
+                    .getEmailRequest();
+            when(tokenService.getByToken(tokenUser))
+                    .thenReturn(userToken);
+            when(userIdentityService.getIdInFormatUUID(tokenAdmin))
+                    .thenReturn(ID_ADMIN);
+            when(sendingDataService.getEmailRequest(user, EmailType.USER_WELCOME_EMAIL))
+                    .thenReturn(emailRequest);
+
+            // when
+            userService.activateJournalistAccount(tokenUser, tokenAdmin);
+
+            // then
+            verify(userRepository, times(1)).persist(user);
+            verify(tokenService, times(1)).deleteUserToken(tokenUser);
+            verify(sendingDataService, times(1)).sendRequestToMailService(any(EmailRequest.class));
+        }
+
+        @Test
+        void shouldThrowExceptionWhenUserTokenNotFound() {
+            // given
+            String tokenUser = TOKEN_USERTOKEN;
+            UserToken userToken = UserTokenTestData.builder()
+                    .withUser(null)
+                    .build()
+                    .getUserToken();
+
+            // when
+            when(tokenService.getByToken(tokenUser))
+                    .thenReturn(userToken);
+
+            // then
+            assertThatThrownBy(() -> userService.activateJournalistAccount(tokenUser, TOKEN_ADMIN))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessageContaining(ErrorMessage.USERTOKEN_NOT_FOUND.getMessage() + tokenUser);
+        }
+
+        @Test
+        public void shouldThrowExceptionWhenUserTokenExpired() {
+            // given
+            String tokenUser = TOKEN_USERTOKEN;
+            UserToken userToken = UserTokenTestData.builder()
+                    .withExpirationAt(EXPIRED_AT_USERTOKEN)
+                    .build()
+                    .getUserToken();
+
+            // when
+            when(tokenService.getByToken(tokenUser))
+                    .thenReturn(userToken);
+
+            // then
+            assertThatThrownBy(() -> userService.activateJournalistAccount(tokenUser, TOKEN_ADMIN))
+                    .isInstanceOf(TokenExpirationException.class)
+                    .hasMessageContaining(ErrorMessage.TOKEN_EXPIRED.getMessage());
+        }
+    }
+
+    @Nested
     class DeactivateUser {
 
         @Test
@@ -353,7 +489,7 @@ class UserServiceImplTest {
                     .getJournalist();
             when(userRepository.findById(userId))
                     .thenReturn(Optional.of(user));
-            when(jwtTokenProvider.getIdInFormatUUID(token))
+            when(userIdentityService.getIdInFormatUUID(token))
                     .thenReturn(userId);
 
             // when
@@ -400,7 +536,7 @@ class UserServiceImplTest {
     class DeleteUser {
 
         @Test
-        void shouldDeactivateUser() {
+        void shouldDeletedUser() {
             // given
             UUID userId = ID_JOURNALIST;
             String token = REFRESH_TOKEN;
@@ -409,7 +545,7 @@ class UserServiceImplTest {
                     .getJournalist();
             when(userRepository.findById(userId))
                     .thenReturn(Optional.of(user));
-            when(jwtTokenProvider.getIdInFormatUUID(token))
+            when(userIdentityService.getIdInFormatUUID(token))
                     .thenReturn(userId);
 
             // when

@@ -11,28 +11,23 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
-@Getter
-@Setter
-@ToString
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
-@Entity
-@FieldNameConstants
 @EqualsAndHashCode(callSuper = true)
+@Entity
 @Table(schema = "security", name = "users")
 public class User extends BaseEntity {
-
     @Column(name = "first_name", nullable = false, length = 40)
     private String firstName;
 

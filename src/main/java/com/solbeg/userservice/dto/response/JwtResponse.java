@@ -12,7 +12,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class JwtResponse {
-
     private UUID id;
     private String email;
     private String accessToken;
