@@ -1,6 +1,6 @@
 package com.solbeg.userservice.service.impl;
 
-import com.solbeg.userservice.entity.EmailRequest;
+import com.solbeg.userservice.dto.request.EmailRequest;
 import com.solbeg.userservice.entity.User;
 import com.solbeg.userservice.entity.UserToken;
 import com.solbeg.userservice.entity.User_;
@@ -10,18 +10,17 @@ import com.solbeg.userservice.exception.SendDataException;
 import com.solbeg.userservice.util.testdata.EmailRequestTestData;
 import com.solbeg.userservice.util.testdata.UserTestData;
 import com.solbeg.userservice.util.testdata.UserTokenTestData;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +28,11 @@ import static com.solbeg.userservice.util.initdata.InitData.BASE_URL;
 import static com.solbeg.userservice.util.initdata.InitData.TOKEN_USERTOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
@@ -37,37 +41,52 @@ class SendDataServiceImplTest {
     @InjectMocks
     private SendDataServiceImpl sendingDataService;
 
-    private MockWebServer mockWebServer;
+    @Mock
+    private WebClient webClient;
 
-    @BeforeEach
-    public void setUp() throws IOException {
-        mockWebServer = new MockWebServer();
-        mockWebServer.start();
-        WebClient webClient = WebClient.create(mockWebServer.url("/").toString());
-        sendingDataService = new SendDataServiceImpl(webClient);
-    }
+    @Mock
+    private WebClient.RequestHeadersSpec<?> requestHeadersMock;
 
-    @AfterEach
-    public void tearDown() throws IOException {
-        mockWebServer.shutdown();
-    }
+    @Mock
+    private WebClient.RequestBodySpec requestBodyMock;
+
+    @Mock
+    private WebClient.RequestBodyUriSpec requestBodyUriMock;
+
+    @Mock
+    private WebClient.ResponseSpec responseMock;
 
     @Nested
     class SendRequestToMailService {
 
         @Test
-        void shouldCheckSendEmailRequestToMailServiceAndReturnStatus200() {
+        void shouldSendRequestToMailService() {
             // given
-            EmailRequest emailRequest = EmailRequestTestData.builder()
-                    .build()
-                    .getEmailRequest();
-            mockWebServer.enqueue(new MockResponse().setResponseCode(200));
+            EmailRequest emailRequest = new EmailRequest();
+
+            when(webClient.post())
+                    .thenReturn(requestBodyUriMock);
+            when(requestBodyUriMock.uri(anyString()))
+                    .thenReturn(requestBodyMock);
+            when(requestBodyMock.header(anyString(), anyString()))
+                    .thenReturn(requestBodyMock);
+            when(requestBodyMock.body(any(), any(Class.class)))
+                    .thenReturn(requestHeadersMock);
+            when(requestHeadersMock.retrieve())
+                    .thenReturn(responseMock);
+            when(responseMock.bodyToMono(String.class))
+                    .thenReturn(Mono.just("Success"));
 
             // when
             sendingDataService.sendRequestToMailService(emailRequest);
 
             // then
-            assertThat(mockWebServer.getRequestCount()).isEqualTo(1);
+            verify(webClient, times(1)).post();
+            verify(requestBodyUriMock, times(1)).uri(anyString());
+            verify(requestBodyMock, times(1)).header(anyString(), anyString());
+            verify(requestBodyMock, times(1)).body(any(), any(Class.class));
+            verify(requestHeadersMock, times(1)).retrieve();
+            verify(responseMock, times(1)).bodyToMono(String.class);
         }
 
         @Test
@@ -76,15 +95,25 @@ class SendDataServiceImplTest {
             EmailRequest emailRequest = EmailRequestTestData.builder()
                     .build()
                     .getEmailRequest();
-            mockWebServer.enqueue(new MockResponse().setResponseCode(409));
 
-            // when, then
+            when(webClient.post())
+                    .thenReturn(requestBodyUriMock);
+            when(requestBodyUriMock.uri(anyString()))
+                    .thenReturn(requestBodyMock);
+            when(requestBodyMock.header(anyString(), anyString()))
+                    .thenReturn(requestBodyMock);
+            when(requestBodyMock.body(any(), any(Class.class)))
+                    .thenReturn(requestHeadersMock);
+            when(requestHeadersMock.retrieve())
+                    .thenReturn(responseMock);
+            when(responseMock.bodyToMono(String.class))
+                    .thenReturn(Mono.error(new WebClientResponseException("Error", 500, "Internal Server Error", HttpHeaders.EMPTY, null, null)));
+
             assertThatThrownBy(() -> sendingDataService.sendRequestToMailService(emailRequest))
                     .isExactlyInstanceOf(SendDataException.class)
                     .hasMessageContaining(ErrorMessage.ERROR_SEND_DATA.getMessage());
         }
     }
-
 
     @Test
     void shouldReturnExpectedActivationData() {
@@ -100,7 +129,7 @@ class SendDataServiceImplTest {
         // then
         assertThat(actual.get(User_.FIRST_NAME)).isEqualTo(user.getFirstName());
         assertThat(actual.get(User_.LAST_NAME)).isEqualTo(user.getLastName());
-        assertThat(actual.get("activationLink")).isEqualTo("http://localhost:8081/api/v1/users/activation?userToken=" + tokenUser);
+        assertThat(actual.get("activationLink")).isEqualTo("http://localhost:8081/api/v1/admin/activation?userToken=" + tokenUser);
     }
 
     @Test
@@ -168,6 +197,5 @@ class SendDataServiceImplTest {
 
         // then
         assertThat(actual).isEqualTo(expected);
-
     }
 }

@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserTokenRepository extends BaseJpaRepository<UserToken, UUID> {
-
     Optional<UserToken> findByToken(String token);
 
     Page<UserToken> findAll(Pageable pageable);

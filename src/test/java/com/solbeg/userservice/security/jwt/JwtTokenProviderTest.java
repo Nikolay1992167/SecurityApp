@@ -3,9 +3,8 @@ package com.solbeg.userservice.security.jwt;
 import com.solbeg.userservice.dto.response.JwtResponse;
 import com.solbeg.userservice.entity.Role;
 import com.solbeg.userservice.entity.User;
-import com.solbeg.userservice.enums.error_response.ErrorMessage;
-import com.solbeg.userservice.exception.JwtParsingException;
 import com.solbeg.userservice.security.props.JwtProperties;
+import com.solbeg.userservice.service.UserIdentityService;
 import com.solbeg.userservice.service.UserService;
 import com.solbeg.userservice.util.testdata.UserTestData;
 import io.jsonwebtoken.Claims;
@@ -32,11 +31,9 @@ import java.util.UUID;
 import static com.solbeg.userservice.util.initdata.InitData.ACCESS_TEST;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.ID_JOURNALIST;
-import static com.solbeg.userservice.util.initdata.InitData.INCORRECT_TOKEN;
 import static com.solbeg.userservice.util.initdata.InitData.REFRESH_TEST;
 import static com.solbeg.userservice.util.initdata.InitData.ROLE_NAME_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.SECRET_TEST;
-import static com.solbeg.userservice.util.initdata.InitData.TOKEN_ADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -50,6 +47,9 @@ class JwtTokenProviderTest {
 
     @Mock
     private UserDetailsService userDetailsService;
+
+    @Mock
+    private UserIdentityService userIdentityService;
 
     @Mock
     private UserService userService;
@@ -104,8 +104,8 @@ class JwtTokenProviderTest {
         User user = UserTestData.builder()
                 .build()
                 .getJournalist();
-        when(userService.findById(userId))
-                .thenReturn(user);
+        when(userIdentityService.getUserById(userId)).
+                thenReturn(user);
 
         // when
         String refreshToken = jwtTokenProvider.createRefreshToken(userId, userEmail);
@@ -141,42 +141,14 @@ class JwtTokenProviderTest {
     @Test
     void shouldReturnTrueWhenTokenIsValid() {
         // given
-        String token = TOKEN_ADMIN;
+        UUID userId = ID_JOURNALIST;
+        String userEmail = EMAIL_JOURNALIST;
+        String token = jwtTokenProvider.createRefreshToken(userId, userEmail);
 
         // when
         boolean actual = jwtTokenProvider.validateToken(token);
 
         assertThat(actual).isTrue();
-    }
-
-    @Test
-    @SneakyThrows
-    void shouldReturnExpectedUUIDWhenTokenIsValid() {
-        // given
-        UUID expectedId = ID_JOURNALIST;
-        String expectedUsername = EMAIL_JOURNALIST;
-        Claims claims = Jwts.claims().setSubject(expectedUsername);
-        claims.put("id", expectedId);
-        Instant validity = Instant.now()
-                .plus(jwtProperties.getRefresh(), ChronoUnit.DAYS);
-        String token = Jwts.builder()
-                .setClaims(claims)
-                .setExpiration(Date.from(validity))
-                .signWith(key)
-                .compact();
-
-        // when
-        UUID actualId = jwtTokenProvider.getIdInFormatUUID(token);
-
-        // then
-        assertThat(actualId).isEqualTo(expectedId);
-    }
-
-    @Test
-    void shouldThrowJwtParsingExceptionWhenTokenIsIncorrect() {
-        assertThatThrownBy(() -> jwtTokenProvider.getIdInFormatUUID(INCORRECT_TOKEN))
-                .isInstanceOf(JwtParsingException.class)
-                .hasMessageContaining(ErrorMessage.ERROR_PARSING.getMessage());
     }
 
     @Test

@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-
     UserResponse findUserByToken(String token);
 
     void registerJournalist(UserRegisterRequest request);

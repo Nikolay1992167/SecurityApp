@@ -1,10 +1,14 @@
 package com.solbeg.userservice.service.impl;
 
+import com.solbeg.userservice.dto.response.UserTokenResponse;
+import com.solbeg.userservice.entity.User;
 import com.solbeg.userservice.entity.UserToken;
 import com.solbeg.userservice.enums.TokenType;
 import com.solbeg.userservice.enums.error_response.ErrorMessage;
 import com.solbeg.userservice.exception.NotFoundException;
 import com.solbeg.userservice.repository.UserTokenRepository;
+import com.solbeg.userservice.service.UserIdentityService;
+import com.solbeg.userservice.util.testdata.UserTestData;
 import com.solbeg.userservice.util.testdata.UserTokenTestData;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -41,6 +45,9 @@ class UserTokenServiceImplTest {
     @Mock
     private UserTokenRepository tokenRepository;
 
+    @Mock
+    private UserIdentityService userIdentityService;
+
     @Nested
     class CreateActivationToken {
 
@@ -48,9 +55,14 @@ class UserTokenServiceImplTest {
         void shouldReturnExpectedValue() {
             // given
             UUID userId = ID_JOURNALIST;
+            User user = UserTestData.builder()
+                    .build()
+                    .getJournalist();
             UserToken expected = UserTokenTestData.builder()
                     .build()
                     .getUserToken();
+            when(userIdentityService.getUserById(userId))
+                    .thenReturn(user);
             when(tokenRepository.persist(any(UserToken.class)))
                     .thenReturn(expected);
 
@@ -58,7 +70,7 @@ class UserTokenServiceImplTest {
             UserToken actual = userTokenService.createActivationToken(userId);
 
             // then
-            assertThat(actual.getCreatedBy()).isEqualTo(userId);
+            assertThat(actual.getUser()).isEqualTo(user);
             assertThat(actual.getTokenType()).isEqualTo(TokenType.ACTIVATION);
             assertThat(actual.getExpirationAt()).isAfter(LocalDateTime.now());
         }
@@ -113,7 +125,7 @@ class UserTokenServiceImplTest {
                     .thenReturn(page);
 
             // when
-            Page<UserToken> actual = userTokenService.getAll(DEFAULT_PAGE_REQUEST_FOR_IT);
+            Page<UserTokenResponse> actual = userTokenService.getAll(DEFAULT_PAGE_REQUEST_FOR_IT);
 
             // then
             assertThat(actual.getTotalElements()).isEqualTo(expectedSize);
@@ -127,7 +139,7 @@ class UserTokenServiceImplTest {
                     .thenReturn(page);
 
             // when
-            Page<UserToken> actual = userTokenService.getAll(DEFAULT_PAGE_REQUEST_FOR_IT);
+            Page<UserTokenResponse> actual = userTokenService.getAll(DEFAULT_PAGE_REQUEST_FOR_IT);
 
             // then
             assertThat(actual).isEmpty();

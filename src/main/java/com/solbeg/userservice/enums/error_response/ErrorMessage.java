@@ -4,7 +4,6 @@ import lombok.Getter;
 
 @Getter
 public enum ErrorMessage {
-
     ERROR_PARSING("Error parsing the JWT token."),
     USER_NOT_FOUND("User not found with "),
     USER_NOT_EXIST_OR_NOT_ACTIVE("User is not exist or not active with "),

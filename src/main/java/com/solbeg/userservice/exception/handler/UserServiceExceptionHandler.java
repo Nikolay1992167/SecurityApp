@@ -9,8 +9,6 @@ import com.solbeg.userservice.exception.TokenExpirationException;
 import com.solbeg.userservice.exception.UniqueEmailException;
 import com.solbeg.userservice.exception.UserStatusException;
 import com.solbeg.userservice.exception.model.IncorrectData;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,7 +23,6 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 
 @RestControllerAdvice
 public class UserServiceExceptionHandler {
