@@ -3,7 +3,25 @@ spring:
     active: dev
   application:
     name: user-service
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default_schema: security
+    open-in-view: false
   liquibase:
     enabled: true
     change-log: liquibase/db.changelog-master.yml
     default-schema: security
+security:
+  jwt:
+    secret: ${SECRET_KEY:73357638792F423F4528482B4D6251655468576D5A7133743677397A24432646}
+    access: ${TIME_ACCESS_TOKEN:1}
+    refresh: ${TIME_REFRESH_TOKEN:2}
+server:
+  port: ${SERVER_PORT:8081}
+urls:
+  emailservice_url: http://localhost:8088/

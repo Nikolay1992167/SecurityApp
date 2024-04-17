@@ -15,7 +15,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserResponse {
-
     private UUID id;
     private UUID createdBy;
     private UUID updatedBy;

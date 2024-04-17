@@ -4,24 +4,23 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-class ApplicationConfigTest {
+class WebClientConfigTest {
 
     @InjectMocks
-    private ApplicationConfig applicationConfig;
+    private WebClientConfig webClientConfig;
 
     @Test
-    void shouldReturnExpectedInstanceOfBCryptPasswordEncoder() {
+    void shouldReturnExpectedInstanceOfWebclient() {
         // given
-        Class<BCryptPasswordEncoder> expectedClass = BCryptPasswordEncoder.class;
+        Class<WebClient> expectedClass = WebClient.class;
 
         // when
-        PasswordEncoder actualClass = applicationConfig.passwordEncoder();
+        WebClient actualClass = webClientConfig.webClient();
 
         // then
         assertThat(actualClass).isInstanceOf(expectedClass);

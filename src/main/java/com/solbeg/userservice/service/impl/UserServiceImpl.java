@@ -1,6 +1,6 @@
 package com.solbeg.userservice.service.impl;
 
-import com.solbeg.userservice.entity.EmailRequest;
+import com.solbeg.userservice.dto.request.EmailRequest;
 import com.solbeg.userservice.dto.request.UserRegisterRequest;
 import com.solbeg.userservice.dto.request.UserUpdateRequest;
 import com.solbeg.userservice.dto.response.UserResponse;
@@ -18,8 +18,8 @@ import com.solbeg.userservice.exception.UniqueEmailException;
 import com.solbeg.userservice.mapper.UserMapper;
 import com.solbeg.userservice.repository.RoleRepository;
 import com.solbeg.userservice.repository.UserRepository;
-import com.solbeg.userservice.security.jwt.JwtTokenProvider;
 import com.solbeg.userservice.service.SendingDataService;
+import com.solbeg.userservice.service.UserIdentityService;
 import com.solbeg.userservice.service.UserService;
 import com.solbeg.userservice.service.UserTokenService;
 import lombok.RequiredArgsConstructor;
@@ -41,19 +41,18 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
     private final UserTokenService userTokenService;
     private final SendingDataService sendingDataService;
     private final UserRepository userRepository;
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final UserIdentityService userIdentityService;
 
     @Override
     @Transactional(readOnly = true)
     public UserResponse findUserByToken(String token) {
-        UUID userId = jwtTokenProvider.getIdInFormatUUID(token);
+        UUID userId = userIdentityService.getIdInFormatUUID(token);
         UserResponse userResponse = userRepository.findById(userId).map(userMapper::toResponse)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + userId));
         log.info("IN findUserByToken - user: {} found by id: {}", userResponse, userId);
@@ -149,26 +148,26 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void activateJournalistAccount(String userToken, String tokenAdmin) {
-        userRepository.findByUserWhenRegistrationWithToken(userToken).ifPresentOrElse(
-                user -> {
-                    LocalDateTime expirationAt = userTokenService.getByToken(userToken).getExpirationAt();
-                    if (expirationAt.isBefore(LocalDateTime.now())) {
-                        EmailRequest emailRequest = sendingDataService.getEmailRequest(user, EmailType.USER_TOKEN_EXPIRATION);
-                        sendingDataService.sendRequestToMailService(emailRequest);
-                        throw new TokenExpirationException(ErrorMessage.TOKEN_EXPIRED.getMessage());
-                    } else {
-                        UUID uuidAdmin = jwtTokenProvider.getIdInFormatUUID(tokenAdmin);
-                        user.setStatus(Status.ACTIVE);
-                        user.setUpdatedBy(uuidAdmin);
-                        userRepository.persist(user);
-                        userTokenService.deleteUserToken(userToken);
-                        EmailRequest emailRequest = sendingDataService.getEmailRequest(user, EmailType.USER_WELCOME_EMAIL);
-                        sendingDataService.sendRequestToMailService(emailRequest);
-                    }
-                },
-                () -> {
-                    throw new NotFoundException(ErrorMessage.USERTOKEN_NOT_FOUND.getMessage() + userToken);
-                });
+        UserToken tokenEntity = userTokenService.getByToken(userToken);
+        User user = tokenEntity.getUser();
+        if (user != null) {
+            LocalDateTime expirationAt = tokenEntity.getExpirationAt();
+            if (expirationAt.isBefore(LocalDateTime.now())) {
+                EmailRequest emailRequest = sendingDataService.getEmailRequest(user, EmailType.USER_TOKEN_EXPIRATION);
+                sendingDataService.sendRequestToMailService(emailRequest);
+                throw new TokenExpirationException(ErrorMessage.TOKEN_EXPIRED.getMessage());
+            } else {
+                UUID uuidAdmin = userIdentityService.getIdInFormatUUID(tokenAdmin);
+                user.setStatus(Status.ACTIVE);
+                user.setUpdatedBy(uuidAdmin);
+                userRepository.persist(user);
+                userTokenService.deleteUserToken(userToken);
+                EmailRequest emailRequest = sendingDataService.getEmailRequest(user, EmailType.USER_WELCOME_EMAIL);
+                sendingDataService.sendRequestToMailService(emailRequest);
+            }
+        } else {
+            throw new NotFoundException(ErrorMessage.USERTOKEN_NOT_FOUND.getMessage() + userToken);
+        }
         log.info("IN activateJournalistAccount - activated user with userToken: {}", userToken);
     }
 
@@ -186,7 +185,6 @@ public class UserServiceImpl implements UserService {
         log.info("IN deleteUser - user with id: {} changed status: DELETED", id);
     }
 
-
     private void checkUniqueEmail(String email) {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new UniqueEmailException(ErrorMessage.UNIQUE_USER_EMAIL.getMessage() + email);
@@ -203,7 +201,7 @@ public class UserServiceImpl implements UserService {
                 })
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + id));
         userInDB.setStatus(status);
-        UUID uuidAdmin = jwtTokenProvider.getIdInFormatUUID(tokenAdmin);
+        UUID uuidAdmin = userIdentityService.getIdInFormatUUID(tokenAdmin);
         userInDB.setUpdatedBy(uuidAdmin);
         userRepository.persist(userInDB);
     }
