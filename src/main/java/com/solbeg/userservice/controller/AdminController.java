@@ -45,7 +45,6 @@ public class AdminController implements AdminOpenApi {
         return userService.findAll(pageable);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('JOURNALIST')")
     @Override
     @GetMapping("/{uuid}")
     public UserResponse findById(@PathVariable UUID uuid) {

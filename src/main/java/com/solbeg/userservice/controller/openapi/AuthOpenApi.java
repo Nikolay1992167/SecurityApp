@@ -31,9 +31,7 @@ public interface AuthOpenApi {
                                         "email": "ivan@google.com",
                                         "password": "123456789"
                                     }
-                                    """)
-                    )
-            ),
+                                    """))),
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -47,9 +45,7 @@ public interface AuthOpenApi {
                                                 "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsInJvbGVzIjpbIkFETUlOIl0sImV4cCI6MTcwOTQ4MTQ5NH0.iTsgestQ0Udfll9RmVwHVRam-MLqrZ9qWWaruJsad7uAzs-Id9DFONSA3bGLoQXRQE5BzLeKnsNB5T6PIqYGWg",
                                                 "refreshToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsImV4cCI6MTcxMjA2OTg5NH0.Bype1oc2qs72GVRqCP3cuZ__MmT0kZvjZog6djxD-UO0eCPe-wdY2Pak-_SmvH3tDM6o8jqb9uMGuJ07M7gA0Q"
                                             }
-                                            """)
-                            )
-                    ),
+                                            """))),
                     @ApiResponse(responseCode = "400", description = "The endpoint has not been completed when an invalid email is entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
@@ -106,9 +102,7 @@ public interface AuthOpenApi {
                                         "email": "grom@grom.com",
                                         "password": "63524178"
                                     }
-                                    """)
-                    )
-            ),
+                                    """))),
             responses = {
                     @ApiResponse(
                             responseCode = "201", description = "The endpoint has been completed."),
@@ -150,9 +144,7 @@ public interface AuthOpenApi {
                                         "email": "popova@email.com",
                                         "password": "9652314"
                                     }
-                                    """)
-                    )
-            ),
+                                    """))),
             responses = {
                     @ApiResponse(
                             responseCode = "201", description = "The endpoint has been completed."),
@@ -191,9 +183,7 @@ public interface AuthOpenApi {
                                     {
                                         "refreshToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsInJvbGVzIjpbIkFETUlOIl0sImV4cCI6MTcwOTA3ODQ2Nn0.6iwpfXY2eZDZCmxLrcXL1rdEs1ZYoKWTFGHl4spzabAT5hRuZ1pBZDHueydtxj-UeW_r4fsMDB386JUsKulsGQ"
                                     }
-                                    """)
-                    )
-            ),
+                                    """))),
             responses = {
                     @ApiResponse(
                             responseCode = "201",
@@ -207,9 +197,7 @@ public interface AuthOpenApi {
                                                 "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsInJvbGVzIjpbIkFETUlOIl0sImV4cCI6MTcwOTA3ODQ4Nn0.dAagsoFXl3GyZUeHn-BUWtSakIkLv5JEJNDycuwSW_iNfW04f5eroXVJtWRX8yCC6gbgzqcPi-BupOyTu8dXdQ",
                                                 "refreshToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsImV4cCI6MTcxMTY2Njg4Nn0.W5FbSle_jHpATJ6SOrWflCdueJSNk9IaT8v1SUSmXN-4HTmL-gmYi_xJGyW7LgCLRumMR4Ad0TuRHldI_p1-uQ"
                                             }
-                                            """)
-                            )
-                    ),
+                                            """))),
                     @ApiResponse(responseCode = "401", description = "The endpoint has not been completed because the token is not active.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""

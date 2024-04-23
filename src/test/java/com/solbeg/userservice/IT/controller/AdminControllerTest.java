@@ -154,7 +154,6 @@ class AdminControllerTest extends PostgresSqlContainerInitializer {
         @Test
         @WithMockUser(authorities = "ADMIN")
         void shouldActivateUserJournalist() throws Exception {
-            //String adminToken = tokenProvider.createRefreshToken(ID_ADMIN, EMAIL_ADMIN);
             stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/send/email"))
                     .willReturn(WireMock.aResponse()
                             .withStatus(200)));

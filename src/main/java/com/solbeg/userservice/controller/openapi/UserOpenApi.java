@@ -27,9 +27,7 @@ public interface UserOpenApi {
                                     {
                                         "token":"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsInJvbGVzIjpbIkFETUlOIl0sImV4cCI6MTcxMTk2NDQ2Mn0.cF-IwOtiDX0Qg3UY42lIaXOia2WkUyZpH58bZxBxYetBrxgCLPW7C1_wm1M6pyKr66FaWwy7UvRVpQrKXAt99w"
                                     }
-                                    """)
-                    )
-            ),
+                                    """))),
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -52,9 +50,7 @@ public interface UserOpenApi {
                                                 ],
                                                 "status": "ACTIVE"
                                             }
-                                            """)
-                            )
-                    ),
+                                            """))),
                     @ApiResponse(responseCode = "400", description = "The endpoint has not been completed because the token is not valid.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""

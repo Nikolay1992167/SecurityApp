@@ -67,9 +67,7 @@ public interface AdminOpenApi {
                                                  "first": true,
                                                  "empty": false
                                              }
-                                            """)
-                            )
-                    ),
+                                            """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
@@ -187,9 +185,7 @@ public interface AdminOpenApi {
                                                     "numberOfElements": 3,
                                                     "empty": false
                                                 }
-                                            """)
-                            )
-                    ),
+                                            """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
@@ -259,9 +255,7 @@ public interface AdminOpenApi {
                                                 ],
                                                 "status": "ACTIVE"
                                             }
-                                            """)
-                            )
-                    ),
+                                            """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
@@ -330,9 +324,7 @@ public interface AdminOpenApi {
                                         "password": "8776868",
                                         "email": "nikolayv@example.com"
                                     }
-                                    """)
-                    )
-            ),
+                                    """))),
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -355,9 +347,7 @@ public interface AdminOpenApi {
                                                 ],
                                                 "status": "ACTIVE"
                                             }
-                                            """)
-                            )
-                    ),
+                                            """))),
                     @ApiResponse(responseCode = "400", description = "The endpoint has not been completed when an invalid uuid is entered.",
                             content = @Content(mediaType = "application/json", examples = @ExampleObject("""
                                             {

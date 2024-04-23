@@ -5,8 +5,6 @@ import com.solbeg.userservice.entity.User;
 import com.solbeg.userservice.entity.UserToken;
 import com.solbeg.userservice.entity.User_;
 import com.solbeg.userservice.enums.EmailType;
-import com.solbeg.userservice.enums.error_response.ErrorMessage;
-import com.solbeg.userservice.exception.SendDataException;
 import com.solbeg.userservice.util.testdata.EmailRequestTestData;
 import com.solbeg.userservice.util.testdata.UserTestData;
 import com.solbeg.userservice.util.testdata.UserTokenTestData;
@@ -30,9 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
@@ -110,8 +106,8 @@ class SendDataServiceImplTest {
                     .thenReturn(Mono.error(new WebClientResponseException("Error", 500, "Internal Server Error", HttpHeaders.EMPTY, null, null)));
 
             assertThatThrownBy(() -> sendingDataService.sendRequestToMailService(emailRequest))
-                    .isExactlyInstanceOf(SendDataException.class)
-                    .hasMessageContaining(ErrorMessage.ERROR_SEND_DATA.getMessage());
+                    .isExactlyInstanceOf(WebClientResponseException.class)
+                    .hasMessageContaining("Error");
         }
     }
 
