@@ -18,7 +18,6 @@ import com.solbeg.userservice.exception.UniqueEmailException;
 import com.solbeg.userservice.mapper.UserMapperImpl;
 import com.solbeg.userservice.repository.RoleRepository;
 import com.solbeg.userservice.repository.UserRepository;
-import com.solbeg.userservice.security.jwt.JwtTokenProvider;
 import com.solbeg.userservice.service.SendingDataService;
 import com.solbeg.userservice.service.UserIdentityService;
 import com.solbeg.userservice.service.UserTokenService;
@@ -41,7 +40,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.solbeg.userservice.util.initdata.InitData.ACCESS_TOKEN;
 import static com.solbeg.userservice.util.initdata.InitData.DEFAULT_PAGE_REQUEST_FOR_IT;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.EXPIRED_AT_USERTOKEN;
@@ -49,7 +47,6 @@ import static com.solbeg.userservice.util.initdata.InitData.ID_ADMIN;
 import static com.solbeg.userservice.util.initdata.InitData.ID_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.NAME_ROLE_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.REFRESH_TOKEN;
-import static com.solbeg.userservice.util.initdata.InitData.TOKEN_ADMIN;
 import static com.solbeg.userservice.util.initdata.InitData.TOKEN_USERTOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -82,50 +79,6 @@ class UserServiceImplTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
-
-    @Mock
-    private JwtTokenProvider jwtTokenProvider;
-
-    @Nested
-    class FindUserByToken {
-
-        @Test
-        void shouldReturnExpectedValue() {
-            // given
-            String userToken = ACCESS_TOKEN;
-            User user = UserTestData.builder()
-                    .build()
-                    .getJournalist();
-            UserResponse expected = UserTestData.builder()
-                    .build()
-                    .getUserResponse();
-            when(userIdentityService.getIdInFormatUUID(userToken))
-                    .thenReturn(ID_JOURNALIST);
-            when(userRepository.findById(ID_JOURNALIST))
-                    .thenReturn(Optional.ofNullable(user));
-
-            // when
-            UserResponse userByToken = userService.findUserByToken(ACCESS_TOKEN);
-
-            // then
-            assertThat(userByToken).isEqualTo(expected);
-        }
-
-        @Test
-        void shouldReturnThrowExceptionWhenUserNotFound() {
-            // given
-            String userToken = ACCESS_TOKEN;
-            when(userIdentityService.getIdInFormatUUID(userToken))
-                    .thenReturn(ID_JOURNALIST);
-            when(userRepository.findById(ID_JOURNALIST))
-                    .thenReturn(Optional.empty());
-
-            // when, then
-            assertThatThrownBy(() -> userService.findUserByToken(userToken))
-                    .isInstanceOf(NotFoundException.class)
-                    .hasMessageContaining(ErrorMessage.USER_NOT_FOUND.getMessage() + ID_JOURNALIST);
-        }
-    }
 
     @Nested
     class RegisterJournalist {
@@ -230,7 +183,7 @@ class UserServiceImplTest {
                     .thenReturn(page);
 
             // when
-            Page<UserResponse> actual = userService.findAll(DEFAULT_PAGE_REQUEST_FOR_IT);
+            Page<UserResponse> actual = userService.getAllUsers(DEFAULT_PAGE_REQUEST_FOR_IT);
 
             // then
             assertThat(actual.getTotalElements()).isEqualTo(expectedSize);
@@ -244,7 +197,7 @@ class UserServiceImplTest {
                     .thenReturn(page);
 
             // when
-            Page<UserResponse> actual = userService.findAll(DEFAULT_PAGE_REQUEST_FOR_IT);
+            Page<UserResponse> actual = userService.getAllUsers(DEFAULT_PAGE_REQUEST_FOR_IT);
 
             // then
             assertThat(actual).isEmpty();
@@ -302,7 +255,7 @@ class UserServiceImplTest {
                     .thenReturn(Optional.of(expectedUser));
 
             // when
-            Optional<User> actualUser = userService.findByUserEmail(userEmail);
+            Optional<User> actualUser = userService.findUserByEmail(userEmail);
 
             // then
             assertThat(actualUser).isPresent();
@@ -317,7 +270,7 @@ class UserServiceImplTest {
                     .thenReturn(Optional.empty());
 
             // when, then
-            assertThatThrownBy(() -> userService.findByUserEmail(userEmail))
+            assertThatThrownBy(() -> userService.findUserByEmail(userEmail))
                     .isInstanceOf(NoSuchUserEmailException.class)
                     .hasMessageContaining(ErrorMessage.USER_NOT_EXIST.getMessage() + userEmail);
         }
@@ -381,7 +334,7 @@ class UserServiceImplTest {
                     .thenReturn(updatedUser);
 
             // when
-            UserResponse actualResponse = userService.update(userId, updateRequest);
+            UserResponse actualResponse = userService.updateUserById(userId, updateRequest);
 
             // then
             assertThat(actualResponse).isEqualTo(expectedResponse);
@@ -398,7 +351,7 @@ class UserServiceImplTest {
                     .thenReturn(Optional.empty());
 
             // when, then
-            assertThatThrownBy(() -> userService.update(userId, updateRequest))
+            assertThatThrownBy(() -> userService.updateUserById(userId, updateRequest))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessageContaining(ErrorMessage.USER_NOT_FOUND.getMessage() + userId);
         }
@@ -411,7 +364,6 @@ class UserServiceImplTest {
         void shouldActivateUserJournalist() {
             // given
             String tokenUser = TOKEN_USERTOKEN;
-            String tokenAdmin = TOKEN_ADMIN;
             User user = UserTestData.builder()
                     .build()
                     .getJournalist();
@@ -423,17 +375,17 @@ class UserServiceImplTest {
                     .getEmailRequest();
             when(tokenService.getByToken(tokenUser))
                     .thenReturn(userToken);
-            when(userIdentityService.getIdInFormatUUID(tokenAdmin))
+            when(userIdentityService.getUserId())
                     .thenReturn(ID_ADMIN);
             when(sendingDataService.getEmailRequest(user, EmailType.USER_WELCOME_EMAIL))
                     .thenReturn(emailRequest);
 
             // when
-            userService.activateJournalistAccount(tokenUser, tokenAdmin);
+            userService.activateJournalistAccount(tokenUser);
 
             // then
             verify(userRepository, times(1)).persist(user);
-            verify(tokenService, times(1)).deleteUserToken(tokenUser);
+            verify(tokenService, times(1)).deleteUserTokenByToken(tokenUser);
             verify(sendingDataService, times(1)).sendRequestToMailService(any(EmailRequest.class));
         }
 
@@ -451,7 +403,7 @@ class UserServiceImplTest {
                     .thenReturn(userToken);
 
             // then
-            assertThatThrownBy(() -> userService.activateJournalistAccount(tokenUser, TOKEN_ADMIN))
+            assertThatThrownBy(() -> userService.activateJournalistAccount(tokenUser))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessageContaining(ErrorMessage.USERTOKEN_NOT_FOUND.getMessage() + tokenUser);
         }
@@ -470,7 +422,7 @@ class UserServiceImplTest {
                     .thenReturn(userToken);
 
             // then
-            assertThatThrownBy(() -> userService.activateJournalistAccount(tokenUser, TOKEN_ADMIN))
+            assertThatThrownBy(() -> userService.activateJournalistAccount(tokenUser))
                     .isInstanceOf(TokenExpirationException.class)
                     .hasMessageContaining(ErrorMessage.TOKEN_EXPIRED.getMessage());
         }
@@ -483,17 +435,16 @@ class UserServiceImplTest {
         void shouldDeactivateUser() {
             // given
             UUID userId = ID_JOURNALIST;
-            String token = REFRESH_TOKEN;
             User user = UserTestData.builder()
                     .build()
                     .getJournalist();
             when(userRepository.findById(userId))
                     .thenReturn(Optional.of(user));
-            when(userIdentityService.getIdInFormatUUID(token))
+            when(userIdentityService.getUserId())
                     .thenReturn(userId);
 
             // when
-            userService.deactivateUser(userId, token);
+            userService.deactivateUserById(userId);
 
             // then
             verify(userRepository, times(1)).persist(user);
@@ -514,7 +465,7 @@ class UserServiceImplTest {
                     .thenReturn(Optional.of(user));
 
             // when, then
-            assertThatThrownBy(() -> userService.deactivateUser(userId, TOKEN_ADMIN))
+            assertThatThrownBy(() -> userService.deactivateUserById(userId))
                     .isInstanceOf(InformationChangeStatusUserException.class);
         }
 
@@ -526,7 +477,7 @@ class UserServiceImplTest {
                     .thenReturn(Optional.empty());
 
             // when, then
-            assertThatThrownBy(() -> userService.deactivateUser(userId, TOKEN_ADMIN))
+            assertThatThrownBy(() -> userService.deactivateUserById(userId))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessageContaining(ErrorMessage.USER_NOT_FOUND.getMessage() + userId);
         }
@@ -539,17 +490,16 @@ class UserServiceImplTest {
         void shouldDeletedUser() {
             // given
             UUID userId = ID_JOURNALIST;
-            String token = REFRESH_TOKEN;
             User user = UserTestData.builder()
                     .build()
                     .getJournalist();
             when(userRepository.findById(userId))
                     .thenReturn(Optional.of(user));
-            when(userIdentityService.getIdInFormatUUID(token))
+            when(userIdentityService.getUserId())
                     .thenReturn(userId);
 
             // when
-            userService.deleteUser(userId, token);
+            userService.deleteUserById(userId);
 
             // then
             verify(userRepository, times(1)).persist(user);

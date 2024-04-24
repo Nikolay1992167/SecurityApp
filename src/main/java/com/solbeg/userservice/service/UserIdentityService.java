@@ -5,7 +5,7 @@ import com.solbeg.userservice.entity.User;
 import java.util.UUID;
 
 public interface UserIdentityService {
-    UUID getIdInFormatUUID(String token);
+    UUID getUserId();
 
     User getUserById(UUID userId);
 }

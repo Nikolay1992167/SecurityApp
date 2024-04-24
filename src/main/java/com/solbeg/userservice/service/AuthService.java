@@ -6,5 +6,5 @@ import com.solbeg.userservice.dto.response.JwtResponse;
 public interface AuthService {
     JwtResponse login(JwtRequest loginRequest);
 
-    JwtResponse refresh(String refreshToken);
+    JwtResponse getRefreshToken(String refreshToken);
 }

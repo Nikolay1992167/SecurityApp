@@ -38,7 +38,7 @@ class JwtUserDetailsServiceTest {
                 .build()
                 .getJournalist();
         JwtUser expectedJwtUser = JwtUserFactory.create(user);
-        when(userService.findByUserEmail(emailUser))
+        when(userService.findUserByEmail(emailUser))
                 .thenReturn(Optional.of(user));
 
         // when
@@ -52,7 +52,7 @@ class JwtUserDetailsServiceTest {
     void shouldThrowExceptionWhenEmailNotFound() {
         // given
         String emailUser = EMAIL_JOURNALIST;
-        when(userService.findByUserEmail(emailUser))
+        when(userService.findUserByEmail(emailUser))
                 .thenReturn(Optional.empty());
 
         // when, then
@@ -68,7 +68,7 @@ class JwtUserDetailsServiceTest {
                 .withStatus(Status.NOT_ACTIVE)
                 .build()
                 .getJournalist();
-        when(userService.findByUserEmail(user.getEmail()))
+        when(userService.findUserByEmail(user.getEmail()))
                 .thenReturn(Optional.of(user));
 
         // when, then

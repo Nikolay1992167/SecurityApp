@@ -5,20 +5,22 @@ import com.solbeg.userservice.entity.User;
 import com.solbeg.userservice.entity.UserToken;
 import com.solbeg.userservice.entity.User_;
 import com.solbeg.userservice.enums.EmailType;
+import com.solbeg.userservice.exception.SendDataException;
 import com.solbeg.userservice.util.testdata.EmailRequestTestData;
 import com.solbeg.userservice.util.testdata.UserTestData;
 import com.solbeg.userservice.util.testdata.UserTokenTestData;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,9 +28,6 @@ import static com.solbeg.userservice.util.initdata.InitData.BASE_URL;
 import static com.solbeg.userservice.util.initdata.InitData.TOKEN_USERTOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
@@ -37,52 +36,36 @@ class SendDataServiceImplTest {
     @InjectMocks
     private SendDataServiceImpl sendingDataService;
 
-    @Mock
-    private WebClient webClient;
+    private MockWebServer mockWebServer;
 
-    @Mock
-    private WebClient.RequestHeadersSpec<?> requestHeadersMock;
+    @BeforeEach
+    public void setUp() throws IOException {
+        mockWebServer = new MockWebServer();
+        mockWebServer.start();
+        WebClient webClient = WebClient.create(mockWebServer.url("/").toString());
+        sendingDataService = new SendDataServiceImpl(webClient);
+    }
 
-    @Mock
-    private WebClient.RequestBodySpec requestBodyMock;
-
-    @Mock
-    private WebClient.RequestBodyUriSpec requestBodyUriMock;
-
-    @Mock
-    private WebClient.ResponseSpec responseMock;
-
+    @AfterEach
+    public void tearDown() throws IOException {
+        mockWebServer.shutdown();
+    }
     @Nested
     class SendRequestToMailService {
 
         @Test
-        void shouldSendRequestToMailService() {
+        void shouldCheckSendEmailRequestToMailServiceAndReturnStatus200() {
             // given
-            EmailRequest emailRequest = new EmailRequest();
-
-            when(webClient.post())
-                    .thenReturn(requestBodyUriMock);
-            when(requestBodyUriMock.uri(anyString()))
-                    .thenReturn(requestBodyMock);
-            when(requestBodyMock.header(anyString(), anyString()))
-                    .thenReturn(requestBodyMock);
-            when(requestBodyMock.body(any(), any(Class.class)))
-                    .thenReturn(requestHeadersMock);
-            when(requestHeadersMock.retrieve())
-                    .thenReturn(responseMock);
-            when(responseMock.bodyToMono(String.class))
-                    .thenReturn(Mono.just("Success"));
+            EmailRequest emailRequest = EmailRequestTestData.builder()
+                    .build()
+                    .getEmailRequest();
+            mockWebServer.enqueue(new MockResponse().setResponseCode(200));
 
             // when
             sendingDataService.sendRequestToMailService(emailRequest);
 
             // then
-            verify(webClient, times(1)).post();
-            verify(requestBodyUriMock, times(1)).uri(anyString());
-            verify(requestBodyMock, times(1)).header(anyString(), anyString());
-            verify(requestBodyMock, times(1)).body(any(), any(Class.class));
-            verify(requestHeadersMock, times(1)).retrieve();
-            verify(responseMock, times(1)).bodyToMono(String.class);
+            assertThat(mockWebServer.getRequestCount()).isEqualTo(1);
         }
 
         @Test
@@ -91,23 +74,11 @@ class SendDataServiceImplTest {
             EmailRequest emailRequest = EmailRequestTestData.builder()
                     .build()
                     .getEmailRequest();
+            mockWebServer.enqueue(new MockResponse().setResponseCode(409));
 
-            when(webClient.post())
-                    .thenReturn(requestBodyUriMock);
-            when(requestBodyUriMock.uri(anyString()))
-                    .thenReturn(requestBodyMock);
-            when(requestBodyMock.header(anyString(), anyString()))
-                    .thenReturn(requestBodyMock);
-            when(requestBodyMock.body(any(), any(Class.class)))
-                    .thenReturn(requestHeadersMock);
-            when(requestHeadersMock.retrieve())
-                    .thenReturn(responseMock);
-            when(responseMock.bodyToMono(String.class))
-                    .thenReturn(Mono.error(new WebClientResponseException("Error", 500, "Internal Server Error", HttpHeaders.EMPTY, null, null)));
-
+            // when, then
             assertThatThrownBy(() -> sendingDataService.sendRequestToMailService(emailRequest))
-                    .isExactlyInstanceOf(WebClientResponseException.class)
-                    .hasMessageContaining("Error");
+                    .isExactlyInstanceOf(SendDataException.class);
         }
     }
 

@@ -51,7 +51,7 @@ public class UserTokenServiceImpl implements UserTokenService {
     }
 
     @Override
-    public Page<UserTokenResponse> getAll(Pageable pageable) {
+    public Page<UserTokenResponse> getAllUserTokens(Pageable pageable) {
         Page<UserToken> response = tokenRepository.findAll(pageable);
         log.info("IN findAll - {} usertokens found", response.stream().count());
         return response
@@ -60,7 +60,7 @@ public class UserTokenServiceImpl implements UserTokenService {
 
     @Override
     @Transactional
-    public void deleteUserToken(String token) {
+    public void deleteUserTokenByToken(String token) {
         tokenRepository.findByToken(token).ifPresentOrElse(
                 activationLink -> tokenRepository.deleteByToken(token),
                 () -> {

@@ -3,7 +3,7 @@
 CREATE TABLE IF NOT EXISTS security.user_tokens
 (
     id            UUID PRIMARY KEY,
-    created_by    UUID        NOT NULL REFERENCES security.users (id),
+    user_id    UUID        NOT NULL REFERENCES security.users (id),
     expiration_at TIMESTAMP   NOT NULL DEFAULT (now()+interval '1 day'),
     token         TEXT        NOT NULL,
     token_type    VARCHAR(50) NOT NULL

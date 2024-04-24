@@ -72,7 +72,7 @@ public interface AdminOpenApi {
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                     {
-                                        "timestamp": "2024-03-13T09:31:50.0882906",
+                                        "timestamp": "2024-04-24T20:52:03.470353",
                                         "error_message": "Full authentication is required to access this resource",
                                         "error_status": 401
                                     }
@@ -106,7 +106,7 @@ public interface AdminOpenApi {
                                     """)))
             }
     )
-    Page<UserTokenResponse> findAllUserTokens(Pageable pageable);
+    Page<UserTokenResponse> getAllUserTokens(Pageable pageable);
 
     @Operation(
             method = "GET",
@@ -224,14 +224,14 @@ public interface AdminOpenApi {
                                     """)))
             }
     )
-    Page<UserResponse> findAll(Pageable pageable);
+    Page<UserResponse> getAllUsers(Pageable pageable);
 
     @Operation(
             method = "GET",
             tags = "Admin",
-            description = "Get a User by uuid",
+            description = "Get a User by id",
             parameters = {
-                    @Parameter(name = "uuid", description = "Id of User", example = "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13")
+                    @Parameter(name = "userId", description = "Id of User", example = "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13")
             },
             responses = {
                     @ApiResponse(
@@ -303,14 +303,14 @@ public interface AdminOpenApi {
                                     """))),
             }
     )
-    UserResponse findById(UUID uuid);
+    UserResponse findUserById(UUID userId);
 
     @Operation(
             method = "PUT",
             tags = "Admin",
-            description = "Update an user with uuid",
+            description = "Update an user by his id.",
             parameters = {
-                    @Parameter(name = "uuid", description = "Uuid of user", example = "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13")
+                    @Parameter(name = "userId", description = "Id of user", example = "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13")
             },
             requestBody = @RequestBody(
                     required = true,
@@ -412,14 +412,14 @@ public interface AdminOpenApi {
                                     """)))
             }
     )
-    UserResponse update(UUID uuid, UserUpdateRequest updateRequest);
+    UserResponse updateUserById(UUID userId, UserUpdateRequest userUpdateRequest);
 
     @Operation(
             method = "PATCH",
             tags = "Admin",
             description = "Changing the user's status to ACTIVE",
             parameters = {
-                    @Parameter(name = "userToken", description = "Token of UserToken", example = "0c5b8c16-5c4a-4d2d-a176-0d53dae0c7ee")
+                    @Parameter(name = "userToken", description = "Identification token of userToken", example = "0c5b8c16-5c4a-4d2d-a176-0d53dae0c7ee")
             },
             responses = {
                     @ApiResponse(
@@ -462,14 +462,14 @@ public interface AdminOpenApi {
                                     """)))
             }
     )
-    void activateUserJournalist(String userToken, String token);
+    void activateUserJournalistByUserToken(String userToken);
 
     @Operation(
             method = "PATCH",
             tags = "Admin",
             description = "Changing the user's status to NOT_ACTIVE",
             parameters = {
-                    @Parameter(name = "uuid", description = "Uuid of user", example = "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13")
+                    @Parameter(name = "userId", description = "Id of user", example = "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13")
             },
             responses = {
                     @ApiResponse(
@@ -529,14 +529,14 @@ public interface AdminOpenApi {
                                     """)))
             }
     )
-    void deactivateUser(UUID id, String token);
+    void deactivateUserById(UUID userId);
 
     @Operation(
             method = "DELETE",
             tags = "Admin",
             description = "Changing the user's status to DELETED",
             parameters = {
-                    @Parameter(name = "uuid", description = "Uuid of user", example = "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13")
+                    @Parameter(name = "userId", description = "Id of user", example = "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13")
             },
             responses = {
                     @ApiResponse(
@@ -597,5 +597,5 @@ public interface AdminOpenApi {
                                     """)))
             }
     )
-    void deleteUser(UUID id, String token);
+    void deleteUserById(UUID userId);
 }

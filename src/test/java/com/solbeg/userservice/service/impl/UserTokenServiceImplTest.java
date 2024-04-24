@@ -125,7 +125,7 @@ class UserTokenServiceImplTest {
                     .thenReturn(page);
 
             // when
-            Page<UserTokenResponse> actual = userTokenService.getAll(DEFAULT_PAGE_REQUEST_FOR_IT);
+            Page<UserTokenResponse> actual = userTokenService.getAllUserTokens(DEFAULT_PAGE_REQUEST_FOR_IT);
 
             // then
             assertThat(actual.getTotalElements()).isEqualTo(expectedSize);
@@ -139,7 +139,7 @@ class UserTokenServiceImplTest {
                     .thenReturn(page);
 
             // when
-            Page<UserTokenResponse> actual = userTokenService.getAll(DEFAULT_PAGE_REQUEST_FOR_IT);
+            Page<UserTokenResponse> actual = userTokenService.getAllUserTokens(DEFAULT_PAGE_REQUEST_FOR_IT);
 
             // then
             assertThat(actual).isEmpty();
@@ -160,7 +160,7 @@ class UserTokenServiceImplTest {
                     .thenReturn(Optional.of(userToken));
 
             // when
-            userTokenService.deleteUserToken(token);
+            userTokenService.deleteUserTokenByToken(token);
 
             // then
             verify(tokenRepository, times(1)).findByToken(token);
@@ -173,7 +173,7 @@ class UserTokenServiceImplTest {
             String token = TOKEN_USERTOKEN;
 
             // when, then
-            assertThatThrownBy(() -> userTokenService.deleteUserToken(token))
+            assertThatThrownBy(() -> userTokenService.deleteUserTokenByToken(token))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessageContaining(ErrorMessage.USERTOKEN_NOT_FOUND.getMessage() + token);
         }

@@ -1,5 +1,6 @@
 package com.solbeg.userservice.security.jwt;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -9,6 +10,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 @Data
+@Builder
 @RequiredArgsConstructor
 public class JwtUser implements UserDetails {
     private final UUID id;

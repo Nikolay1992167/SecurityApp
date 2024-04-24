@@ -218,5 +218,5 @@ public interface AuthOpenApi {
                                     """)))
             }
     )
-    JwtResponse refresh(RefreshTokenRequest refreshTokenRequest);
+    JwtResponse getRefreshToken(RefreshTokenRequest refreshTokenRequest);
 }

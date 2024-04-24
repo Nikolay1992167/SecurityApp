@@ -9,7 +9,6 @@ import com.solbeg.userservice.service.UserTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,16 +17,18 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+
 import java.util.UUID;
+
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @RestController
 @PreAuthorize("hasAuthority('ADMIN')")
-@RequestMapping(value = "/api/v1/admin", produces = "application/json")
+@RequestMapping(value = "/api/v1/admin", produces = APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class AdminController implements AdminOpenApi {
     private final UserService userService;
@@ -35,47 +36,44 @@ public class AdminController implements AdminOpenApi {
 
     @Override
     @GetMapping("/tokens")
-    public Page<UserTokenResponse> findAllUserTokens(Pageable pageable) {
-        return tokenService.getAll(pageable);
+    public Page<UserTokenResponse> getAllUserTokens(Pageable pageable) {
+        return tokenService.getAllUserTokens(pageable);
     }
 
     @Override
     @GetMapping
-    public Page<UserResponse> findAll(Pageable pageable) {
-        return userService.findAll(pageable);
+    public Page<UserResponse> getAllUsers(Pageable pageable) {
+        return userService.getAllUsers(pageable);
     }
 
     @Override
-    @GetMapping("/{uuid}")
-    public UserResponse findById(@PathVariable UUID uuid) {
-        return userService.findUserById(uuid);
+    @GetMapping("/{userId}")
+    public UserResponse findUserById(@PathVariable UUID userId) {
+        return userService.findUserById(userId);
     }
 
     @Override
-    @PutMapping("/{uuid}")
-    public UserResponse update(@PathVariable UUID uuid,
-                               @Validated @RequestBody UserUpdateRequest updateRequest) {
-        return userService.update(uuid, updateRequest);
+    @PutMapping("/{userId}")
+    public UserResponse updateUserById(@PathVariable UUID userId,
+                                       @Validated @RequestBody UserUpdateRequest userUpdateRequest) {
+        return userService.updateUserById(userId, userUpdateRequest);
     }
 
     @Override
     @PatchMapping("/activation")
-    public void activateUserJournalist(@RequestParam String userToken,
-                                       @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token) {
-        userService.activateJournalistAccount(userToken, token);
+    public void activateUserJournalistByUserToken(@RequestParam String userToken) {
+        userService.activateJournalistAccount(userToken);
     }
 
     @Override
-    @PatchMapping("/deactivate/{id}")
-    public void deactivateUser(@PathVariable UUID id,
-                               @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token) {
-        userService.deactivateUser(id, token);
+    @PatchMapping("/deactivate/{userId}")
+    public void deactivateUserById(@PathVariable UUID userId) {
+        userService.deactivateUserById(userId);
     }
 
     @Override
-    @DeleteMapping("/delete/{id}")
-    public void deleteUser(@PathVariable UUID id,
-                           @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token) {
-        userService.deleteUser(id, token);
+    @DeleteMapping("/delete/{userId}")
+    public void deleteUserById(@PathVariable UUID userId) {
+        userService.deleteUserById(userId);
     }
 }

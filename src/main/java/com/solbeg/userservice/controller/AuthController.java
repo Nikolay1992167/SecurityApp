@@ -16,8 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+
+
 @RestController
-@RequestMapping(value = "/api/v1/auth", produces = "application/json")
+@RequestMapping(value = "/api/v1/auth", produces = APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class AuthController implements AuthOpenApi {
     private final AuthService authService;
@@ -32,20 +35,20 @@ public class AuthController implements AuthOpenApi {
     @Override
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register/journalist")
-    public void registerJournalist(@Validated @RequestBody UserRegisterRequest request) {
-        userService.registerJournalist(request);
+    public void registerJournalist(@Validated @RequestBody UserRegisterRequest userRegisterRequest) {
+        userService.registerJournalist(userRegisterRequest);
     }
 
     @Override
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register/subscriber")
-    public void registerSubscriber(@Validated @RequestBody UserRegisterRequest request) {
-        userService.registerSubscriber(request);
+    public void registerSubscriber(@Validated @RequestBody UserRegisterRequest userRegisterRequest) {
+        userService.registerSubscriber(userRegisterRequest);
     }
 
     @Override
     @PostMapping("/refresh")
-    public JwtResponse refresh(@Validated @RequestBody RefreshTokenRequest refreshTokenRequest) {
-        return authService.refresh(refreshTokenRequest.getRefreshToken());
+    public JwtResponse getRefreshToken(@Validated @RequestBody RefreshTokenRequest refreshTokenRequest) {
+        return authService.getRefreshToken(refreshTokenRequest.getRefreshToken());
     }
 }

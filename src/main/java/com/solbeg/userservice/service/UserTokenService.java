@@ -12,9 +12,9 @@ public interface UserTokenService {
 
     UserToken getByToken(String token);
 
-    Page<UserTokenResponse> getAll(Pageable pageable);
+    Page<UserTokenResponse> getAllUserTokens(Pageable pageable);
 
-    void deleteUserToken(String token);
+    void deleteUserTokenByToken(String token);
 
     void deleteOldUserTokens();
 }

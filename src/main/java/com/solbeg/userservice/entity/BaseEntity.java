@@ -16,10 +16,10 @@ import java.util.UUID;
 
 @Data
 @SuperBuilder
-@MappedSuperclass
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
+@MappedSuperclass
 public abstract class BaseEntity {
 
     @Id

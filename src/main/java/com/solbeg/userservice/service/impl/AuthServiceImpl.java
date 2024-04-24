@@ -28,7 +28,7 @@ public class AuthServiceImpl implements AuthService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(), loginRequest.getPassword()));
-        User userInDB = userService.findByUserEmail(loginRequest.getEmail())
+        User userInDB = userService.findUserByEmail(loginRequest.getEmail())
                 .filter(user -> user.getStatus() == Status.ACTIVE)
                 .orElseThrow(() -> new NoSuchUserEmailException(ErrorMessage.USER_NOT_EXIST_OR_NOT_ACTIVE.getMessage() + loginRequest.getEmail()));
 
@@ -42,7 +42,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public JwtResponse refresh(String refreshToken) {
+    public JwtResponse getRefreshToken(String refreshToken) {
         return jwtTokenProvider.refreshUserToken(refreshToken);
     }
 }

@@ -25,6 +25,11 @@ public class UserServiceExceptionHandler {
         return getResponse(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(SendDataException.class)
+    public ResponseEntity<IncorrectData> sendDataException(SendDataException exception) {
+        return getResponse(exception.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<IncorrectData> accessDeniedException(AccessDeniedException exception) {
         return getResponse(exception.getMessage(), HttpStatus.FORBIDDEN);
@@ -36,10 +41,9 @@ public class UserServiceExceptionHandler {
     }
 
     @ExceptionHandler(TokenExpirationException.class)
-    public ResponseEntity<IncorrectData> TokenExpirationException(TokenExpirationException exception) {
+    public ResponseEntity<IncorrectData> tokenExpirationException(TokenExpirationException exception) {
         return getResponse(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
-
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<IncorrectData> methodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {
