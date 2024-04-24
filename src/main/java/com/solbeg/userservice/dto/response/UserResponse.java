@@ -24,6 +24,6 @@ public class UserResponse {
     private String lastName;
     private String password;
     private String email;
-    private List<String> roles;
+    private List<RoleResponse> roles;
     private Status status;
 }

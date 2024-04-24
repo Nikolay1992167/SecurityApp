@@ -11,6 +11,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
+  //  UserResponse getUser();
+
     void registerJournalist(UserRegisterRequest request);
 
     void registerSubscriber(UserRegisterRequest request);
@@ -19,9 +21,9 @@ public interface UserService {
 
     UserResponse findUserById(UUID userId);
 
-    Optional<User> findUserByEmail(String userEmail);
+    User findActiveUserByEmailOrThrowException(String userEmail);
 
-    User findById(UUID userId);
+    //User getUserOrThrowException(UUID userId);
 
     UserResponse updateUserById(UUID userId, UserUpdateRequest userUpdateRequest);
 

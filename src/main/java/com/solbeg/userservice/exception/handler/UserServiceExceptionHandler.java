@@ -25,6 +25,11 @@ public class UserServiceExceptionHandler {
         return getResponse(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<IncorrectData> illegalStateException(IllegalStateException exception) {
+        return getResponse(exception.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(SendDataException.class)
     public ResponseEntity<IncorrectData> sendDataException(SendDataException exception) {
         return getResponse(exception.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);

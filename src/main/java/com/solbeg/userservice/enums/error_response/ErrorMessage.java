@@ -13,7 +13,8 @@ public enum ErrorMessage {
     USER_NOT_ACTIVE("User is not active!"),
 
     USERTOKEN_NOT_FOUND("UserToken not found with token "),
-    TOKEN_EXPIRED("Token expired!");
+    TOKEN_EXPIRED("Token expired!"),
+    ERROR_EXTRACTION("Cannot get user ID!");
 
     private final String message;
 
