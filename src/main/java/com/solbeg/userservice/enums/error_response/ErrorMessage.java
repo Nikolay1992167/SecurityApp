@@ -4,7 +4,6 @@ import lombok.Getter;
 
 @Getter
 public enum ErrorMessage {
-
     ERROR_PARSING("Error parsing the JWT token."),
     USER_NOT_FOUND("User not found with "),
     USER_NOT_EXIST_OR_NOT_ACTIVE("User is not exist or not active with "),
@@ -14,7 +13,6 @@ public enum ErrorMessage {
     USER_NOT_ACTIVE("User is not active!"),
 
     USERTOKEN_NOT_FOUND("UserToken not found with token "),
-    ERROR_SEND_DATA("Failed to send data to mail-service."),
     TOKEN_EXPIRED("Token expired!");
 
     private final String message;

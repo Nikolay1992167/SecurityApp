@@ -4,7 +4,6 @@ import com.solbeg.userservice.dto.request.JwtRequest;
 import com.solbeg.userservice.dto.request.RefreshTokenRequest;
 import com.solbeg.userservice.dto.request.UserRegisterRequest;
 import com.solbeg.userservice.dto.response.JwtResponse;
-import com.solbeg.userservice.dto.response.UserResponse;
 import com.solbeg.userservice.exception.model.IncorrectData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,7 +13,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ResponseEntity;
 
 @Tag(name = "Authentication", description = "The Authentication Api")
 public interface AuthOpenApi {
@@ -33,9 +31,7 @@ public interface AuthOpenApi {
                                         "email": "ivan@google.com",
                                         "password": "123456789"
                                     }
-                                    """)
-                    )
-            ),
+                                    """))),
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -49,9 +45,7 @@ public interface AuthOpenApi {
                                                 "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsInJvbGVzIjpbIkFETUlOIl0sImV4cCI6MTcwOTQ4MTQ5NH0.iTsgestQ0Udfll9RmVwHVRam-MLqrZ9qWWaruJsad7uAzs-Id9DFONSA3bGLoQXRQE5BzLeKnsNB5T6PIqYGWg",
                                                 "refreshToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsImV4cCI6MTcxMjA2OTg5NH0.Bype1oc2qs72GVRqCP3cuZ__MmT0kZvjZog6djxD-UO0eCPe-wdY2Pak-_SmvH3tDM6o8jqb9uMGuJ07M7gA0Q"
                                             }
-                                            """)
-                            )
-                    ),
+                                            """))),
                     @ApiResponse(responseCode = "400", description = "The endpoint has not been completed when an invalid email is entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
@@ -90,7 +84,7 @@ public interface AuthOpenApi {
                                     """)))
             }
     )
-    ResponseEntity<JwtResponse> authenticate(@Parameter(hidden = true) JwtRequest loginRequest);
+    JwtResponse authenticate(@Parameter(hidden = true) JwtRequest loginRequest);
 
     @Operation(
             method = "POST",
@@ -108,9 +102,7 @@ public interface AuthOpenApi {
                                         "email": "grom@grom.com",
                                         "password": "63524178"
                                     }
-                                    """)
-                    )
-            ),
+                                    """))),
             responses = {
                     @ApiResponse(
                             responseCode = "201", description = "The endpoint has been completed."),
@@ -134,7 +126,7 @@ public interface AuthOpenApi {
                                     """)))
             }
     )
-    ResponseEntity<?> registerJournalist(UserRegisterRequest request);
+    void registerJournalist(UserRegisterRequest request);
 
     @Operation(
             method = "POST",
@@ -152,9 +144,7 @@ public interface AuthOpenApi {
                                         "email": "popova@email.com",
                                         "password": "9652314"
                                     }
-                                    """)
-                    )
-            ),
+                                    """))),
             responses = {
                     @ApiResponse(
                             responseCode = "201", description = "The endpoint has been completed."),
@@ -178,7 +168,7 @@ public interface AuthOpenApi {
                                     """)))
             }
     )
-    ResponseEntity<?> registerSubscriber(UserRegisterRequest request);
+    void registerSubscriber(UserRegisterRequest request);
 
     @Operation(
             method = "POST",
@@ -193,9 +183,7 @@ public interface AuthOpenApi {
                                     {
                                         "refreshToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsInJvbGVzIjpbIkFETUlOIl0sImV4cCI6MTcwOTA3ODQ2Nn0.6iwpfXY2eZDZCmxLrcXL1rdEs1ZYoKWTFGHl4spzabAT5hRuZ1pBZDHueydtxj-UeW_r4fsMDB386JUsKulsGQ"
                                     }
-                                    """)
-                    )
-            ),
+                                    """))),
             responses = {
                     @ApiResponse(
                             responseCode = "201",
@@ -209,9 +197,7 @@ public interface AuthOpenApi {
                                                 "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsInJvbGVzIjpbIkFETUlOIl0sImV4cCI6MTcwOTA3ODQ4Nn0.dAagsoFXl3GyZUeHn-BUWtSakIkLv5JEJNDycuwSW_iNfW04f5eroXVJtWRX8yCC6gbgzqcPi-BupOyTu8dXdQ",
                                                 "refreshToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsImV4cCI6MTcxMTY2Njg4Nn0.W5FbSle_jHpATJ6SOrWflCdueJSNk9IaT8v1SUSmXN-4HTmL-gmYi_xJGyW7LgCLRumMR4Ad0TuRHldI_p1-uQ"
                                             }
-                                            """)
-                            )
-                    ),
+                                            """))),
                     @ApiResponse(responseCode = "401", description = "The endpoint has not been completed because the token is not active.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
@@ -232,59 +218,5 @@ public interface AuthOpenApi {
                                     """)))
             }
     )
-    ResponseEntity<JwtResponse> refresh(RefreshTokenRequest refreshTokenRequest);
-
-    @Operation(
-            method = "POST",
-            tags = "Authentication",
-            description = "Get data about the user.",
-            requestBody = @RequestBody(
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = RefreshTokenRequest.class),
-                            examples = @ExampleObject("""
-                                    {
-                                        "token":"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsInJvbGVzIjpbIkFETUlOIl0sImV4cCI6MTcxMTk2NDQ2Mn0.cF-IwOtiDX0Qg3UY42lIaXOia2WkUyZpH58bZxBxYetBrxgCLPW7C1_wm1M6pyKr66FaWwy7UvRVpQrKXAt99w"
-                                    }
-                                    """)
-                    )
-            ),
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = UserResponse.class),
-                                    examples = @ExampleObject("""
-                                            {
-                                                "id": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-                                                "createdBy": null,
-                                                "updatedBy": null,
-                                                "createdAt": "2024-02-15T12:00:00",
-                                                "updatedAt": "2024-02-19T12:00:00",
-                                                "firstName": "Ivan",
-                                                "lastName": "Sidorov",
-                                                "password": "$2a$10$ch99apPuJoORMIf8Ew.D9e.cgWa1C6EYQ3iQMp7idTlGyNpyoF.P.",
-                                                "email": "ivan@google.com",
-                                                "roles": [
-                                                    "ADMIN"
-                                                ],
-                                                "status": "ACTIVE"
-                                            }
-                                            """)
-                            )
-                    ),
-                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed because the token is not valid.",
-                            content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
-                                    {
-                                        "timestamp": "2024-04-03T12:02:01.6087338",
-                                        "error_message": "Illegal base64 character 22",
-                                        "error_status": 400
-                                    }
-                                    """)))
-            }
-    )
-    ResponseEntity<UserResponse> getUserData(String token);
+    JwtResponse getRefreshToken(RefreshTokenRequest refreshTokenRequest);
 }

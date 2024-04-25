@@ -1,6 +1,6 @@
 package com.solbeg.userservice.service.impl;
 
-import com.solbeg.userservice.entity.EmailRequest;
+import com.solbeg.userservice.dto.request.EmailRequest;
 import com.solbeg.userservice.dto.request.UserRegisterRequest;
 import com.solbeg.userservice.dto.request.UserUpdateRequest;
 import com.solbeg.userservice.dto.response.UserResponse;
@@ -18,8 +18,8 @@ import com.solbeg.userservice.exception.UniqueEmailException;
 import com.solbeg.userservice.mapper.UserMapper;
 import com.solbeg.userservice.repository.RoleRepository;
 import com.solbeg.userservice.repository.UserRepository;
-import com.solbeg.userservice.security.jwt.JwtTokenProvider;
 import com.solbeg.userservice.service.SendingDataService;
+import com.solbeg.userservice.service.UserIdentityService;
 import com.solbeg.userservice.service.UserService;
 import com.solbeg.userservice.service.UserTokenService;
 import lombok.RequiredArgsConstructor;
@@ -41,30 +41,19 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
     private final UserTokenService userTokenService;
     private final SendingDataService sendingDataService;
     private final UserRepository userRepository;
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
-
-    @Override
-    @Transactional(readOnly = true)
-    public UserResponse findUserByToken(String token) {
-        UUID userId = jwtTokenProvider.getIdInFormatUUID(token);
-        UserResponse userResponse = userRepository.findById(userId).map(userMapper::toResponse)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + userId));
-        log.info("IN findUserByToken - user: {} found by id: {}", userResponse, userId);
-        return userResponse;
-    }
+    private final UserIdentityService userIdentityService;
 
     @Override
     @Transactional
-    public void registerJournalist(UserRegisterRequest request) {
-        checkUniqueEmail(request.getEmail());
-        User userToSave = userMapper.fromRequest(request);
+    public void registerJournalist(UserRegisterRequest userRegisterRequest) {
+        checkUniqueEmail(userRegisterRequest.getEmail());
+        User userToSave = userMapper.fromRequest(userRegisterRequest);
         List<Role> userRoles = new ArrayList<>();
         Role journalistRole = roleRepository.findByName("JOURNALIST");
         userRoles.add(journalistRole);
@@ -79,9 +68,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void registerSubscriber(UserRegisterRequest request) {
-        checkUniqueEmail(request.getEmail());
-        User userToSave = userMapper.fromRequest(request);
+    public void registerSubscriber(UserRegisterRequest userRegisterRequest) {
+        checkUniqueEmail(userRegisterRequest.getEmail());
+        User userToSave = userMapper.fromRequest(userRegisterRequest);
         List<Role> userRoles = new ArrayList<>();
         Role subscriberRole = roleRepository.findByName("SUBSCRIBER");
         userRoles.add(subscriberRole);
@@ -94,7 +83,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<UserResponse> findAll(Pageable pageable) {
+    public Page<UserResponse> getAllUsers(Pageable pageable) {
         Page<UserResponse> responses = userRepository.findAll(pageable)
                 .map(userMapper::toResponse);
         log.info("IN findAll - {} users found", responses.stream().count());
@@ -103,107 +92,106 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserResponse findUserById(UUID uuid) {
-        UserResponse userResponse = userRepository.findById(uuid)
+    public UserResponse findUserById(UUID userId) {
+        UserResponse userResponse = userRepository.findById(userId)
                 .map(userMapper::toResponse)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + uuid));
-        log.info("IN findUserById - user: {} found by id: {}", userResponse, uuid);
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + userId));
+        log.info("IN findUserById - user: {} found by id: {}", userResponse, userId);
 
         return userResponse;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<User> findByUserEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NoSuchUserEmailException(ErrorMessage.USER_NOT_EXIST.getMessage() + email));
-        log.info("IN findByUserEmail - user: {} found by email: {}", user, email);
+    public Optional<User> findUserByEmail(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new NoSuchUserEmailException(ErrorMessage.USER_NOT_EXIST.getMessage() + userEmail));
+        log.info("IN findByUserEmail - user: {} found by email: {}", user, userEmail);
         return Optional.ofNullable(user);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public User findById(UUID id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + id));
-        log.info("IN findById - user: {} found by id: {}", user, id);
+    public User findById(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + userId));
+        log.info("IN findById - user: {} found by id: {}", user, userId);
         return user;
     }
 
     @Override
     @Transactional
-    public UserResponse update(UUID uuid, UserUpdateRequest updateRequest) {
-        checkUniqueEmail(updateRequest.getEmail());
-        User userInDB = userRepository.findById(uuid)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + uuid));
-        userInDB.setFirstName(updateRequest.getFirstName());
-        userInDB.setLastName(updateRequest.getLastName());
-        userInDB.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
-        userInDB.setEmail(updateRequest.getEmail());
+    public UserResponse updateUserById(UUID userId, UserUpdateRequest userUpdateRequest) {
+        checkUniqueEmail(userUpdateRequest.getEmail());
+        User userInDB = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + userId));
+        userInDB.setFirstName(userUpdateRequest.getFirstName());
+        userInDB.setLastName(userUpdateRequest.getLastName());
+        userInDB.setPassword(passwordEncoder.encode(userUpdateRequest.getPassword()));
+        userInDB.setEmail(userUpdateRequest.getEmail());
         User updatedUser = userRepository.persistAndFlush(userInDB);
         UserResponse userResponse = userMapper.toResponse(updatedUser);
-        log.info("IN update - user: {} with id: {}", userResponse, uuid);
+        log.info("IN update - user: {} with id: {}", userResponse, userId);
         return userResponse;
     }
 
     @Override
     @Transactional
-    public void activateJournalistAccount(String userToken, String tokenAdmin) {
-        userRepository.findByUserWhenRegistrationWithToken(userToken).ifPresentOrElse(
-                user -> {
-                    LocalDateTime expirationAt = userTokenService.getByToken(userToken).getExpirationAt();
-                    if (expirationAt.isBefore(LocalDateTime.now())) {
-                        EmailRequest emailRequest = sendingDataService.getEmailRequest(user, EmailType.USER_TOKEN_EXPIRATION);
-                        sendingDataService.sendRequestToMailService(emailRequest);
-                        throw new TokenExpirationException(ErrorMessage.TOKEN_EXPIRED.getMessage());
-                    } else {
-                        UUID uuidAdmin = jwtTokenProvider.getIdInFormatUUID(tokenAdmin);
-                        user.setStatus(Status.ACTIVE);
-                        user.setUpdatedBy(uuidAdmin);
-                        userRepository.persist(user);
-                        userTokenService.deleteUserToken(userToken);
-                        EmailRequest emailRequest = sendingDataService.getEmailRequest(user, EmailType.USER_WELCOME_EMAIL);
-                        sendingDataService.sendRequestToMailService(emailRequest);
-                    }
-                },
-                () -> {
-                    throw new NotFoundException(ErrorMessage.USERTOKEN_NOT_FOUND.getMessage() + userToken);
-                });
+    public void activateJournalistAccount(String userToken) {
+        UserToken tokenEntity = userTokenService.getByToken(userToken);
+        User user = tokenEntity.getUser();
+        if (user != null) {
+            LocalDateTime expirationAt = tokenEntity.getExpirationAt();
+            if (expirationAt.isBefore(LocalDateTime.now())) {
+                EmailRequest emailRequest = sendingDataService.getEmailRequest(user, EmailType.USER_TOKEN_EXPIRATION);
+                sendingDataService.sendRequestToMailService(emailRequest);
+                throw new TokenExpirationException(ErrorMessage.TOKEN_EXPIRED.getMessage());
+            } else {
+                UUID uuidAdmin = userIdentityService.getUserId();
+                user.setStatus(Status.ACTIVE);
+                user.setUpdatedBy(uuidAdmin);
+                userRepository.persist(user);
+                userTokenService.deleteUserTokenByToken(userToken);
+                EmailRequest emailRequest = sendingDataService.getEmailRequest(user, EmailType.USER_WELCOME_EMAIL);
+                sendingDataService.sendRequestToMailService(emailRequest);
+            }
+        } else {
+            throw new NotFoundException(ErrorMessage.USERTOKEN_NOT_FOUND.getMessage() + userToken);
+        }
         log.info("IN activateJournalistAccount - activated user with userToken: {}", userToken);
     }
 
     @Override
     @Transactional
-    public void deactivateUser(UUID id, String token) {
-        changeUserStatus(id, token, Status.NOT_ACTIVE);
-        log.info("IN deactivateUser - user with id: {} changed status: NOT_ACTIVE", id);
+    public void deactivateUserById(UUID userId) {
+        changeUserStatus(userId, Status.NOT_ACTIVE);
+        log.info("IN deactivateUser - user with id: {} changed status: NOT_ACTIVE", userId);
     }
 
     @Override
     @Transactional
-    public void deleteUser(UUID id, String token) {
-        changeUserStatus(id, token, Status.DELETED);
-        log.info("IN deleteUser - user with id: {} changed status: DELETED", id);
+    public void deleteUserById(UUID userId) {
+        changeUserStatus(userId, Status.DELETED);
+        log.info("IN deleteUser - user with id: {} changed status: DELETED", userId);
     }
 
-
-    private void checkUniqueEmail(String email) {
-        if (userRepository.findByEmail(email).isPresent()) {
-            throw new UniqueEmailException(ErrorMessage.UNIQUE_USER_EMAIL.getMessage() + email);
+    private void checkUniqueEmail(String userEmail) {
+        if (userRepository.findByEmail(userEmail).isPresent()) {
+            throw new UniqueEmailException(ErrorMessage.UNIQUE_USER_EMAIL.getMessage() + userEmail);
         }
     }
 
-    private void changeUserStatus(UUID id, String tokenAdmin, Status status) {
-        User userInDB = userRepository.findById(id)
+    private void changeUserStatus(UUID userId, Status userStatus) {
+        User userInDB = userRepository.findById(userId)
                 .map(user -> {
                     if (user.getRoles().stream().anyMatch(role -> role.getName().equals("ADMIN"))) {
                         throw new InformationChangeStatusUserException(ErrorMessage.CHANGE_STATUS.getMessage());
                     }
                     return user;
                 })
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + id));
-        userInDB.setStatus(status);
-        UUID uuidAdmin = jwtTokenProvider.getIdInFormatUUID(tokenAdmin);
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + userId));
+        userInDB.setStatus(userStatus);
+        UUID uuidAdmin = userIdentityService.getUserId();
         userInDB.setUpdatedBy(uuidAdmin);
         userRepository.persist(userInDB);
     }

@@ -1,13 +1,17 @@
 package com.solbeg.userservice.service.impl;
 
+import com.solbeg.userservice.dto.response.UserTokenResponse;
 import com.solbeg.userservice.entity.UserToken;
 import com.solbeg.userservice.enums.TokenType;
 import com.solbeg.userservice.enums.error_response.ErrorMessage;
 import com.solbeg.userservice.exception.NotFoundException;
+import com.solbeg.userservice.mapper.UserTokenMapper;
 import com.solbeg.userservice.repository.UserTokenRepository;
+import com.solbeg.userservice.service.UserIdentityService;
 import com.solbeg.userservice.service.UserTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,14 +25,15 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserTokenServiceImpl implements UserTokenService {
-
     private final UserTokenRepository tokenRepository;
+    private final UserIdentityService userIdentityService;
+    private final UserTokenMapper userTokenMapper = Mappers.getMapper(UserTokenMapper.class);
 
     @Override
     @Transactional
     public UserToken createActivationToken(UUID userId) {
         UserToken userToken = UserToken.builder()
-                .createdBy(userId)
+                .user(userIdentityService.getUserById(userId))
                 .expirationAt(LocalDateTime.now().plusDays(3))
                 .token(UUID.randomUUID().toString())
                 .tokenType(TokenType.ACTIVATION)
@@ -46,15 +51,16 @@ public class UserTokenServiceImpl implements UserTokenService {
     }
 
     @Override
-    public Page<UserToken> getAll(Pageable pageable) {
+    public Page<UserTokenResponse> getAllUserTokens(Pageable pageable) {
         Page<UserToken> response = tokenRepository.findAll(pageable);
         log.info("IN findAll - {} usertokens found", response.stream().count());
-        return response;
+        return response
+                .map(userTokenMapper::toUserTokenResponse);
     }
 
     @Override
     @Transactional
-    public void deleteUserToken(String token) {
+    public void deleteUserTokenByToken(String token) {
         tokenRepository.findByToken(token).ifPresentOrElse(
                 activationLink -> tokenRepository.deleteByToken(token),
                 () -> {

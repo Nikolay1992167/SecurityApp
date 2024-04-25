@@ -16,12 +16,11 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class JwtUserDetailsService implements UserDetailsService {
-
     private final UserService userService;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userService.findByUserEmail(email)
+        User user = userService.findUserByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + email));
         if (user.getStatus() != Status.ACTIVE) {
             throw new UserStatusException(ErrorMessage.USER_NOT_ACTIVE.getMessage());

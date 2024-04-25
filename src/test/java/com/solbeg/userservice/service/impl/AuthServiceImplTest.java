@@ -56,7 +56,7 @@ class AuthServiceImplTest {
             JwtResponse expectedResponse = JwtData.builder()
                     .build()
                     .getJwtResponse();
-            when(userService.findByUserEmail(loginRequest.getEmail()))
+            when(userService.findUserByEmail(loginRequest.getEmail()))
                     .thenReturn(Optional.of(user));
             when(jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), user.getRoles()))
                     .thenReturn(ACCESS_TOKEN);
@@ -76,7 +76,7 @@ class AuthServiceImplTest {
             JwtRequest loginRequest = JwtData.builder()
                     .build()
                     .getJwtRequest();
-            when(userService.findByUserEmail(loginRequest.getEmail()))
+            when(userService.findUserByEmail(loginRequest.getEmail()))
                     .thenReturn(Optional.empty());
 
             // when, then
@@ -100,7 +100,7 @@ class AuthServiceImplTest {
                     .thenReturn(expectedResponse);
 
             // when
-            JwtResponse actualResponse = authService.refresh(refreshToken);
+            JwtResponse actualResponse = authService.getRefreshToken(refreshToken);
 
             // then
             assertThat(actualResponse).isEqualTo(expectedResponse);

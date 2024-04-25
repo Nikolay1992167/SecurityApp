@@ -39,9 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @RequiredArgsConstructor
 class AuthControllerTest extends PostgresSqlContainerInitializer {
-
     private final MockMvc mockMvc;
-
     private final ObjectMapper objectMapper;
 
     @Autowired
@@ -65,8 +63,8 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/authenticate")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
                     .andExpectAll(
                             status().isOk(),
                             jsonPath("$.id").isNotEmpty(),
@@ -85,8 +83,8 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/authenticate")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.error_message")
                             .value("{email=must be a well-formed email address}"));
@@ -102,8 +100,8 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/authenticate")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.error_message")
                             .value(ErrorMessage.USER_NOT_EXIST.getMessage() + EMAIL_NOT_EXIST));
@@ -126,9 +124,9 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                             .withStatus(200)));
 
             // when, then
-            mockMvc.perform(post(URL_AUTH + "/registerjournalist")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post(URL_AUTH + "/register/journalist")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
                     .andExpectAll(
                             status().isCreated()
                     );
@@ -143,9 +141,9 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                     .getRegisterRequestJournalist();
 
             // when, then
-            mockMvc.perform(post(URL_AUTH + "/registerjournalist")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post(URL_AUTH + "/register/journalist")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.error_message")
                             .value("{firstName=size must be between 2 and 40}"));
@@ -160,9 +158,9 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                     .getRegisterRequestJournalist();
 
             // when, then
-            mockMvc.perform(post(URL_AUTH + "/registerjournalist")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post(URL_AUTH + "/register/journalist")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.error_message")
                             .value("{lastName=size must be between 2 and 50}"));
@@ -177,9 +175,9 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                     .getRegisterRequestJournalist();
 
             // when, then
-            mockMvc.perform(post(URL_AUTH + "/registerjournalist")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post(URL_AUTH + "/register/journalist")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.error_message")
                             .value("{password=size must be between 3 and 100}"));
@@ -194,9 +192,9 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                     .getRegisterRequestJournalist();
 
             // when, then
-            mockMvc.perform(post(URL_AUTH + "/registerjournalist")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post(URL_AUTH + "/register/journalist")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.error_message")
                             .value("{email=must be a well-formed email address}"));
@@ -214,9 +212,9 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                     .getRegisterRequestSubscriber();
 
             // when, then
-            mockMvc.perform(post(URL_AUTH + "/registersubscriber")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post(URL_AUTH + "/register/subscriber")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
                     .andExpectAll(
                             status().isCreated()
                     );
@@ -231,9 +229,9 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                     .getRegisterRequestJournalist();
 
             // when, then
-            mockMvc.perform(post(URL_AUTH + "/registersubscriber")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post(URL_AUTH + "/register/subscriber")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.error_message")
                             .value("{firstName=size must be between 2 and 40}"));
@@ -248,9 +246,9 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                     .getRegisterRequestJournalist();
 
             // when, then
-            mockMvc.perform(post(URL_AUTH + "/registersubscriber")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post(URL_AUTH + "/register/subscriber")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.error_message")
                             .value("{lastName=size must be between 2 and 50}"));
@@ -265,9 +263,9 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                     .getRegisterRequestJournalist();
 
             // when, then
-            mockMvc.perform(post(URL_AUTH + "/registersubscriber")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post(URL_AUTH + "/register/subscriber")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.error_message")
                             .value("{password=size must be between 3 and 100}"));
@@ -282,9 +280,9 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                     .getRegisterRequestJournalist();
 
             // when, then
-            mockMvc.perform(post(URL_AUTH + "/registersubscriber")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post(URL_AUTH + "/register/subscriber")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.error_message")
                             .value("{email=must be a well-formed email address}"));
@@ -302,8 +300,8 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/refresh")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
                     .andExpectAll(
                             status().isOk()
                     );
@@ -316,8 +314,8 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/refresh")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest());
         }
     }

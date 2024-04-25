@@ -1,11 +1,10 @@
 package com.solbeg.userservice.service.impl;
 
-import com.solbeg.userservice.entity.EmailRequest;
+import com.solbeg.userservice.dto.request.EmailRequest;
 import com.solbeg.userservice.entity.User;
 import com.solbeg.userservice.entity.UserToken;
 import com.solbeg.userservice.entity.User_;
 import com.solbeg.userservice.enums.EmailType;
-import com.solbeg.userservice.enums.error_response.ErrorMessage;
 import com.solbeg.userservice.exception.SendDataException;
 import com.solbeg.userservice.util.testdata.EmailRequestTestData;
 import com.solbeg.userservice.util.testdata.UserTestData;
@@ -51,7 +50,6 @@ class SendDataServiceImplTest {
     public void tearDown() throws IOException {
         mockWebServer.shutdown();
     }
-
     @Nested
     class SendRequestToMailService {
 
@@ -80,11 +78,9 @@ class SendDataServiceImplTest {
 
             // when, then
             assertThatThrownBy(() -> sendingDataService.sendRequestToMailService(emailRequest))
-                    .isExactlyInstanceOf(SendDataException.class)
-                    .hasMessageContaining(ErrorMessage.ERROR_SEND_DATA.getMessage());
+                    .isExactlyInstanceOf(SendDataException.class);
         }
     }
-
 
     @Test
     void shouldReturnExpectedActivationData() {
@@ -100,7 +96,7 @@ class SendDataServiceImplTest {
         // then
         assertThat(actual.get(User_.FIRST_NAME)).isEqualTo(user.getFirstName());
         assertThat(actual.get(User_.LAST_NAME)).isEqualTo(user.getLastName());
-        assertThat(actual.get("activationLink")).isEqualTo("http://localhost:8081/api/v1/users/activation?userToken=" + tokenUser);
+        assertThat(actual.get("activationLink")).isEqualTo("http://localhost:8081/api/v1/admin/activation?userToken=" + tokenUser);
     }
 
     @Test
@@ -168,6 +164,5 @@ class SendDataServiceImplTest {
 
         // then
         assertThat(actual).isEqualTo(expected);
-
     }
 }

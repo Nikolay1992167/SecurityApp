@@ -2,7 +2,7 @@ package com.solbeg.userservice.controller.openapi;
 
 import com.solbeg.userservice.dto.request.UserUpdateRequest;
 import com.solbeg.userservice.dto.response.UserResponse;
-import com.solbeg.userservice.entity.UserToken;
+import com.solbeg.userservice.dto.response.UserTokenResponse;
 import com.solbeg.userservice.exception.model.IncorrectData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,69 +14,65 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
-@Tag(name = "User", description = "The User Api")
-public interface UserOpenApi {
+@Tag(name = "Admin", description = "The Admin Api")
+public interface AdminOpenApi {
 
     @Operation(
             method = "GET",
-            tags = "User",
-            description = "Get page of users",
+            tags = "Admin",
+            description = "Get page of userTokens",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = UserResponse.class),
+                                    schema = @Schema(implementation = UserTokenResponse.class),
                                     examples = @ExampleObject("""
                                             {
-                                                "content": [
-                                                    {
-                                                        "id": "e4313010-16a1-4cd2-bbdc-5fe77ec211d8",
-                                                        "createdBy": "8127e85b-99a2-4bdb-9d9f-d260ee4ebe25",
-                                                        "expirationAt": "2024-03-16T09:22:22.83435",
-                                                        "token": "0c5b8c16-5c4a-4d2d-a176-0d53dae0c7ee",
-                                                        "tokenType": "ACTIVATION"
-                                                    }
-                                                ],
-                                                "pageable": {
-                                                    "pageNumber": 0,
-                                                    "pageSize": 15,
-                                                    "sort": {
-                                                        "empty": true,
-                                                        "sorted": false,
-                                                        "unsorted": true
-                                                    },
-                                                    "offset": 0,
-                                                    "unpaged": false,
-                                                    "paged": true
-                                                },
-                                                "last": true,
-                                                "totalPages": 1,
-                                                "totalElements": 1,
-                                                "size": 15,
-                                                "number": 0,
-                                                "sort": {
-                                                    "empty": true,
-                                                    "sorted": false,
-                                                    "unsorted": true
-                                                },
-                                                "first": true,
-                                                "numberOfElements": 1,
-                                                "empty": false
-                                            }
-                                            """)
-                            )
-                    ),
+                                                 "content": [
+                                                     {
+                                                         "id": "d56b4c9c-c01c-48d3-a8ea-a79c2b247de7",
+                                                         "expirationAt": "2024-04-19T15:44:22.428452",
+                                                         "token": "5d8d4183-6ac8-408d-9f0d-40177743ea00",
+                                                         "tokenType": "ACTIVATION",
+                                                         "userId": "7570e2e9-492e-4a61-8c37-8dd3b1ed390a"
+                                                     }
+                                                 ],
+                                                 "pageable": {
+                                                     "pageNumber": 0,
+                                                     "pageSize": 20,
+                                                     "sort": {
+                                                         "sorted": false,
+                                                         "unsorted": true,
+                                                         "empty": true
+                                                     },
+                                                     "offset": 0,
+                                                     "unpaged": false,
+                                                     "paged": true
+                                                 },
+                                                 "totalElements": 1,
+                                                 "totalPages": 1,
+                                                 "last": true,
+                                                 "numberOfElements": 1,
+                                                 "size": 20,
+                                                 "number": 0,
+                                                 "sort": {
+                                                     "sorted": false,
+                                                     "unsorted": true,
+                                                     "empty": true
+                                                 },
+                                                 "first": true,
+                                                 "empty": false
+                                             }
+                                            """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                     {
-                                        "timestamp": "2024-03-13T09:31:50.0882906",
+                                        "timestamp": "2024-04-24T20:52:03.470353",
                                         "error_message": "Full authentication is required to access this resource",
                                         "error_status": 401
                                     }
@@ -110,11 +106,11 @@ public interface UserOpenApi {
                                     """)))
             }
     )
-    ResponseEntity<Page<UserToken>> findAllUserTokens(Pageable pageable);
+    Page<UserTokenResponse> getAllUserTokens(Pageable pageable);
 
     @Operation(
             method = "GET",
-            tags = "User",
+            tags = "Admin",
             description = "Get page of users",
             responses = {
                     @ApiResponse(
@@ -189,9 +185,7 @@ public interface UserOpenApi {
                                                     "numberOfElements": 3,
                                                     "empty": false
                                                 }
-                                            """)
-                            )
-                    ),
+                                            """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
@@ -230,14 +224,14 @@ public interface UserOpenApi {
                                     """)))
             }
     )
-    ResponseEntity<Page<UserResponse>> findAll(Pageable pageable);
+    Page<UserResponse> getAllUsers(Pageable pageable);
 
     @Operation(
             method = "GET",
-            tags = "User",
-            description = "Get a User by uuid",
+            tags = "Admin",
+            description = "Get a User by id",
             parameters = {
-                    @Parameter(name = "uuid", description = "Id of User", example = "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13")
+                    @Parameter(name = "userId", description = "Id of User", example = "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13")
             },
             responses = {
                     @ApiResponse(
@@ -261,9 +255,7 @@ public interface UserOpenApi {
                                                 ],
                                                 "status": "ACTIVE"
                                             }
-                                            """)
-                            )
-                    ),
+                                            """))),
                     @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
@@ -311,14 +303,14 @@ public interface UserOpenApi {
                                     """))),
             }
     )
-    ResponseEntity<UserResponse> findById(UUID uuid);
+    UserResponse findUserById(UUID userId);
 
     @Operation(
             method = "PUT",
-            tags = "User",
-            description = "Update an user with uuid",
+            tags = "Admin",
+            description = "Update an user by his id.",
             parameters = {
-                    @Parameter(name = "uuid", description = "Uuid of user", example = "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13")
+                    @Parameter(name = "userId", description = "Id of user", example = "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13")
             },
             requestBody = @RequestBody(
                     required = true,
@@ -332,9 +324,7 @@ public interface UserOpenApi {
                                         "password": "8776868",
                                         "email": "nikolayv@example.com"
                                     }
-                                    """)
-                    )
-            ),
+                                    """))),
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -357,9 +347,7 @@ public interface UserOpenApi {
                                                 ],
                                                 "status": "ACTIVE"
                                             }
-                                            """)
-                            )
-                    ),
+                                            """))),
                     @ApiResponse(responseCode = "400", description = "The endpoint has not been completed when an invalid uuid is entered.",
                             content = @Content(mediaType = "application/json", examples = @ExampleObject("""
                                             {
@@ -424,14 +412,14 @@ public interface UserOpenApi {
                                     """)))
             }
     )
-    ResponseEntity<UserResponse> update(UUID uuid, @Parameter(hidden = true) UserUpdateRequest updateRequest);
+    UserResponse updateUserById(UUID userId, UserUpdateRequest userUpdateRequest);
 
     @Operation(
             method = "PATCH",
-            tags = "User",
-            description = "Changing the user's status to NOT_ACTIVE",
+            tags = "Admin",
+            description = "Changing the user's status to ACTIVE",
             parameters = {
-                    @Parameter(name = "userToken", description = "Token of UserToken", example = "0c5b8c16-5c4a-4d2d-a176-0d53dae0c7ee")
+                    @Parameter(name = "userToken", description = "Identification token of userToken", example = "0c5b8c16-5c4a-4d2d-a176-0d53dae0c7ee")
             },
             responses = {
                     @ApiResponse(
@@ -474,14 +462,14 @@ public interface UserOpenApi {
                                     """)))
             }
     )
-    ResponseEntity<?> activateUserJournalist(@RequestParam String userToken, @Parameter(hidden = true) String token);
+    void activateUserJournalistByUserToken(String userToken);
 
     @Operation(
             method = "PATCH",
-            tags = "User",
+            tags = "Admin",
             description = "Changing the user's status to NOT_ACTIVE",
             parameters = {
-                    @Parameter(name = "uuid", description = "Uuid of user", example = "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13")
+                    @Parameter(name = "userId", description = "Id of user", example = "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13")
             },
             responses = {
                     @ApiResponse(
@@ -541,14 +529,14 @@ public interface UserOpenApi {
                                     """)))
             }
     )
-    ResponseEntity<?> deactivateUser(UUID id, @Parameter(hidden = true) String token);
+    void deactivateUserById(UUID userId);
 
     @Operation(
-            method = "PATCH",
-            tags = "User",
+            method = "DELETE",
+            tags = "Admin",
             description = "Changing the user's status to DELETED",
             parameters = {
-                    @Parameter(name = "uuid", description = "Uuid of user", example = "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13")
+                    @Parameter(name = "userId", description = "Id of user", example = "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13")
             },
             responses = {
                     @ApiResponse(
@@ -609,5 +597,5 @@ public interface UserOpenApi {
                                     """)))
             }
     )
-    ResponseEntity<?> deleteUser(UUID id, @Parameter(hidden = true) String token);
+    void deleteUserById(UUID userId);
 }

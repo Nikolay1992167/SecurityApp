@@ -11,26 +11,23 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-
-    UserResponse findUserByToken(String token);
-
     void registerJournalist(UserRegisterRequest request);
 
     void registerSubscriber(UserRegisterRequest request);
 
-    Page<UserResponse> findAll(Pageable pageable);
+    Page<UserResponse> getAllUsers(Pageable pageable);
 
-    UserResponse findUserById(UUID uuid);
+    UserResponse findUserById(UUID userId);
 
-    Optional<User> findByUserEmail(String email);
+    Optional<User> findUserByEmail(String userEmail);
 
-    User findById(UUID id);
+    User findById(UUID userId);
 
-    UserResponse update(UUID uuid, UserUpdateRequest updateRequest);
+    UserResponse updateUserById(UUID userId, UserUpdateRequest userUpdateRequest);
 
-    void activateJournalistAccount(String email, String token);
+    void activateJournalistAccount(String userEmail);
 
-    void deactivateUser(UUID id, String token);
+    void deactivateUserById(UUID userId);
 
-    void deleteUser(UUID id, String token);
+    void deleteUserById(UUID userId);
 }
