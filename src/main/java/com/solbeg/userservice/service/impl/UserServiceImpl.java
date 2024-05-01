@@ -1,6 +1,5 @@
 package com.solbeg.userservice.service.impl;
 
-import com.solbeg.userservice.dto.request.EmailRequest;
 import com.solbeg.userservice.dto.request.UserRegisterRequest;
 import com.solbeg.userservice.dto.request.UserUpdateRequest;
 import com.solbeg.userservice.dto.response.UserResponse;
@@ -104,7 +103,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmailAndStatus(userEmail, Status.ACTIVE)
                 .orElseThrow(() -> new NoSuchUserEmailException(ErrorMessage.USER_NOT_EXIST.getMessage() + userEmail));
     }
-
 
 
     @Override

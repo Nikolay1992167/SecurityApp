@@ -8,9 +8,7 @@ import com.solbeg.userservice.exception.NotFoundException;
 import com.solbeg.userservice.mapper.UserTokenMapper;
 import com.solbeg.userservice.repository.UserTokenRepository;
 import com.solbeg.userservice.service.UserIdentityService;
-import com.solbeg.userservice.service.UserService;
 import com.solbeg.userservice.service.UserTokenService;
-import com.solbeg.userservice.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j

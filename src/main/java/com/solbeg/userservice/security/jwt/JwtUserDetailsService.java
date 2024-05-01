@@ -1,9 +1,6 @@
 package com.solbeg.userservice.security.jwt;
 
 import com.solbeg.userservice.entity.User;
-import com.solbeg.userservice.enums.Status;
-import com.solbeg.userservice.enums.error_response.ErrorMessage;
-import com.solbeg.userservice.exception.UserStatusException;
 import com.solbeg.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

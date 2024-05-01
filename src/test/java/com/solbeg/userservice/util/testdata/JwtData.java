@@ -20,19 +20,19 @@ import static com.solbeg.userservice.util.initdata.InitData.REFRESH_TOKEN;
 public class JwtData {
 
     @Builder.Default
-    private UUID id = ID_JOURNALIST;
+    private static UUID id = ID_JOURNALIST;
 
     @Builder.Default
-    private String email = EMAIL_JOURNALIST;
+    private static String email = EMAIL_JOURNALIST;
 
     @Builder.Default
-    private String accessToken = ACCESS_TOKEN;
+    private static String accessToken = ACCESS_TOKEN;
 
     @Builder.Default
-    private String refreshToken = REFRESH_TOKEN;
+    private static String refreshToken = REFRESH_TOKEN;
 
     @Builder.Default
-    private String password = PASSWORD_JOURNALIST;
+    private static String password = PASSWORD_JOURNALIST;
 
     public JwtRequest getJwtRequest() {
         return JwtRequest.builder()
@@ -41,14 +41,14 @@ public class JwtData {
                 .build();
     }
 
-    public JwtRequest getJwtRequestForIT() {
+    public static JwtRequest getJwtRequestForIT() {
         return JwtRequest.builder()
                 .email(EMAIL_JOURNALIST_FOR_IT)
                 .password(PASSWORD_JOURNALIST_FOR_IT)
                 .build();
     }
 
-    public JwtResponse getJwtResponse() {
+    public static JwtResponse getJwtResponse() {
         return JwtResponse.builder()
                 .id(id)
                 .email(email)

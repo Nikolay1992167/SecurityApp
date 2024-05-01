@@ -1,6 +1,5 @@
 package com.solbeg.userservice.controller.openapi;
 
-import com.solbeg.userservice.dto.request.RefreshTokenRequest;
 import com.solbeg.userservice.dto.response.UserResponse;
 import com.solbeg.userservice.exception.model.IncorrectData;
 import io.swagger.v3.oas.annotations.Operation;

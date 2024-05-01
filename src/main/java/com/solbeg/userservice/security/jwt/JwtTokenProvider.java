@@ -5,7 +5,6 @@ import com.solbeg.userservice.entity.Role;
 import com.solbeg.userservice.entity.User;
 import com.solbeg.userservice.security.props.JwtProperties;
 import com.solbeg.userservice.service.UserIdentityService;
-import com.solbeg.userservice.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;

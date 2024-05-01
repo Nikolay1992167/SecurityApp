@@ -22,6 +22,7 @@ public class InitData {
     public static String EMAIL_ADMIN = "dronov@google.com";
     public static String EMAIL_JOURNALIST = "suzko@mail.ru";
     public static String EMAIL_JOURNALIST_FOR_IT = "smirnov@google.com";
+    public static String EMAIL_ADMIN_FOR_IT = "dronov@google.com";
     public static String EMAIL_SUBSCRIBER = "pronina@google.com";
     public static String EMAIL_INCORRECT = "incorrect";
     public static String EMAIL_NOT_EXIST = "nikolay@mail.by";
@@ -34,6 +35,7 @@ public class InitData {
     public static UUID ID_ADMIN = UUID.fromString("44212253-a305-4495-9982-45e833aa74ac");
     public static UUID ID_JOURNALIST = UUID.fromString("f2361e91-718e-41ad-9ddc-4be05ebc09b5");
     public static UUID ID_JOURNALIST_FOR_IT = UUID.fromString("b3afa636-8006-42fe-961e-21ae926b3265");
+    public static UUID ID_ADMIN_FOR_IT = UUID.fromString("44212253-a305-4495-9982-45e833aa74ac");
     public static UUID ID_SUBSCRIBER = UUID.fromString("42f77a57-3cd7-4e5d-a2f8-78f951fc9a41");
     public static UUID ID_SUBSCRIBER_FOR_IT = UUID.fromString("3a472b53-236d-4cd9-a9d3-0d413ad3b903");
     public static UUID ID_NOT_EXIST = UUID.fromString("ddcf4b2b-3ee4-4927-9466-953aa27c8785");
@@ -80,4 +82,5 @@ public class InitData {
     public static String TOKEN_USERTOKEN = "e6bf32a9-22cc-44ec-85eb-4f7632dabfd1";
     public static String TOKEN_USERTOKEN_NOT_EXIST = "b0c47e3f-152e-4c04-bfbb-8ac46546";
     public static String BASE_URL = "http://localhost:8081/api/v1/admin/activation?userToken=";
+    public static String BEARER = "Bearer ";
 }
