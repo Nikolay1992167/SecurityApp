@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/users")
 public class UserController implements UserOpenApi {
-    private final UserIdentityService userIdentityService;
     private final UserMapper userMapper;
+
+    private final UserIdentityService userIdentityService;
+
 
     @Override
     @GetMapping("/details")

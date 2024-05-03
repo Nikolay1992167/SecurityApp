@@ -23,11 +23,13 @@ public interface UserMapper {
     User fromRequest(UserRegisterRequest source, Status status);
 
     @Mapping(target = "updatedBy", source = "userId")
+    @Mapping(target = "password", source = "source.password", qualifiedByName = "encodePassword")
     void update(@MappingTarget User target, UserUpdateRequest source, UUID userId);
 
-    UserResponse toResponse(User user);
+    @Mapping(target = "password", source = "source.password", qualifiedByName = "encodePassword")
+    UserResponse toResponse(User source);
 
-    @Mapping(target = "accessToken", source = "user",  qualifiedByName = "createAccessToken")
+    @Mapping(target = "accessToken", source = "user", qualifiedByName = "createAccessToken")
     @Mapping(target = "refreshToken", source = "user", qualifiedByName = "createRefreshToken")
     JwtResponse toJwtResponse(User user);
 }

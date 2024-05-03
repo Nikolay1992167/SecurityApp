@@ -68,7 +68,7 @@ public interface AdminOpenApi {
                                                  "empty": false
                                              }
                                             """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is not entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                     {
@@ -77,7 +77,7 @@ public interface AdminOpenApi {
                                         "error_status": 401
                                     }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when an expired token is entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is expired.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -86,7 +86,7 @@ public interface AdminOpenApi {
                                                 "error_status": 401
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when an invalid token is entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is invalid.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -95,7 +95,7 @@ public interface AdminOpenApi {
                                                 "error_status": 401
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "403", description = "Not Authenticated User if a token with a non-admin role is entered",
+                    @ApiResponse(responseCode = "403", description = "Token with a non-admin role.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -120,73 +120,72 @@ public interface AdminOpenApi {
                                     schema = @Schema(implementation = UserResponse.class),
                                     examples = @ExampleObject("""
                                             {
-                                                    "content": [
-                                                        {
-                                                            "id": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-                                                            "createdBy": null,
-                                                            "updatedBy": null,
-                                                            "createdAt": "2024-02-15T12:00:00",
-                                                            "updatedAt": "2024-02-19T12:00:00",
-                                                            "firstName": "Ivan",
-                                                            "lastName": "Sidorov",
-                                                            "password": "$2a$10$ch99apPuJoORMIf8Ew.D9e.cgWa1C6EYQ3iQMp7idTlGyNpyoF.P.",
-                                                            "email": "ivan@google.com",
-                                                            "roles": [
-                                                                "ADMIN"
-                                                            ],
-                                                            "status": "ACTIVE"
-                                                        },
-                                                        {
-                                                            "id": "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12",
-                                                            "createdBy": null,
-                                                            "updatedBy": null,
-                                                            "createdAt": "2024-02-13T12:00:00",
-                                                            "updatedAt": "2024-02-16T12:00:00",
-                                                            "firstName": "Egor",
-                                                            "lastName": "Strelin",
-                                                            "password": "$2a$10$uuwsQHbWZMIUMTuxKwij8e/l5zea9.Q2XW0eG3Bs/2fUMarbqiymG",
-                                                            "email": "strelin@mail.ru",
-                                                            "roles": [
-                                                                "JOURNALIST"
-                                                            ],
-                                                            "status": "ACTIVE"
-                                                        },
-                                                        {
-                                                            "id": "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13",
-                                                            "createdBy": null,
-                                                            "updatedBy": null,
-                                                            "createdAt": "2024-02-11T12:00:00",
-                                                            "updatedAt": "2024-02-14T12:00:00",
-                                                            "firstName": "Alex",
-                                                            "lastName": "Volk",
-                                                            "password": "$2a$10$wH5b5g3QibOOdDhOVlSGxuyvqOO4kDcWMI3TQKNK9HdzUeQLowmNG",
-                                                            "email": "volk@google.com",
-                                                            "roles": [
-                                                                "SUBSCRIBER"
-                                                            ],
-                                                            "status": "ACTIVE"
-                                                        }
-                                                    ],
-                                                    "pageable": {
-                                                        "pageNumber": 0,
-                                                        "pageSize": 15,
-                                                        "sort": [],
-                                                        "offset": 0,
-                                                        "unpaged": false,
-                                                        "paged": true
+                                                "content": [
+                                                    {
+                                                        "id": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+                                                        "createdBy": null,
+                                                        "updatedBy": null,
+                                                        "createdAt": "2024-05-01T23:21:28.714835",
+                                                        "updatedAt": "2024-05-01T23:21:28.714835",
+                                                        "firstName": "Ivan",
+                                                        "lastName": "Sidorov",
+                                                        "password": "$2a$10$P9GsTtz4wB/6xDygXcJfse3g0MhDG2bXnLx9OeT5yX9k.Cdg7PjaO",
+                                                        "email": "ivan@google.com",
+                                                        "roles": [
+                                                            {
+                                                                "id": "73c65923-b5b1-42df-bd99-299180f287e0",
+                                                                "name": "ADMIN"
+                                                            }
+                                                        ],
+                                                        "status": "ACTIVE"
                                                     },
-                                                    "last": true,
-                                                    "totalPages": 1,
-                                                    "totalElements": 3,
-                                                    "size": 15,
-                                                    "number": 0,
-                                                    "sort": [],
-                                                    "first": true,
-                                                    "numberOfElements": 3,
-                                                    "empty": false
-                                                }
+                                                    {
+                                                        "id": "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12",
+                                                        "createdBy": null,
+                                                        "updatedBy": null,
+                                                        "createdAt": "2024-05-01T23:21:28.714835",
+                                                        "updatedAt": "2024-05-01T23:21:28.714835",
+                                                        "firstName": "Egor",
+                                                        "lastName": "Strelin",
+                                                        "password": "$2a$10$HQF7p0wcws4NDvhIUdOQDeDOFu3OokJseoz.2gvcFOTsSqQGOGG3K",
+                                                        "email": "strelin@mail.ru",
+                                                        "roles": [
+                                                            {
+                                                                "id": "2512c298-6a1d-48d7-a12d-b51069aceb08",
+                                                                "name": "JOURNALIST"
+                                                            }
+                                                        ],
+                                                        "status": "ACTIVE"
+                                                    }
+                                                ],
+                                                "pageable": {
+                                                    "pageNumber": 0,
+                                                    "pageSize": 20,
+                                                    "sort": {
+                                                        "empty": true,
+                                                        "unsorted": true,
+                                                        "sorted": false
+                                                    },
+                                                    "offset": 0,
+                                                    "unpaged": false,
+                                                    "paged": true
+                                                },
+                                                "last": true,
+                                                "totalPages": 1,
+                                                "totalElements": 5,
+                                                "size": 20,
+                                                "number": 0,
+                                                "sort": {
+                                                    "empty": true,
+                                                    "unsorted": true,
+                                                    "sorted": false
+                                                },
+                                                "first": true,
+                                                "numberOfElements": 5,
+                                                "empty": false
+                                            }
                                             """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is not entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                     {
@@ -195,7 +194,7 @@ public interface AdminOpenApi {
                                         "error_status": 401
                                     }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when an expired token is entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is expired.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -204,7 +203,7 @@ public interface AdminOpenApi {
                                                 "error_status": 401
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when an invalid token is entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is invalid.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -213,7 +212,7 @@ public interface AdminOpenApi {
                                                 "error_status": 401
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "403", description = "Not Authenticated User if a token with a non-admin role is entered",
+                    @ApiResponse(responseCode = "403", description = "Token with a non-admin role.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -241,22 +240,25 @@ public interface AdminOpenApi {
                                     schema = @Schema(implementation = UserResponse.class),
                                     examples = @ExampleObject("""
                                             {
-                                                "id": "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13",
+                                                "id": "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12",
                                                 "createdBy": null,
                                                 "updatedBy": null,
-                                                "createdAt": "2024-02-11T12:00:00",
-                                                "updatedAt": "2024-02-14T12:00:00",
-                                                "firstName": "Alex",
-                                                "lastName": "Volk",
-                                                "password": "$2a$10$wH5b5g3QibOOdDhOVlSGxuyvqOO4kDcWMI3TQKNK9HdzUeQLowmNG",
-                                                "email": "volk@google.com",
+                                                "createdAt": "2024-05-01T21:04:43.644024",
+                                                "updatedAt": "2024-05-01T21:04:43.644024",
+                                                "firstName": "Egor",
+                                                "lastName": "Strelin",
+                                                "password": "$2a$10$uuwsQHbWZMIUMTuxKwij8e/l5zea9.Q2XW0eG3Bs/2fUMarbqiymG",
+                                                "email": "strelin@mail.ru",
                                                 "roles": [
-                                                    "SUBSCRIBER"
+                                                    {
+                                                        "id": "2512c298-6a1d-48d7-a12d-b51069aceb08",
+                                                        "name": "JOURNALIST"
+                                                    }
                                                 ],
                                                 "status": "ACTIVE"
                                             }
                                             """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is not entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                     {
@@ -265,7 +267,7 @@ public interface AdminOpenApi {
                                         "error_status": 401
                                     }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when an expired token is entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is expired.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -274,7 +276,7 @@ public interface AdminOpenApi {
                                                 "error_status": 401
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when an invalid token is entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is invalid.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -283,7 +285,7 @@ public interface AdminOpenApi {
                                                 "error_status": 401
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "403", description = "The endpoint has not been completed if a token with a non-admin role is entered",
+                    @ApiResponse(responseCode = "403", description = "Token with a non-admin role.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -292,7 +294,7 @@ public interface AdminOpenApi {
                                                 "error_status": 403
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "404", description = "The user not found when entered not existent uuid.",
+                    @ApiResponse(responseCode = "404", description = "Id is not existent.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -335,20 +337,23 @@ public interface AdminOpenApi {
                                             {
                                                 "id": "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13",
                                                 "createdBy": null,
-                                                "updatedBy": null,
-                                                "createdAt": "2024-02-11T12:00:00",
-                                                "updatedAt": "2024-02-14T12:00:00",
+                                                "updatedBy": "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13",
+                                                "createdAt": "2024-05-01T21:35:17.943424",
+                                                "updatedAt": "2024-05-01T21:35:17.943424",
                                                 "firstName": "Nikolay",
                                                 "lastName": "Minich",
-                                                "password": "$2a$10$4NHxBR02aHWxiHt5CrGOmuLhTqu.0SQYU16F/OQXus5ZQ2.KDvCPq",
-                                                "email": "nikolayv@example.com",
+                                                "password": "$2a$10$WflfzbK.w8gn1nNJtodpE.EO/.2Qv.89i3YWHJUc1HFySq64ZImYS",
+                                                "email": "nikolay555@example.com",
                                                 "roles": [
-                                                    "SUBSCRIBER"
+                                                    {
+                                                        "id": "f5b50fda-f157-4a8b-948c-6705206c81c6",
+                                                        "name": "SUBSCRIBER"
+                                                    }
                                                 ],
                                                 "status": "ACTIVE"
                                             }
                                             """))),
-                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed when an invalid uuid is entered.",
+                    @ApiResponse(responseCode = "400", description = "Id is invalid.",
                             content = @Content(mediaType = "application/json", examples = @ExampleObject("""
                                             {
                                                 "timestamp": "2024-03-03T21:04:33.3089845",
@@ -356,7 +361,7 @@ public interface AdminOpenApi {
                                                 "error_status": 400
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is not entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                     {
@@ -365,7 +370,7 @@ public interface AdminOpenApi {
                                         "error_status": 401
                                     }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when an expired token is entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is expired.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -374,7 +379,7 @@ public interface AdminOpenApi {
                                                 "error_status": 401
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when an invalid token is entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is invalid.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -383,7 +388,7 @@ public interface AdminOpenApi {
                                                 "error_status": 401
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "404", description = "The user not found when entered not existent uuid.",
+                    @ApiResponse(responseCode = "404", description = "Id is not existent.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -392,7 +397,7 @@ public interface AdminOpenApi {
                                                 "error_status": 404
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed when entered not existent uuid.",
+                    @ApiResponse(responseCode = "400", description = "Request data is incorrect.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -401,13 +406,13 @@ public interface AdminOpenApi {
                                                 "error_status": 400
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "406", description = "The endpoint has not been completed when the email of UserUpdateRequest is exist in BD.",
+                    @ApiResponse(responseCode = "400", description = "Email is not unique.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
                                                 "timestamp": "2024-03-03T21:15:04.0445334",
                                                 "error_message": "Email is occupied! Another user is already registered by this nikolayv@example.com",
-                                                "error_status": 406
+                                                "error_status": 400
                                             }
                                     """)))
             }
@@ -423,8 +428,8 @@ public interface AdminOpenApi {
             },
             responses = {
                     @ApiResponse(
-                            responseCode = "200", description = "The endpoint has been completed."),
-                    @ApiResponse(responseCode = "404", description = "The user not found when entered not existent uuid.",
+                            responseCode = "200", description = "The status has been changed to ACTIVE."),
+                    @ApiResponse(responseCode = "404", description = "Id is not existent.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -433,7 +438,7 @@ public interface AdminOpenApi {
                                                 "error_status": 404
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is not entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                     {
@@ -442,7 +447,7 @@ public interface AdminOpenApi {
                                         "error_status": 401
                                     }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when an expired token is entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is expired.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -451,7 +456,7 @@ public interface AdminOpenApi {
                                                 "error_status": 401
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when an invalid token is entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is invalid.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -473,8 +478,8 @@ public interface AdminOpenApi {
             },
             responses = {
                     @ApiResponse(
-                            responseCode = "200", description = "The endpoint has been completed."),
-                    @ApiResponse(responseCode = "404", description = "The user not found when entered not existent uuid.",
+                            responseCode = "200", description = "The status has been changed to NOT_ACTIVE."),
+                    @ApiResponse(responseCode = "404", description = "Id is not existent.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -483,7 +488,7 @@ public interface AdminOpenApi {
                                                 "error_status": 404
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed when an invalid uuid is entered.",
+                    @ApiResponse(responseCode = "400", description = "Id is invalid.",
                             content = @Content(mediaType = "application/json", examples = @ExampleObject("""
                                             {
                                                 "timestamp": "2024-03-03T21:17:09.5058146",
@@ -491,16 +496,16 @@ public interface AdminOpenApi {
                                                 "error_status": 400
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "409", description = "You cannot change the status of a user with the role ADMIN.",
+                    @ApiResponse(responseCode = "400", description = "Not change status of a user with the role ADMIN.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
                                                 "timestamp": "2024-03-03T21:17:42.2449021",
                                                 "error_message": "You cannot change the status of a user with the ADMIN role.",
-                                                "error_status": 409
+                                                "error_status": 400
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is not entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                     {
@@ -509,7 +514,7 @@ public interface AdminOpenApi {
                                         "error_status": 401
                                     }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when an expired token is entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is expired.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -518,7 +523,7 @@ public interface AdminOpenApi {
                                                 "error_status": 401
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when an invalid token is entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is invalid.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -540,8 +545,8 @@ public interface AdminOpenApi {
             },
             responses = {
                     @ApiResponse(
-                            responseCode = "200", description = "The endpoint has been completed."),
-                    @ApiResponse(responseCode = "404", description = "The user not found when entered not existent uuid.",
+                            responseCode = "200", description = "The status has been changed to DELETED."),
+                    @ApiResponse(responseCode = "404", description = "Id is not existent.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -550,7 +555,7 @@ public interface AdminOpenApi {
                                                 "error_status": 404
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed when an invalid uuid is entered.",
+                    @ApiResponse(responseCode = "400", description = "Id is invalid.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -559,7 +564,7 @@ public interface AdminOpenApi {
                                                 "error_status": 400
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "409", description = "You cannot change the status of a user with the role ADMIN.",
+                    @ApiResponse(responseCode = "409", description = "Not change status of a user with the role ADMIN.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -568,7 +573,7 @@ public interface AdminOpenApi {
                                                 "error_status": 409
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when the token is not entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is not entered.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                     {
@@ -577,7 +582,7 @@ public interface AdminOpenApi {
                                         "error_status": 401
                                     }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when an expired token is entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is expired.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -586,7 +591,7 @@ public interface AdminOpenApi {
                                                 "error_status": 401
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "Not Authenticated User when an invalid token is entered.",
+                    @ApiResponse(responseCode = "401", description = "Token is invalid.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {

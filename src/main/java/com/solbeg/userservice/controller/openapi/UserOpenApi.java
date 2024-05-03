@@ -15,7 +15,7 @@ public interface UserOpenApi {
 
     @Operation(
             method = "POST",
-            tags = "Authentication",
+            tags = "User",
             description = "Get data about the user.",
             requestBody = @RequestBody(
                     required = true,
@@ -38,19 +38,22 @@ public interface UserOpenApi {
                                                 "id": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
                                                 "createdBy": null,
                                                 "updatedBy": null,
-                                                "createdAt": "2024-02-15T12:00:00",
-                                                "updatedAt": "2024-02-19T12:00:00",
+                                                "createdAt": "2024-05-01T21:04:43.644024",
+                                                "updatedAt": "2024-05-01T21:04:43.644024",
                                                 "firstName": "Ivan",
                                                 "lastName": "Sidorov",
                                                 "password": "$2a$10$ch99apPuJoORMIf8Ew.D9e.cgWa1C6EYQ3iQMp7idTlGyNpyoF.P.",
                                                 "email": "ivan@google.com",
                                                 "roles": [
-                                                    "ADMIN"
+                                                    {
+                                                        "id": "73c65923-b5b1-42df-bd99-299180f287e0",
+                                                        "name": "ADMIN"
+                                                    }
                                                 ],
                                                 "status": "ACTIVE"
                                             }
                                             """))),
-                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed because the token is not valid.",
+                    @ApiResponse(responseCode = "400", description = "Token is not valid.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                     {
@@ -58,7 +61,8 @@ public interface UserOpenApi {
                                         "error_message": "Illegal base64 character 22",
                                         "error_status": 400
                                     }
-                                    """)))
+                                    """))),
+
             }
     )
     UserResponse getUserData();

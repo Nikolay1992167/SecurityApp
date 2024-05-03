@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.2.2'
 	id 'io.spring.dependency-management' version '1.1.4'
-//	id "io.freefair.lombok" version "8.4"
+	id "io.freefair.lombok" version "8.4"
 }
 
 group = 'com.solbeg'
@@ -28,7 +28,6 @@ ext {
 }
 
 dependencies {
-	implementation "org.springframework.boot:spring-boot-starter-webflux"
 	implementation "io.hypersistence:hypersistence-utils-hibernate-62:${hypersistenceVersion}"
 	implementation "org.springframework.boot:spring-boot-starter-validation"
 	implementation "org.springframework.boot:spring-boot-starter-data-jpa"
@@ -36,11 +35,6 @@ dependencies {
 	implementation "org.springframework.boot:spring-boot-starter-security"
 	implementation "org.springframework.boot:spring-boot-configuration-processor"
 	implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${openapiVersion}"
-	implementation "org.liquibase:liquibase-core"
-
-
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
 
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
 	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
@@ -51,16 +45,15 @@ dependencies {
 	runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
 	implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
 
+	implementation "org.liquibase:liquibase-core"
 	runtimeOnly "org.postgresql:postgresql"
 
 	testImplementation "com.squareup.okhttp3:mockwebserver:${mockWebserver}"
 	testImplementation "com.squareup.okhttp3:okhttp:${mockWebserver}"
-	testImplementation "com.github.tomakehurst:wiremock-standalone:3.0.1"
 	testImplementation "org.springframework.boot:spring-boot-starter-test"
 	testImplementation "org.springframework.security:spring-security-test"
 	testImplementation "org.testcontainers:postgresql:${postgresqlContainersVersion}"
 	testImplementation "org.assertj:assertj-core:${assertJVersion}"
-	testImplementation 'org.projectlombok:lombok:1.18.26'
 }
 
 tasks.named('test') {

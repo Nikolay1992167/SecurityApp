@@ -13,13 +13,13 @@ import java.util.UUID;
 
 @Repository
 public interface UserRepository extends BaseJpaRepository<User, UUID> {
-   // @EntityGraph("roles")
+    @EntityGraph(attributePaths = {"roles"})
     Optional<User> findByEmailAndStatus(String email, Status status);
 
     Optional<User> findByEmail(String email);
 
     Page<User> findAll(Pageable pageable);
 
-    @EntityGraph("roles")
+    @EntityGraph(attributePaths = {"roles"})
     Optional<User> findUserFetchRolesById(UUID userId);
 }

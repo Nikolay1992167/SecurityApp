@@ -10,8 +10,6 @@ import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 public interface UserService {
-    //  UserResponse getUser();
-
     void registerJournalist(UserRegisterRequest request);
 
     void registerSubscriber(UserRegisterRequest request);
@@ -21,8 +19,6 @@ public interface UserService {
     UserResponse findUserById(UUID userId);
 
     User findActiveUserByEmailOrThrowException(String userEmail);
-
-    //User getUserOrThrowException(UUID userId);
 
     UserResponse updateUserById(UUID userId, UserUpdateRequest userUpdateRequest);
 

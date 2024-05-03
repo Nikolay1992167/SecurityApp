@@ -21,9 +21,7 @@ class JwtUserFactoryTest {
     @Test
     void shouldCreateJwtUserFromUser() {
         // given
-        User user = UserTestData.builder()
-                .build()
-                .getJournalist();
+        User user = UserTestData.getJournalist();
         Role role1 = new Role();
         role1.setName(ROLE_NAME_SUBSCRIBER);
         Role role2 = new Role();

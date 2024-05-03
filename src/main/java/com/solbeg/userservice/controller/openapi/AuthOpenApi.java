@@ -46,7 +46,7 @@ public interface AuthOpenApi {
                                                 "refreshToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsImV4cCI6MTcxMjA2OTg5NH0.Bype1oc2qs72GVRqCP3cuZ__MmT0kZvjZog6djxD-UO0eCPe-wdY2Pak-_SmvH3tDM6o8jqb9uMGuJ07M7gA0Q"
                                             }
                                             """))),
-                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed when an invalid email is entered.",
+                    @ApiResponse(responseCode = "400", description = "Email is incorrect.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -55,7 +55,7 @@ public interface AuthOpenApi {
                                                 "error_status": 400
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed because the user with this email does not exist.",
+                    @ApiResponse(responseCode = "400", description = "User with this email does not exist.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -64,21 +64,12 @@ public interface AuthOpenApi {
                                                 "error_status": 400
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "401", description = "The endpoint has not been completed because the user with status not active.",
+                    @ApiResponse(responseCode = "401", description = "User with status not active.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
                                                 "timestamp": "2024-03-03T18:04:10.6152098",
                                                 "error_message": "User is not active!",
-                                                "error_status": 401
-                                            }
-                                    """))),
-                    @ApiResponse(responseCode = "401", description = "The endpoint has not been completed because the password not correct.",
-                            content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
-                                            {
-                                                "timestamp": "2024-03-12T17:34:16.543065",
-                                                "error_message": "Неверные учетные данные пользователя",
                                                 "error_status": 401
                                             }
                                     """)))
@@ -105,17 +96,17 @@ public interface AuthOpenApi {
                                     """))),
             responses = {
                     @ApiResponse(
-                            responseCode = "201", description = "The endpoint has been completed."),
-                    @ApiResponse(responseCode = "406", description = "The endpoint has not been completed because an email is exist in DB.",
+                            responseCode = "201", description = "The journalist was registered."),
+                    @ApiResponse(responseCode = "400", description = "Email is exist in DB.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
                                                 "timestamp": "2024-03-03T18:06:30.1734508",
                                                 "error_message": "Email is occupied! Another user is already registered by this gromov@google.com",
-                                                "error_status": 406
+                                                "error_status": 400
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed because the request arguments are not validated.",
+                    @ApiResponse(responseCode = "400", description = "Request arguments are incorrect.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -147,8 +138,8 @@ public interface AuthOpenApi {
                                     """))),
             responses = {
                     @ApiResponse(
-                            responseCode = "201", description = "The endpoint has been completed."),
-                    @ApiResponse(responseCode = "406", description = "The endpoint has not been completed because an email is exist in DB.",
+                            responseCode = "201", description = "The subscriber was registered."),
+                    @ApiResponse(responseCode = "406", description = "Email is exist in DB.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -157,7 +148,7 @@ public interface AuthOpenApi {
                                                 "error_status": 406
                                             }
                                     """))),
-                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed because the request arguments are not validated.",
+                    @ApiResponse(responseCode = "400", description = "Request arguments are incorrect.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {
@@ -198,7 +189,7 @@ public interface AuthOpenApi {
                                                 "refreshToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsImV4cCI6MTcxMTY2Njg4Nn0.W5FbSle_jHpATJ6SOrWflCdueJSNk9IaT8v1SUSmXN-4HTmL-gmYi_xJGyW7LgCLRumMR4Ad0TuRHldI_p1-uQ"
                                             }
                                             """))),
-                    @ApiResponse(responseCode = "401", description = "The endpoint has not been completed because the token is not active.",
+                    @ApiResponse(responseCode = "401", description = "Token is expired.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                     {
@@ -207,7 +198,7 @@ public interface AuthOpenApi {
                                         "error_status": 401
                                     }
                                     """))),
-                    @ApiResponse(responseCode = "400", description = "The endpoint has not been completed because the token is not valid.",
+                    @ApiResponse(responseCode = "400", description = "Token is not valid.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
                                             {

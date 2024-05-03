@@ -11,7 +11,6 @@ import com.solbeg.userservice.service.UserIdentityService;
 import com.solbeg.userservice.service.UserTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,7 +26,7 @@ import java.util.UUID;
 public class UserTokenServiceImpl implements UserTokenService {
     private final UserTokenRepository tokenRepository;
     private final UserIdentityService userIdentityService;
-    private final UserTokenMapper userTokenMapper = Mappers.getMapper(UserTokenMapper.class);
+    private final UserTokenMapper userTokenMapper;
 
     @Override
     @Transactional

@@ -24,7 +24,7 @@ class SecurityConfigTest {
     private SecurityConfig securityConfig;
 
     @Test
-    void testShouldReturnAuthenticationManagerFromAuthenticationConfiguration() throws Exception {
+    void shouldReturnAuthenticationManagerFromAuthenticationConfiguration() throws Exception {
         // given
         AuthenticationConfiguration configuration = mock(AuthenticationConfiguration.class);
         AuthenticationManager expectedValue = mock(AuthenticationManager.class);

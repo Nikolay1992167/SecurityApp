@@ -3,45 +3,47 @@ package com.solbeg.userservice.service.impl;
 import com.solbeg.userservice.dto.request.EmailRequest;
 import com.solbeg.userservice.entity.User;
 import com.solbeg.userservice.entity.UserToken;
-
 import com.solbeg.userservice.enums.EmailType;
 import com.solbeg.userservice.exception.SendDataException;
 import com.solbeg.userservice.service.SendingDataService;
 import com.solbeg.userservice.service.UserTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientException;
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.solbeg.userservice.util.Constants.ACTIVATION_URL;
 import static com.solbeg.userservice.util.Constants.FIRST_NAME;
 import static com.solbeg.userservice.util.Constants.LAST_NAME;
+import static com.solbeg.userservice.util.Constants.NAME_LINK;
+import static com.solbeg.userservice.util.Constants.URL_EMAIL_SERVICE;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class SendDataServiceImpl implements SendingDataService {
+    private final RestClient restClient;
 
-    private final WebClient webClient;
     private final UserTokenService userTokenService;
 
     @Override
     public void sendRequestForActivationUser(User user) {
         UserToken activationToken = userTokenService.createActivationToken(user.getId());
+
         EmailRequest emailRequest = getEmailRequest(user, activationToken);
+
         sendData(emailRequest);
     }
 
     @Override
     public void sendInformation(User user, EmailType emailType) {
         EmailRequest emailRequest = null;
-        switch (emailType){
+        switch (emailType) {
             case USER_TOKEN_EXPIRATION -> emailRequest = getEmailRequest(user, EmailType.USER_TOKEN_EXPIRATION);
             case USER_WELCOME_EMAIL -> emailRequest = getEmailRequest(user, EmailType.USER_WELCOME_EMAIL);
         }
@@ -50,15 +52,14 @@ public class SendDataServiceImpl implements SendingDataService {
 
     private void sendData(EmailRequest emailRequest) {
         try {
-            webClient.post()
-                    .uri("/api/v1/send/email")
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .body(Mono.just(emailRequest), EmailRequest.class)
+            restClient.post()
+                    .uri(URL_EMAIL_SERVICE)
+                    .contentType(APPLICATION_JSON)
+                    .body(emailRequest)
                     .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
+                    .body(EmailRequest.class);
             log.info("User data successfully sent to mail-service.");
-        } catch (WebClientException exception) {
+        } catch (RestClientException exception) {
             log.error("Failed to send user data to mail-service!");
             throw new SendDataException(exception.getMessage());
         }
@@ -74,11 +75,10 @@ public class SendDataServiceImpl implements SendingDataService {
     }
 
     private Map<String, String> getActivationData(User user, String token) {
-        String baseUrl = "http://localhost:8081/api/v1/admin/activation?userToken=";
         Map<String, String> data = new HashMap<>();
         data.put(FIRST_NAME, user.getFirstName());
         data.put(LAST_NAME, user.getLastName());
-        data.put("activationLink", baseUrl + token);
+        data.put(NAME_LINK, ACTIVATION_URL + token);
         return data;
     }
 

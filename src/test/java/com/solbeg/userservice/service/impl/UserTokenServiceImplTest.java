@@ -6,6 +6,7 @@ import com.solbeg.userservice.entity.UserToken;
 import com.solbeg.userservice.enums.TokenType;
 import com.solbeg.userservice.enums.error_response.ErrorMessage;
 import com.solbeg.userservice.exception.NotFoundException;
+import com.solbeg.userservice.mapper.UserTokenMapper;
 import com.solbeg.userservice.repository.UserTokenRepository;
 import com.solbeg.userservice.service.UserIdentityService;
 import com.solbeg.userservice.util.testdata.UserTestData;
@@ -18,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.context.TestConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,7 +36,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class UserTokenServiceImplTest {
 
     @InjectMocks
@@ -48,6 +47,9 @@ class UserTokenServiceImplTest {
     @Mock
     private UserIdentityService userIdentityService;
 
+    @Mock
+    private UserTokenMapper userTokenMapper;
+
     @Nested
     class CreateActivationToken {
 
@@ -55,13 +57,9 @@ class UserTokenServiceImplTest {
         void shouldReturnExpectedValue() {
             // given
             UUID userId = ID_JOURNALIST;
-            User user = UserTestData.builder()
-                    .build()
-                    .getJournalist();
-            UserToken expected = UserTokenTestData.builder()
-                    .build()
-                    .getUserToken();
-            when(userIdentityService.getUserById(userId))
+            User user = UserTestData.getJournalist();
+            UserToken expected = UserTokenTestData.getUserToken();
+            when(userIdentityService.getUserOrThrowException(userId))
                     .thenReturn(user);
             when(tokenRepository.persist(any(UserToken.class)))
                     .thenReturn(expected);
@@ -83,9 +81,7 @@ class UserTokenServiceImplTest {
         void shouldReturnExpectedUserToken() {
             // given
             String tokenUser = TOKEN_USERTOKEN;
-            UserToken expected = UserTokenTestData.builder()
-                    .build()
-                    .getUserToken();
+            UserToken expected = UserTokenTestData.getUserToken();
             when(tokenRepository.findByToken(tokenUser))
                     .thenReturn(Optional.ofNullable(expected));
 
@@ -117,12 +113,14 @@ class UserTokenServiceImplTest {
         void shouldReturnListOfUserToken() {
             // given
             int expectedSize = 1;
-            List<UserToken> userTokens = List.of(UserTokenTestData.builder()
-                    .build()
-                    .getUserToken());
+            UserToken userToken = UserTokenTestData.getUserToken();
+            UserTokenResponse userTokenResponse = UserTokenTestData.getUserTokenResponse();
+            List<UserToken> userTokens = List.of(userToken);
             Page<UserToken> page = new PageImpl<>(userTokens);
             when(tokenRepository.findAll(any(PageRequest.class)))
                     .thenReturn(page);
+            when(userTokenMapper.toUserTokenResponse(userToken))
+                    .thenReturn(userTokenResponse);
 
             // when
             Page<UserTokenResponse> actual = userTokenService.getAllUserTokens(DEFAULT_PAGE_REQUEST_FOR_IT);
@@ -153,9 +151,7 @@ class UserTokenServiceImplTest {
         void shouldDeleteUserTokenByToken() {
             // given
             String token = TOKEN_USERTOKEN;
-            UserToken userToken = UserTokenTestData.builder()
-                    .build()
-                    .getUserToken();
+            UserToken userToken = UserTokenTestData.getUserToken();
             when(tokenRepository.findByToken(token))
                     .thenReturn(Optional.of(userToken));
 

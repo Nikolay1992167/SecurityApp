@@ -1,9 +1,6 @@
 package com.solbeg.userservice.security.jwt;
 
 import com.solbeg.userservice.entity.User;
-import com.solbeg.userservice.enums.Status;
-import com.solbeg.userservice.enums.error_response.ErrorMessage;
-import com.solbeg.userservice.exception.UserStatusException;
 import com.solbeg.userservice.service.UserService;
 import com.solbeg.userservice.util.testdata.UserTestData;
 import org.junit.jupiter.api.Test;
@@ -13,8 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import java.util.Optional;
 
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_JOURNALIST;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,12 +29,10 @@ class JwtUserDetailsServiceTest {
     void shouldLoadUserByUsername() {
         // given
         String emailUser = EMAIL_JOURNALIST;
-        User user = UserTestData.builder()
-                .build()
-                .getJournalist();
+        User user = UserTestData.getJournalist();
         JwtUser expectedJwtUser = JwtUserFactory.create(user);
-        when(userService.findUserByEmail(emailUser))
-                .thenReturn(Optional.of(user));
+        when(userService.findActiveUserByEmailOrThrowException(emailUser))
+                .thenReturn(user);
 
         // when
         UserDetails actualJwtUser = jwtUserDetailsService.loadUserByUsername(emailUser);
@@ -49,31 +42,15 @@ class JwtUserDetailsServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenEmailNotFound() {
+    void shouldThrowExceptionWhenStatusNotActive() {
         // given
-        String emailUser = EMAIL_JOURNALIST;
-        when(userService.findUserByEmail(emailUser))
-                .thenReturn(Optional.empty());
-
-        // when, then
-        assertThatThrownBy(() -> jwtUserDetailsService.loadUserByUsername(emailUser))
-                .isInstanceOf(UsernameNotFoundException.class)
-                .hasMessageContaining(ErrorMessage.USER_NOT_FOUND.getMessage() + emailUser);
-    }
-
-    @Test
-    void shouldThrowExceptionWhenStatusNotActiv() {
-        // given
-        User user = UserTestData.builder()
-                .withStatus(Status.NOT_ACTIVE)
-                .build()
-                .getJournalist();
-        when(userService.findUserByEmail(user.getEmail()))
-                .thenReturn(Optional.of(user));
+        User user = UserTestData.getJournalistWithStatusNotActive();
+        when(userService.findActiveUserByEmailOrThrowException(user.getEmail()))
+                .thenThrow(new UsernameNotFoundException("User not found!"));
 
         // when, then
         assertThatThrownBy(() -> jwtUserDetailsService.loadUserByUsername(user.getEmail()))
-                .isInstanceOf(UserStatusException.class)
-                .hasMessage(ErrorMessage.USER_NOT_ACTIVE.getMessage());
+                .isInstanceOf(UsernameNotFoundException.class)
+                .hasMessage("User not found!");
     }
 }

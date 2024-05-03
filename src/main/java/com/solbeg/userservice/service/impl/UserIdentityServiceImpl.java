@@ -17,7 +17,7 @@ public class UserIdentityServiceImpl implements UserIdentityService {
 
     @Override
     public User getUserOrThrowException(UUID userId) {
-        return userRepository.findById(userId)
+        return userRepository.findUserFetchRolesById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + userId));
     }
 }

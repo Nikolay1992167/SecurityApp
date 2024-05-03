@@ -23,7 +23,6 @@ import com.solbeg.userservice.util.AuthUtil;
 import com.solbeg.userservice.validation.UserValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -42,7 +41,7 @@ import static com.solbeg.userservice.util.Constants.ROLE_SUBSCRIBER;
 public class UserServiceImpl implements UserService {
     private final UserValidator userValidator;
 
-    private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+    private final UserMapper userMapper;
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -50,16 +49,6 @@ public class UserServiceImpl implements UserService {
     private final UserIdentityService userIdentityService;
     private final UserTokenService userTokenService;
     private final SendingDataService sendingDataService;
-
-//    @Override
-//    @Transactional(readOnly = true)
-//    public UserResponse getUser() {
-//        UUID userId = AuthUtil.getUserId();
-//        UserResponse userResponse = userRepository.findById(userId).map(userMapper::toResponse)
-//                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + userId));
-//        log.info("IN findUserByToken - user: {} found by id: {}", userResponse, userId);
-//        return userResponse;
-//    }
 
     @Override
     @Transactional
@@ -75,6 +64,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void registerSubscriber(UserRegisterRequest userRegisterRequest) {
         userValidator.checkUniqueEmail(userRegisterRequest.getEmail());
 
@@ -114,7 +104,7 @@ public class UserServiceImpl implements UserService {
 
         userMapper.update(user, userUpdateRequest, userId);
 
-        user = userRepository.persistAndFlush(user);
+        user = userRepository.update(user);
 
         return userMapper.toResponse(user);
     }
@@ -164,8 +154,7 @@ public class UserServiceImpl implements UserService {
                 })
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND.getMessage() + userId));
         userInDB.setStatus(userStatus);
-        UUID uuidAdmin = AuthUtil.getUserId();
-        userInDB.setUpdatedBy(uuidAdmin);
+        userInDB.setUpdatedBy(AuthUtil.getUserId());
         userRepository.persist(userInDB);
     }
 }

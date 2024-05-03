@@ -1,6 +1,5 @@
 package com.solbeg.userservice.service.impl;
 
-import com.solbeg.userservice.dto.request.EmailRequest;
 import com.solbeg.userservice.dto.request.UserRegisterRequest;
 import com.solbeg.userservice.dto.request.UserUpdateRequest;
 import com.solbeg.userservice.dto.response.UserResponse;
@@ -14,53 +13,62 @@ import com.solbeg.userservice.exception.InformationChangeStatusUserException;
 import com.solbeg.userservice.exception.NoSuchUserEmailException;
 import com.solbeg.userservice.exception.NotFoundException;
 import com.solbeg.userservice.exception.TokenExpirationException;
-import com.solbeg.userservice.exception.UniqueEmailException;
-import com.solbeg.userservice.mapper.UserMapperImpl;
+import com.solbeg.userservice.mapper.UserMapper;
 import com.solbeg.userservice.repository.RoleRepository;
 import com.solbeg.userservice.repository.UserRepository;
+import com.solbeg.userservice.security.jwt.JwtUser;
 import com.solbeg.userservice.service.SendingDataService;
 import com.solbeg.userservice.service.UserIdentityService;
 import com.solbeg.userservice.service.UserTokenService;
-import com.solbeg.userservice.util.testdata.EmailRequestTestData;
+import com.solbeg.userservice.util.testdata.JwtUserTestData;
 import com.solbeg.userservice.util.testdata.RoleTestData;
 import com.solbeg.userservice.util.testdata.UserTestData;
 import com.solbeg.userservice.util.testdata.UserTokenTestData;
+import com.solbeg.userservice.validation.UserValidator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.TestConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.solbeg.userservice.util.Constants.ROLE_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.DEFAULT_PAGE_REQUEST_FOR_IT;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_JOURNALIST;
-import static com.solbeg.userservice.util.initdata.InitData.EXPIRED_AT_USERTOKEN;
 import static com.solbeg.userservice.util.initdata.InitData.ID_ADMIN;
 import static com.solbeg.userservice.util.initdata.InitData.ID_JOURNALIST;
-import static com.solbeg.userservice.util.initdata.InitData.NAME_ROLE_JOURNALIST;
-import static com.solbeg.userservice.util.initdata.InitData.REFRESH_TOKEN;
+import static com.solbeg.userservice.util.initdata.InitData.ROLE_NAME_SUBSCRIBER;
 import static com.solbeg.userservice.util.initdata.InitData.TOKEN_USERTOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {UserMapperImpl.class})
-@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+@SpringBootTest
 class UserServiceImplTest {
+
+    @Mock
+    private UserMapper userMapper;
 
     @InjectMocks
     private UserServiceImpl userService;
+
+    @Mock
+    private UserValidator userValidator;
 
     @Mock
     private UserTokenService tokenService;
@@ -78,7 +86,13 @@ class UserServiceImplTest {
     private RoleRepository roleRepository;
 
     @Mock
-    private PasswordEncoder passwordEncoder;
+    private Authentication authentication;
+
+    @Mock
+    private SecurityContext securityContext;
+
+    @Captor
+    private ArgumentCaptor<User> userCaptor;
 
     @Nested
     class RegisterJournalist {
@@ -86,45 +100,20 @@ class UserServiceImplTest {
         @Test
         void shouldCheckSuccessRegistration() {
             // given
-            UserRegisterRequest registerRequest = UserTestData.builder()
-                    .build()
-                    .getRegisterRequestJournalist();
-            User expectedUser = UserTestData.builder()
-                    .withStatus(Status.NOT_ACTIVE)
-                    .build()
-                    .getJournalist();
-            Role role = RoleTestData.builder()
-                    .build()
-                    .getEntity();
-            when(roleRepository.findByName(NAME_ROLE_JOURNALIST))
-                    .thenReturn(role);
-            when(userRepository.persistAndFlush(any(User.class)))
-                    .thenReturn(expectedUser);
+            UserRegisterRequest registerRequest = UserTestData.getRegisterRequestJournalist();
+            User savedUser = UserTestData.getJournalistWithStatusNotActive();
+            when(userMapper.fromRequest(registerRequest, Status.NOT_ACTIVE))
+                    .thenReturn(savedUser);
+            when(roleRepository.findByName(ROLE_JOURNALIST))
+                    .thenReturn(RoleTestData.getJournalist());
+            when(userRepository.persistAndFlush(savedUser))
+                    .thenReturn(savedUser);
 
             // when
             userService.registerJournalist(registerRequest);
 
             // then
             verify(userRepository, times(1)).persistAndFlush(any(User.class));
-            verify(tokenService, times(1)).createActivationToken(expectedUser.getId());
-        }
-
-        @Test
-        void shouldReturnThrowExceptionWhenEmailIsFound() {
-            // given
-            UserRegisterRequest registerRequest = UserTestData.builder()
-                    .build()
-                    .getRegisterRequestJournalist();
-            User user = UserTestData.builder()
-                    .build()
-                    .getJournalist();
-            when(userRepository.findByEmail(registerRequest.getEmail()))
-                    .thenReturn(Optional.of(user));
-
-            // when, then
-            assertThatThrownBy(() -> userService.registerJournalist(registerRequest))
-                    .isInstanceOf(UniqueEmailException.class)
-                    .hasMessageContaining(ErrorMessage.UNIQUE_USER_EMAIL.getMessage() + registerRequest.getEmail());
         }
     }
 
@@ -134,11 +123,12 @@ class UserServiceImplTest {
         @Test
         void shouldCheckSuccessRegistration() {
             // given
-            UserRegisterRequest registerRequest = UserTestData.builder()
-                    .build()
-                    .getRegisterRequestSubscriber();
-            User savedUser = UserTestData.builder()
-                    .build().getSubscriber();
+            UserRegisterRequest registerRequest = UserTestData.getRegisterRequestSubscriber();
+            User savedUser = UserTestData.getSubscriber();
+            when(userMapper.fromRequest(registerRequest, Status.ACTIVE))
+                    .thenReturn(savedUser);
+            when(roleRepository.findByName(ROLE_NAME_SUBSCRIBER))
+                    .thenReturn(RoleTestData.getSubscriber());
             when(userRepository.persistAndFlush(any(User.class)))
                     .thenReturn(savedUser);
 
@@ -148,36 +138,16 @@ class UserServiceImplTest {
             // then
             verify(userRepository, times(1)).persistAndFlush(any(User.class));
         }
-
-        @Test
-        void shouldReturnThrowExceptionWhenEmailIsFound() {
-            // given
-            UserRegisterRequest registerRequest = UserTestData.builder()
-                    .build()
-                    .getRegisterRequestSubscriber();
-            User user = UserTestData.builder()
-                    .build()
-                    .getSubscriber();
-            when(userRepository.findByEmail(registerRequest.getEmail()))
-                    .thenReturn(Optional.of(user));
-
-            // when, then
-            assertThatThrownBy(() -> userService.registerSubscriber(registerRequest))
-                    .isInstanceOf(UniqueEmailException.class)
-                    .hasMessageContaining(ErrorMessage.UNIQUE_USER_EMAIL.getMessage() + registerRequest.getEmail());
-        }
     }
 
     @Nested
-    class FindAll {
+    class GetAllUsers {
 
         @Test
         void shouldReturnListOfPersonResponse() {
             // given
             int expectedSize = 1;
-            List<User> usersList = List.of(UserTestData.builder()
-                    .build()
-                    .getJournalist());
+            List<User> usersList = List.of(UserTestData.getJournalist());
             Page<User> page = new PageImpl<>(usersList);
             when(userRepository.findAll(any(PageRequest.class)))
                     .thenReturn(page);
@@ -205,39 +175,24 @@ class UserServiceImplTest {
     }
 
     @Nested
-    class findUserById {
+    class FindUserById {
 
         @Test
         void shouldReturnExpectedUserResponse() {
             // given
-            UUID id = ID_JOURNALIST;
-            User user = UserTestData.builder()
-                    .build()
-                    .getJournalist();
-            UserResponse expectedResponse = UserTestData.builder()
-                    .build()
-                    .getUserResponse();
-            when(userRepository.findById(id))
-                    .thenReturn(Optional.of(user));
+            UUID userId = ID_JOURNALIST;
+            User user = UserTestData.getJournalist();
+            UserResponse expectedResponse = UserTestData.getUserResponse();
+            when(userIdentityService.getUserOrThrowException(userId))
+                    .thenReturn(user);
+            when(userMapper.toResponse(user))
+                    .thenReturn(expectedResponse);
 
             // when
-            UserResponse actualResponse = userService.findUserById(id);
+            UserResponse actualResponse = userService.findUserById(userId);
 
             // then
             assertThat(actualResponse).isEqualTo(expectedResponse);
-        }
-
-        @Test
-        void shouldReturnThrowExceptionWhenUserNotFound() {
-            // given
-            UUID userId = ID_JOURNALIST;
-            when(userRepository.findById(userId))
-                    .thenReturn(Optional.empty());
-
-            // when, then
-            assertThatThrownBy(() -> userService.findUserById(userId))
-                    .isInstanceOf(NotFoundException.class)
-                    .hasMessageContaining(ErrorMessage.USER_NOT_FOUND.getMessage() + userId);
         }
     }
 
@@ -248,64 +203,28 @@ class UserServiceImplTest {
         void shouldReturnExpectedUser() {
             // given
             String userEmail = EMAIL_JOURNALIST;
-            User expectedUser = UserTestData.builder()
-                    .build()
-                    .getJournalist();
-            when(userRepository.findByEmail(userEmail))
+            User expectedUser = UserTestData.getJournalist();
+            when(userRepository.findByEmailAndStatus(userEmail, Status.ACTIVE))
                     .thenReturn(Optional.of(expectedUser));
 
             // when
-            Optional<User> actualUser = userService.findUserByEmail(userEmail);
+            User actualUser = userService.findActiveUserByEmailOrThrowException(userEmail);
 
             // then
-            assertThat(actualUser).isPresent();
-            assertThat(actualUser.get()).isEqualTo(expectedUser);
+            assertThat(actualUser).isEqualTo(expectedUser);
         }
 
         @Test
         void shouldReturnThrowExceptionWhenUserNotFound() {
             // given
             String userEmail = EMAIL_JOURNALIST;
-            when(userRepository.findByEmail(userEmail))
+            when(userRepository.findByEmailAndStatus(userEmail, Status.ACTIVE))
                     .thenReturn(Optional.empty());
 
             // when, then
-            assertThatThrownBy(() -> userService.findUserByEmail(userEmail))
+            assertThatThrownBy(() -> userService.findActiveUserByEmailOrThrowException(userEmail))
                     .isInstanceOf(NoSuchUserEmailException.class)
                     .hasMessageContaining(ErrorMessage.USER_NOT_EXIST.getMessage() + userEmail);
-        }
-    }
-
-    @Nested
-    class FindById {
-
-        @Test
-        void shouldReturnExpectedUser() {
-            // given
-            UUID id = ID_JOURNALIST;
-            User expectedUser = UserTestData.builder()
-                    .build()
-                    .getJournalist();
-            when(userRepository.findById(id))
-                    .thenReturn(Optional.ofNullable(expectedUser));
-
-            // when
-            User actualResponse = userService.findById(id);
-
-            // then
-            assertThat(actualResponse).isEqualTo(expectedUser);
-        }
-
-        @Test
-        void shouldReturnThrowExceptionWhenUserNotFound() {
-            // given
-            UUID userId = ID_JOURNALIST;
-            when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-            // when, then
-            assertThatThrownBy(() -> userService.findById(userId))
-                    .isInstanceOf(NotFoundException.class)
-                    .hasMessageContaining(ErrorMessage.USER_NOT_FOUND.getMessage() + userId);
         }
     }
 
@@ -316,44 +235,23 @@ class UserServiceImplTest {
         void shouldReturnExpectedUserResponse() {
             // given
             UUID userId = ID_JOURNALIST;
-            UserUpdateRequest updateRequest = UserTestData.builder()
-                    .build()
-                    .getUserUpdateRequest();
-            User userInDB = UserTestData.builder()
-                    .build()
-                    .getJournalist();
-            User updatedUser = UserTestData.builder()
-                    .build()
-                    .getJournalist();
-            UserResponse expectedResponse = UserTestData.builder()
-                    .build()
-                    .getUserResponse();
-            when(userRepository.findById(userId))
-                    .thenReturn(Optional.of(userInDB));
-            when(userRepository.persistAndFlush(userInDB))
+            UserUpdateRequest updateRequest = UserTestData.getUserUpdateRequest();
+            User userInDB = UserTestData.getJournalist();
+            User updatedUser = UserTestData.getJournalist();
+            UserResponse expectedResponse = UserTestData.getUserResponse();
+            when(userIdentityService.getUserOrThrowException(userId))
+                    .thenReturn(userInDB);
+            doNothing().when(userMapper).update(userInDB, updateRequest, userId);
+            when(userRepository.update(userInDB))
                     .thenReturn(updatedUser);
+            when(userMapper.toResponse(userInDB))
+                    .thenReturn(expectedResponse);
 
             // when
             UserResponse actualResponse = userService.updateUserById(userId, updateRequest);
 
             // then
             assertThat(actualResponse).isEqualTo(expectedResponse);
-        }
-
-        @Test
-        void shouldThrowExceptionWhenUserNotFound() {
-            // given
-            UUID userId = ID_JOURNALIST;
-            UserUpdateRequest updateRequest = UserTestData.builder()
-                    .build()
-                    .getUserUpdateRequest();
-            when(userRepository.findById(userId))
-                    .thenReturn(Optional.empty());
-
-            // when, then
-            assertThatThrownBy(() -> userService.updateUserById(userId, updateRequest))
-                    .isInstanceOf(NotFoundException.class)
-                    .hasMessageContaining(ErrorMessage.USER_NOT_FOUND.getMessage() + userId);
         }
     }
 
@@ -364,58 +262,34 @@ class UserServiceImplTest {
         void shouldActivateUserJournalist() {
             // given
             String tokenUser = TOKEN_USERTOKEN;
-            User user = UserTestData.builder()
-                    .build()
-                    .getJournalist();
-            UserToken userToken = UserTokenTestData.builder()
-                    .build()
-                    .getUserToken();
-            EmailRequest emailRequest = EmailRequestTestData.builder()
-                    .build()
-                    .getEmailRequest();
+            User user = UserTestData.getJournalist();
+            UserToken userToken = UserTokenTestData.getUserToken();
             when(tokenService.getByToken(tokenUser))
                     .thenReturn(userToken);
-            when(userIdentityService.getUserId())
-                    .thenReturn(ID_ADMIN);
-            when(sendingDataService.getEmailRequest(user, EmailType.USER_WELCOME_EMAIL))
-                    .thenReturn(emailRequest);
+            doNothing().when(sendingDataService).sendInformation(user, EmailType.USER_WELCOME_EMAIL);
+            JwtUser jwtUser = JwtUserTestData.getJwtUser();
+            when(authentication.getPrincipal())
+                    .thenReturn(jwtUser);
+            when(securityContext.getAuthentication())
+                    .thenReturn(authentication);
+            SecurityContextHolder.setContext(securityContext);
 
             // when
             userService.activateJournalistAccount(tokenUser);
 
             // then
-            verify(userRepository, times(1)).persist(user);
+            verify(userRepository, times(1)).persist(userCaptor.capture());
+            assertThat(userCaptor.getValue())
+                    .hasFieldOrPropertyWithValue(User.Fields.email, user.getEmail())
+                    .hasFieldOrPropertyWithValue(User.Fields.password, user.getPassword());
             verify(tokenService, times(1)).deleteUserTokenByToken(tokenUser);
-            verify(sendingDataService, times(1)).sendRequestToMailService(any(EmailRequest.class));
-        }
-
-        @Test
-        void shouldThrowExceptionWhenUserTokenNotFound() {
-            // given
-            String tokenUser = TOKEN_USERTOKEN;
-            UserToken userToken = UserTokenTestData.builder()
-                    .withUser(null)
-                    .build()
-                    .getUserToken();
-
-            // when
-            when(tokenService.getByToken(tokenUser))
-                    .thenReturn(userToken);
-
-            // then
-            assertThatThrownBy(() -> userService.activateJournalistAccount(tokenUser))
-                    .isInstanceOf(NotFoundException.class)
-                    .hasMessageContaining(ErrorMessage.USERTOKEN_NOT_FOUND.getMessage() + tokenUser);
         }
 
         @Test
         public void shouldThrowExceptionWhenUserTokenExpired() {
             // given
             String tokenUser = TOKEN_USERTOKEN;
-            UserToken userToken = UserTokenTestData.builder()
-                    .withExpirationAt(EXPIRED_AT_USERTOKEN)
-                    .build()
-                    .getUserToken();
+            UserToken userToken = UserTokenTestData.getExpiredUserToken();
 
             // when
             when(tokenService.getByToken(tokenUser))
@@ -435,13 +309,15 @@ class UserServiceImplTest {
         void shouldDeactivateUser() {
             // given
             UUID userId = ID_JOURNALIST;
-            User user = UserTestData.builder()
-                    .build()
-                    .getJournalist();
+            User user = UserTestData.getJournalist();
             when(userRepository.findById(userId))
                     .thenReturn(Optional.of(user));
-            when(userIdentityService.getUserId())
-                    .thenReturn(userId);
+            JwtUser jwtUser = JwtUserTestData.getJwtUser();
+            when(authentication.getPrincipal())
+                    .thenReturn(jwtUser);
+            when(securityContext.getAuthentication())
+                    .thenReturn(authentication);
+            SecurityContextHolder.setContext(securityContext);
 
             // when
             userService.deactivateUserById(userId);
@@ -457,10 +333,7 @@ class UserServiceImplTest {
             UUID userId = ID_ADMIN;
             Role adminRole = new Role();
             adminRole.setName("ADMIN");
-            User user = UserTestData.builder()
-                    .withRolesUser(List.of(adminRole))
-                    .build()
-                    .getJournalist();
+            User user = UserTestData.getAdmin();
             when(userRepository.findById(userId))
                     .thenReturn(Optional.of(user));
 
@@ -490,13 +363,15 @@ class UserServiceImplTest {
         void shouldDeletedUser() {
             // given
             UUID userId = ID_JOURNALIST;
-            User user = UserTestData.builder()
-                    .build()
-                    .getJournalist();
+            User user = UserTestData.getJournalist();
             when(userRepository.findById(userId))
                     .thenReturn(Optional.of(user));
-            when(userIdentityService.getUserId())
-                    .thenReturn(userId);
+            JwtUser jwtUser = JwtUserTestData.getJwtUser();
+            when(authentication.getPrincipal())
+                    .thenReturn(jwtUser);
+            when(securityContext.getAuthentication())
+                    .thenReturn(authentication);
+            SecurityContextHolder.setContext(securityContext);
 
             // when
             userService.deleteUserById(userId);

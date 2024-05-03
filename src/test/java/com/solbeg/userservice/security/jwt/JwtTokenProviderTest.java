@@ -101,10 +101,8 @@ class JwtTokenProviderTest {
         // given
         UUID userId = ID_JOURNALIST;
         String userEmail = EMAIL_JOURNALIST;
-        User user = UserTestData.builder()
-                .build()
-                .getJournalist();
-        when(userIdentityService.getUserById(userId)).
+        User user = UserTestData.getJournalist();
+        when(userIdentityService.getUserOrThrowException(userId)).
                 thenReturn(user);
 
         // when

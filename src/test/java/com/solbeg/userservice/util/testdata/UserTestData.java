@@ -3,96 +3,62 @@ package com.solbeg.userservice.util.testdata;
 import com.solbeg.userservice.dto.request.UserRegisterRequest;
 import com.solbeg.userservice.dto.request.UserUpdateRequest;
 import com.solbeg.userservice.dto.response.UserResponse;
-import com.solbeg.userservice.entity.Role;
 import com.solbeg.userservice.entity.User;
 import com.solbeg.userservice.enums.Status;
-import lombok.Builder;
-import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 import static com.solbeg.userservice.util.initdata.InitData.CREATED_AT_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.CREATED_AT_SUBSCRIBER;
 import static com.solbeg.userservice.util.initdata.InitData.CREATED_BY_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.CREATED_BY_SUBSCRIBER;
+import static com.solbeg.userservice.util.initdata.InitData.EMAIL_ADMIN;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_SUBSCRIBER;
+import static com.solbeg.userservice.util.initdata.InitData.FIRST_NAME_ADMIN;
+import static com.solbeg.userservice.util.initdata.InitData.FIRST_NAME_INCORRECT;
 import static com.solbeg.userservice.util.initdata.InitData.FIRST_NAME_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.FIRST_NAME_SUBSCRIBER;
+import static com.solbeg.userservice.util.initdata.InitData.ID_ADMIN;
 import static com.solbeg.userservice.util.initdata.InitData.ID_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.ID_SUBSCRIBER;
-import static com.solbeg.userservice.util.initdata.InitData.JOURNALIST_LIST_OF_ROLES;
+import static com.solbeg.userservice.util.initdata.InitData.LAST_NAME_ADMIN;
+import static com.solbeg.userservice.util.initdata.InitData.LAST_NAME_INCORRECT;
 import static com.solbeg.userservice.util.initdata.InitData.LAST_NAME_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.LAST_NAME_SUBSCRIBER;
 import static com.solbeg.userservice.util.initdata.InitData.PASSWORD_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.PASSWORD_SUBSCRIBER;
-import static com.solbeg.userservice.util.initdata.InitData.ROLE_NAME_SUBSCRIBER;
 import static com.solbeg.userservice.util.initdata.InitData.UPDATED_AT_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.UPDATED_AT_SUBSCRIBER;
 import static com.solbeg.userservice.util.initdata.InitData.UPDATED_BY_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.UPDATED_BY_SUBSCRIBER;
 
-@Data
-@Builder(setterPrefix = "with")
 public class UserTestData {
 
-    @Builder.Default
-    private UUID id = ID_JOURNALIST;
-
-    @Builder.Default
-    private UUID createdBy = CREATED_BY_JOURNALIST;
-
-    @Builder.Default
-    private UUID updatedBy = UPDATED_BY_JOURNALIST;
-
-    @Builder.Default
-    private LocalDateTime createdAt = CREATED_AT_JOURNALIST;
-
-    @Builder.Default
-    private LocalDateTime updatedAt = UPDATED_AT_JOURNALIST;
-
-    @Builder.Default
-    private String firstName = FIRST_NAME_JOURNALIST;
-
-    @Builder.Default
-    private String lastName = LAST_NAME_JOURNALIST;
-
-    @Builder.Default
-    private String password = PASSWORD_JOURNALIST;
-
-    @Builder.Default
-    private String email = EMAIL_JOURNALIST;
-
-    @Builder.Default
-    private Status status = Status.ACTIVE;
-
-    @Builder.Default
-    private List<String> roles = JOURNALIST_LIST_OF_ROLES;
-
-    @Builder.Default
-    private List<Role> rolesUser = List.of(RoleTestData.builder()
-            .build()
-            .getEntity());
-
-    public User getJournalist() {
+    public static User getJournalist() {
         return User.builder()
-                .id(id)
-                .createdBy(createdBy)
-                .updatedBy(updatedBy)
-                .createdAt(createdAt)
-                .updatedAt(updatedAt)
-                .firstName(firstName)
-                .lastName(lastName)
-                .password(password)
-                .email(email)
-                .status(status)
-                .roles(rolesUser)
+                .id(ID_JOURNALIST)
+                .createdBy(CREATED_BY_JOURNALIST)
+                .updatedBy(UPDATED_BY_JOURNALIST)
+                .createdAt(CREATED_AT_JOURNALIST)
+                .updatedAt(UPDATED_AT_JOURNALIST)
+                .firstName(FIRST_NAME_JOURNALIST)
+                .lastName(LAST_NAME_JOURNALIST)
+                .password(PASSWORD_JOURNALIST)
+                .email(EMAIL_JOURNALIST)
+                .status(Status.ACTIVE)
+                .roles(List.of(RoleTestData.getJournalist()))
                 .build();
     }
 
-    public User getSubscriber() {
+    public static User getJournalistWithStatusNotActive() {
+        User user = getJournalist();
+        user.setStatus(Status.NOT_ACTIVE);
+        return user;
+    }
+
+    public static User getSubscriber() {
         return User.builder()
                 .id(ID_SUBSCRIBER)
                 .createdBy(CREATED_BY_SUBSCRIBER)
@@ -104,23 +70,54 @@ public class UserTestData {
                 .password(PASSWORD_SUBSCRIBER)
                 .email(EMAIL_SUBSCRIBER)
                 .status(Status.ACTIVE)
-                .roles(List.of(RoleTestData.builder()
-                            .withName(ROLE_NAME_SUBSCRIBER)
-                            .build()
-                            .getEntity()))
+                .roles(List.of(RoleTestData.getSubscriber()))
                 .build();
     }
 
-    public UserRegisterRequest getRegisterRequestJournalist() {
+    public static User getAdmin(){
+        return  User.builder()
+                .id(ID_ADMIN)
+                .createdBy(null)
+                .updatedBy(null)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .firstName(FIRST_NAME_ADMIN)
+                .lastName(LAST_NAME_ADMIN)
+                .password(PASSWORD_SUBSCRIBER)
+                .email(EMAIL_ADMIN)
+                .status(Status.ACTIVE)
+                .roles(List.of(RoleTestData.getAdmin()))
+                .build();
+    }
+
+    public static UserRegisterRequest getRegisterRequestJournalist() {
         return UserRegisterRequest.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .password(password)
+                .firstName(FIRST_NAME_JOURNALIST)
+                .lastName(LAST_NAME_JOURNALIST)
+                .email(EMAIL_JOURNALIST)
+                .password(PASSWORD_JOURNALIST)
                 .build();
     }
 
-    public UserRegisterRequest getRegisterRequestSubscriber() {
+    public static UserRegisterRequest getRegisterRequestJournalistWithIncorrectFirstName() {
+        return UserRegisterRequest.builder()
+                .firstName(FIRST_NAME_INCORRECT)
+                .lastName(LAST_NAME_JOURNALIST)
+                .email(EMAIL_JOURNALIST)
+                .password(PASSWORD_JOURNALIST)
+                .build();
+    }
+
+    public static UserRegisterRequest getRegisterRequestJournalistWithIncorrectLastName() {
+        return UserRegisterRequest.builder()
+                .firstName(FIRST_NAME_JOURNALIST)
+                .lastName(LAST_NAME_INCORRECT)
+                .email(EMAIL_JOURNALIST)
+                .password(PASSWORD_JOURNALIST)
+                .build();
+    }
+
+    public static UserRegisterRequest getRegisterRequestSubscriber() {
         return UserRegisterRequest.builder()
                 .firstName(FIRST_NAME_SUBSCRIBER)
                 .lastName(LAST_NAME_SUBSCRIBER)
@@ -129,28 +126,46 @@ public class UserTestData {
                 .build();
     }
 
-    public UserUpdateRequest getUserUpdateRequest() {
-        return UserUpdateRequest.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .password(password)
+    public static UserRegisterRequest getRegisterRequestSubscriberWithIncorrectFirstName() {
+        return UserRegisterRequest.builder()
+                .firstName(FIRST_NAME_INCORRECT)
+                .lastName(LAST_NAME_SUBSCRIBER)
+                .email(EMAIL_SUBSCRIBER)
+                .password(PASSWORD_SUBSCRIBER)
                 .build();
     }
 
-    public UserResponse getUserResponse() {
+    public static UserRegisterRequest getRegisterRequestSubscriberWithIncorrectLastName() {
+        return UserRegisterRequest.builder()
+                .firstName(FIRST_NAME_SUBSCRIBER)
+                .lastName(LAST_NAME_INCORRECT)
+                .email(EMAIL_SUBSCRIBER)
+                .password(PASSWORD_SUBSCRIBER)
+                .build();
+    }
+
+    public static UserUpdateRequest getUserUpdateRequest() {
+        return UserUpdateRequest.builder()
+                .firstName(FIRST_NAME_SUBSCRIBER)
+                .lastName(LAST_NAME_SUBSCRIBER)
+                .email(EMAIL_SUBSCRIBER)
+                .password(PASSWORD_SUBSCRIBER)
+                .build();
+    }
+
+    public static UserResponse getUserResponse() {
         return UserResponse.builder()
-                .id(id)
-                .createdBy(createdBy)
-                .updatedBy(updatedBy)
-                .createdAt(createdAt)
-                .updatedAt(updatedAt)
-                .firstName(firstName)
-                .lastName(lastName)
-                .password(password)
-                .email(email)
-                .roles(roles)
-                .status(status)
+                .id(ID_JOURNALIST)
+                .createdBy(CREATED_BY_JOURNALIST)
+                .updatedBy(UPDATED_BY_JOURNALIST)
+                .createdAt(CREATED_AT_JOURNALIST)
+                .updatedAt(UPDATED_AT_JOURNALIST)
+                .firstName(FIRST_NAME_JOURNALIST)
+                .lastName(LAST_NAME_JOURNALIST)
+                .password(PASSWORD_JOURNALIST)
+                .email(EMAIL_JOURNALIST)
+                .status(Status.ACTIVE)
+                .roles(List.of(RoleTestData.getRoleResponse()))
                 .build();
     }
 }
