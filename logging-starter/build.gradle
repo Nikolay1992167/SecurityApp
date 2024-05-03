@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+    id "io.freefair.lombok" version "8.4"
+}
+
+group = 'com.solbeg'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:3.2.2"
+
+    implementation 'org.springframework.boot:spring-boot-starter:3.2.2'
+    implementation 'org.springframework.boot:spring-boot-starter-aop:3.2.1'
+}
+
+test {
+    useJUnitPlatform()
+}

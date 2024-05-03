@@ -1,5 +1,6 @@
 package com.solbeg.userservice.controller;
 
+import com.solbeg.annotation.Logging;
 import com.solbeg.userservice.controller.openapi.UserOpenApi;
 import com.solbeg.userservice.dto.response.UserResponse;
 import com.solbeg.userservice.entity.User;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Logging
 @RestController
 @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('JOURNALIST') || hasAuthority('SUBSCRIBER')")
 @RequiredArgsConstructor

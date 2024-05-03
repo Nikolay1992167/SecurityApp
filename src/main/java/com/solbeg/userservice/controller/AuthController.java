@@ -1,5 +1,6 @@
 package com.solbeg.userservice.controller;
 
+import com.solbeg.annotation.Logging;
 import com.solbeg.userservice.controller.openapi.AuthOpenApi;
 import com.solbeg.userservice.dto.request.JwtRequest;
 import com.solbeg.userservice.dto.request.RefreshTokenRequest;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
-
+@Logging
 @RestController
 @RequestMapping(value = "/api/v1/auth", produces = APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
