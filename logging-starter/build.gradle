@@ -11,8 +11,6 @@ repositories {
 }
 
 dependencies {
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:3.2.2"
-
     implementation 'org.springframework.boot:spring-boot-starter:3.2.2'
     implementation 'org.springframework.boot:spring-boot-starter-aop:3.2.1'
 }

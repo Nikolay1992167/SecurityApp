@@ -3,6 +3,7 @@ package com.solbeg.userservice.service.impl;
 import com.solbeg.userservice.dto.request.EmailRequest;
 import com.solbeg.userservice.entity.User;
 import com.solbeg.userservice.entity.UserToken;
+import com.solbeg.userservice.entity.User_;
 import com.solbeg.userservice.enums.EmailType;
 import com.solbeg.userservice.exception.SendDataException;
 import com.solbeg.userservice.service.SendingDataService;
@@ -17,8 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.solbeg.userservice.util.Constants.ACTIVATION_URL;
-import static com.solbeg.userservice.util.Constants.FIRST_NAME;
-import static com.solbeg.userservice.util.Constants.LAST_NAME;
 import static com.solbeg.userservice.util.Constants.NAME_LINK;
 import static com.solbeg.userservice.util.Constants.URL_EMAIL_SERVICE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -76,8 +75,8 @@ public class SendDataServiceImpl implements SendingDataService {
 
     private Map<String, String> getActivationData(User user, String token) {
         Map<String, String> data = new HashMap<>();
-        data.put(FIRST_NAME, user.getFirstName());
-        data.put(LAST_NAME, user.getLastName());
+        data.put(User_.FIRST_NAME, user.getFirstName());
+        data.put(User_.LAST_NAME, user.getLastName());
         data.put(NAME_LINK, ACTIVATION_URL + token);
         return data;
     }
@@ -92,8 +91,8 @@ public class SendDataServiceImpl implements SendingDataService {
 
     private Map<String, String> getWelcomeMessageData(User user) {
         Map<String, String> data = new HashMap<>();
-        data.put(FIRST_NAME, user.getFirstName());
-        data.put(LAST_NAME, user.getLastName());
+        data.put(User_.FIRST_NAME, user.getFirstName());
+        data.put(User_.LAST_NAME, user.getLastName());
         return data;
     }
 }

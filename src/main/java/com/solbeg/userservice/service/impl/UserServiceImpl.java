@@ -23,6 +23,10 @@ import com.solbeg.userservice.util.AuthUtil;
 import com.solbeg.userservice.validation.UserValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -83,12 +87,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "UserResponse", key = "#userId")
     public UserResponse findUserById(UUID userId) {
         return userMapper.toResponse(userIdentityService.getUserOrThrowException(userId));
     }
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "User", key = "#userEmail")
     public User findActiveUserByEmailOrThrowException(String userEmail) {
         return userRepository.findByEmailAndStatus(userEmail, Status.ACTIVE)
                 .orElseThrow(() -> new NoSuchUserEmailException(ErrorMessage.USER_NOT_EXIST.getMessage() + userEmail));
@@ -97,6 +103,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @CachePut(value = "UserResponse", key = "#userId")
     public UserResponse updateUserById(UUID userId, UserUpdateRequest userUpdateRequest) {
         userValidator.checkUniqueEmail(userUpdateRequest.getEmail(), userId);
 
@@ -138,6 +145,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "User", key = "#userId"),
+            @CacheEvict(value = "UserResponse", key = "#userId")
+    })
     public void deleteUserById(UUID userId) {
         changeUserStatus(userId, Status.DELETED);
         log.info("IN deleteUser - user with id: {} changed status: DELETED", userId);

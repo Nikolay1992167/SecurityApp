@@ -6,8 +6,6 @@ import com.solbeg.userservice.dto.request.RefreshTokenRequest;
 import com.solbeg.userservice.dto.request.UserRegisterRequest;
 import com.solbeg.userservice.enums.error_response.ErrorMessage;
 import com.solbeg.userservice.security.jwt.JwtTokenProvider;
-import com.solbeg.userservice.service.AuthService;
-import com.solbeg.userservice.service.impl.UserServiceImpl;
 import com.solbeg.userservice.util.PostgresSqlContainerInitializer;
 import com.solbeg.userservice.util.testdata.JwtData;
 import com.solbeg.userservice.util.testdata.UserTestData;
@@ -19,7 +17,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -43,12 +40,6 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
     private ObjectMapper objectMapper;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
-
-    @SpyBean
-    private UserServiceImpl userService;
-
-    @SpyBean
-    private AuthService authService;
 
     public static MockWebServer mockWebServer;
 

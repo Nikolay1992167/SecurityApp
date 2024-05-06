@@ -1,12 +1,10 @@
 package com.solbeg.userservice.IT.controller;
 
 import com.solbeg.userservice.security.jwt.JwtTokenProvider;
-import com.solbeg.userservice.service.impl.UserServiceImpl;
 import com.solbeg.userservice.util.PostgresSqlContainerInitializer;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static com.solbeg.userservice.util.initdata.InitData.BEARER;
@@ -20,12 +18,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @RequiredArgsConstructor
-class UserControllerTest extends PostgresSqlContainerInitializer {
+class AccountControllerTest extends PostgresSqlContainerInitializer {
     private final MockMvc mockMvc;
     private final JwtTokenProvider jwtTokenProvider;
-
-    @SpyBean
-    private UserServiceImpl userService;
 
     @Test
     void shouldReturnExpectedValueAndStatus200() throws Exception {

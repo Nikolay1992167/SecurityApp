@@ -11,11 +11,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "User", description = "The User Api")
-public interface UserOpenApi {
+public interface AccountOpenApi {
 
     @Operation(
             method = "POST",
-            tags = "User",
+            tags = "Account",
             description = "Get data about the user.",
             requestBody = @RequestBody(
                     required = true,

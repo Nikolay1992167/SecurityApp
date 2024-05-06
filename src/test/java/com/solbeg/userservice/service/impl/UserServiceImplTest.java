@@ -6,6 +6,7 @@ import com.solbeg.userservice.dto.response.UserResponse;
 import com.solbeg.userservice.entity.Role;
 import com.solbeg.userservice.entity.User;
 import com.solbeg.userservice.entity.UserToken;
+import com.solbeg.userservice.entity.User_;
 import com.solbeg.userservice.enums.EmailType;
 import com.solbeg.userservice.enums.Status;
 import com.solbeg.userservice.enums.error_response.ErrorMessage;
@@ -61,8 +62,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class UserServiceImplTest {
 
-    @Mock
-    private UserMapper userMapper;
+
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -90,6 +90,9 @@ class UserServiceImplTest {
 
     @Mock
     private SecurityContext securityContext;
+
+    @Mock
+    private UserMapper userMapper;
 
     @Captor
     private ArgumentCaptor<User> userCaptor;
@@ -264,10 +267,10 @@ class UserServiceImplTest {
             String tokenUser = TOKEN_USERTOKEN;
             User user = UserTestData.getJournalist();
             UserToken userToken = UserTokenTestData.getUserToken();
+            JwtUser jwtUser = JwtUserTestData.getJwtUser();
             when(tokenService.getByToken(tokenUser))
                     .thenReturn(userToken);
             doNothing().when(sendingDataService).sendInformation(user, EmailType.USER_WELCOME_EMAIL);
-            JwtUser jwtUser = JwtUserTestData.getJwtUser();
             when(authentication.getPrincipal())
                     .thenReturn(jwtUser);
             when(securityContext.getAuthentication())
@@ -280,8 +283,8 @@ class UserServiceImplTest {
             // then
             verify(userRepository, times(1)).persist(userCaptor.capture());
             assertThat(userCaptor.getValue())
-                    .hasFieldOrPropertyWithValue(User.Fields.email, user.getEmail())
-                    .hasFieldOrPropertyWithValue(User.Fields.password, user.getPassword());
+                    .hasFieldOrPropertyWithValue(User_.EMAIL, user.getEmail())
+                    .hasFieldOrPropertyWithValue(User_.PASSWORD, user.getPassword());
             verify(tokenService, times(1)).deleteUserTokenByToken(tokenUser);
         }
 
@@ -310,9 +313,9 @@ class UserServiceImplTest {
             // given
             UUID userId = ID_JOURNALIST;
             User user = UserTestData.getJournalist();
+            JwtUser jwtUser = JwtUserTestData.getJwtUser();
             when(userRepository.findById(userId))
                     .thenReturn(Optional.of(user));
-            JwtUser jwtUser = JwtUserTestData.getJwtUser();
             when(authentication.getPrincipal())
                     .thenReturn(jwtUser);
             when(securityContext.getAuthentication())
@@ -364,9 +367,9 @@ class UserServiceImplTest {
             // given
             UUID userId = ID_JOURNALIST;
             User user = UserTestData.getJournalist();
+            JwtUser jwtUser = JwtUserTestData.getJwtUser();
             when(userRepository.findById(userId))
                     .thenReturn(Optional.of(user));
-            JwtUser jwtUser = JwtUserTestData.getJwtUser();
             when(authentication.getPrincipal())
                     .thenReturn(jwtUser);
             when(securityContext.getAuthentication())

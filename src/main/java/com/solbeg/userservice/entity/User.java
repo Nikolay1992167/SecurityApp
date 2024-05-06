@@ -16,9 +16,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.experimental.FieldNameConstants;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,10 +27,9 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
-@FieldNameConstants
 @Entity
 @Table(schema = "security", name = "users")
-public class User extends BaseEntity {
+public class User extends BaseEntity implements Serializable {
     @Column(name = "first_name", nullable = false, length = 40)
     private String firstName;
 

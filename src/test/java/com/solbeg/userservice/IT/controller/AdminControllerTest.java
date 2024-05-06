@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.solbeg.userservice.dto.request.UserUpdateRequest;
 import com.solbeg.userservice.enums.error_response.ErrorMessage;
 import com.solbeg.userservice.security.jwt.JwtTokenProvider;
-import com.solbeg.userservice.service.impl.UserServiceImpl;
 import com.solbeg.userservice.util.PostgresSqlContainerInitializer;
 import com.solbeg.userservice.util.testdata.UserTestData;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -49,9 +47,6 @@ class AdminControllerTest extends PostgresSqlContainerInitializer {
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
     private final JwtTokenProvider jwtTokenProvider;
-
-    @SpyBean
-    private UserServiceImpl userService;
 
     private String ADMIN_TOKEN;
 
