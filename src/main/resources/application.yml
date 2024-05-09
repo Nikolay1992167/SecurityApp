@@ -10,7 +10,7 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: 6379
-      password: ${REDIS_PASSWORD:c2Rmc2Rmc2Rmcw==}
+      password: ${REDIS_PASSWORD:cGFzc3dvcnRvcmVkaXM=}
   jpa:
     hibernate:
       ddl-auto: validate

@@ -62,8 +62,6 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class UserServiceImplTest {
 
-
-
     @InjectMocks
     private UserServiceImpl userService;
 
@@ -221,8 +219,6 @@ class UserServiceImplTest {
         void shouldReturnThrowExceptionWhenUserNotFound() {
             // given
             String userEmail = EMAIL_JOURNALIST;
-            when(userRepository.findByEmailAndStatus(userEmail, Status.ACTIVE))
-                    .thenReturn(Optional.empty());
 
             // when, then
             assertThatThrownBy(() -> userService.findActiveUserByEmailOrThrowException(userEmail))
