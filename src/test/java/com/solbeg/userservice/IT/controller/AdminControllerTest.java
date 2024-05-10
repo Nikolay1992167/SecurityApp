@@ -50,7 +50,7 @@ class AdminControllerTest extends PostgresSqlContainerInitializer {
 
     private String ADMIN_TOKEN;
 
-    public MockWebServer mockWebServer;
+    private MockWebServer mockWebServer;
 
     @BeforeEach
     void setUp() {
