@@ -11,9 +11,6 @@ import com.solbeg.userservice.service.UserIdentityService;
 import com.solbeg.userservice.service.UserTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -33,7 +30,6 @@ public class UserTokenServiceImpl implements UserTokenService {
 
     @Override
     @Transactional
-    @CachePut(value = "UserToken", key = "#result.token")
     public UserToken createActivationToken(UUID userId) {
         UserToken userToken = UserToken.builder()
                 .user(userIdentityService.getUserOrThrowException(userId))
@@ -46,7 +42,6 @@ public class UserTokenServiceImpl implements UserTokenService {
     }
 
     @Override
-    @Cacheable(value = "UserToken", key = "#token")
     public UserToken getByToken(String token) {
         UserToken userToken = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.USERTOKEN_NOT_FOUND.getMessage() + token));
@@ -64,7 +59,6 @@ public class UserTokenServiceImpl implements UserTokenService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "UserToken", key = "#token")
     public void deleteUserTokenByToken(String token) {
         tokenRepository.findByToken(token).ifPresentOrElse(
                 activationLink -> tokenRepository.deleteByToken(token),
@@ -78,7 +72,6 @@ public class UserTokenServiceImpl implements UserTokenService {
     @Override
     @Transactional
     @Scheduled(fixedRate = 7 * 60 * 60 * 1000)
-    @CacheEvict(value = "UserToken", allEntries = true)
     public void deleteOldUserTokens() {
         tokenRepository.deleteByExpirationAtBefore(LocalDateTime.now());
         log.info("IN deleteOldUserTokens - the method worked");

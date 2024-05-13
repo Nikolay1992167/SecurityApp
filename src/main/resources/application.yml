@@ -8,7 +8,7 @@ spring:
     cache-names: redis-cache
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
+      host: ${REDIS_HOST:redis}
       port: 6379
       password: ${REDIS_PASSWORD:cGFzc3dvcnRvcmVkaXM=}
   jpa:
@@ -35,5 +35,5 @@ aop:
   logging:
     enabled: true
 urls:
-  emailservice_url: http://localhost:8088/
-#  emailservice_url: http://email-service:8088/
+#  emailservice_url: http://localhost:8088/
+  emailservice_url: http://email-service:8088/

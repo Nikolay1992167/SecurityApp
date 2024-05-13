@@ -130,10 +130,10 @@ public class UserServiceImpl implements UserService {
         user.setStatus(Status.ACTIVE);
         user.setUpdatedBy(AuthUtil.getUserId());
 
-        userRepository.persist(user);
+        User savedUser = userRepository.merge(user);
 
         userTokenService.deleteUserTokenByToken(userToken);
-        sendingDataService.sendInformation(user, EmailType.USER_WELCOME_EMAIL);
+        sendingDataService.sendInformation(savedUser, EmailType.USER_WELCOME_EMAIL);
     }
 
     @Override

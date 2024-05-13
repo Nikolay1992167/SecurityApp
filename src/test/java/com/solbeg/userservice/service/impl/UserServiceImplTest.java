@@ -277,7 +277,7 @@ class UserServiceImplTest {
             userService.activateJournalistAccount(tokenUser);
 
             // then
-            verify(userRepository, times(1)).persist(userCaptor.capture());
+            verify(userRepository, times(1)).merge(userCaptor.capture());
             assertThat(userCaptor.getValue())
                     .hasFieldOrPropertyWithValue(User_.EMAIL, user.getEmail())
                     .hasFieldOrPropertyWithValue(User_.PASSWORD, user.getPassword());
