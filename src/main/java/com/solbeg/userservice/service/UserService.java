@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 public interface UserService {
+
     void registerJournalist(UserRegisterRequest request);
 
     void registerSubscriber(UserRegisterRequest request);

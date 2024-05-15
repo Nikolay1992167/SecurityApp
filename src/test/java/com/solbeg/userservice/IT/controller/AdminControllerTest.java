@@ -1,21 +1,24 @@
 package com.solbeg.userservice.IT.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.solbeg.userservice.dto.request.EmailRequest;
 import com.solbeg.userservice.dto.request.UserUpdateRequest;
 import com.solbeg.userservice.enums.error_response.ErrorMessage;
 import com.solbeg.userservice.security.jwt.JwtTokenProvider;
+import com.solbeg.userservice.service.impl.SendDataServiceImpl;
 import com.solbeg.userservice.util.PostgresSqlContainerInitializer;
 import com.solbeg.userservice.util.testdata.UserTestData;
 import lombok.RequiredArgsConstructor;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -32,6 +35,9 @@ import static com.solbeg.userservice.util.initdata.InitData.TOKEN_USERTOKEN;
 import static com.solbeg.userservice.util.initdata.InitData.TOKEN_USERTOKEN_NOT_EXIST;
 import static com.solbeg.userservice.util.initdata.InitData.URL_ADMIN;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -47,10 +53,12 @@ class AdminControllerTest extends PostgresSqlContainerInitializer {
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
     private final JwtTokenProvider jwtTokenProvider;
+    private final SendDataServiceImpl sendDataService;
+
+    @Mock
+    private RabbitTemplate rabbitTemplate;
 
     private String ADMIN_TOKEN;
-
-    private MockWebServer mockWebServer;
 
     @BeforeEach
     void setUp() {
@@ -163,10 +171,9 @@ class AdminControllerTest extends PostgresSqlContainerInitializer {
         @Test
         void shouldActivateUserJournalist() throws Exception {
             // given
-            mockWebServer = new MockWebServer();
-            mockWebServer.start(8088);
-            mockWebServer.enqueue(new MockResponse()
-                    .setResponseCode(200));
+            doNothing().when(rabbitTemplate)
+                    .convertAndSend(anyString(), anyString(), any(EmailRequest.class));
+            ReflectionTestUtils.setField(sendDataService, "rabbitTemplate", rabbitTemplate);
 
             // when, then
             mockMvc.perform(patch(URL_ADMIN + "/activation")
@@ -174,7 +181,6 @@ class AdminControllerTest extends PostgresSqlContainerInitializer {
                             .header(AUTHORIZATION, BEARER + ADMIN_TOKEN)
                             .contentType(APPLICATION_JSON))
                     .andExpect(status().isOk());
-            mockWebServer.shutdown();
         }
 
         @Test

@@ -1,58 +1,48 @@
 package com.solbeg.userservice.IT.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.solbeg.userservice.dto.request.EmailRequest;
 import com.solbeg.userservice.dto.request.JwtRequest;
 import com.solbeg.userservice.dto.request.RefreshTokenRequest;
 import com.solbeg.userservice.dto.request.UserRegisterRequest;
 import com.solbeg.userservice.enums.error_response.ErrorMessage;
 import com.solbeg.userservice.security.jwt.JwtTokenProvider;
+import com.solbeg.userservice.service.impl.SendDataServiceImpl;
 import com.solbeg.userservice.util.PostgresSqlContainerInitializer;
 import com.solbeg.userservice.util.testdata.JwtData;
 import com.solbeg.userservice.util.testdata.UserTestData;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.Mock;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.io.IOException;
 
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_ADMIN;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_NOT_EXIST;
 import static com.solbeg.userservice.util.initdata.InitData.ID_ADMIN;
 import static com.solbeg.userservice.util.initdata.InitData.INCORRECT_TOKEN;
 import static com.solbeg.userservice.util.initdata.InitData.URL_AUTH;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
+@RequiredArgsConstructor
 class AuthControllerTest extends PostgresSqlContainerInitializer {
+    private final MockMvc mockMvc;
+    private final ObjectMapper objectMapper;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final SendDataServiceImpl sendDataService;
 
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
-    public static MockWebServer mockWebServer;
-
-    @BeforeAll
-    static void setUp() throws IOException {
-        mockWebServer = new MockWebServer();
-        mockWebServer.start(8088);
-    }
-
-    @AfterAll
-    static void tearDown() throws IOException {
-        mockWebServer.shutdown();
-    }
+    @Mock
+    private RabbitTemplate rabbitTemplate;
 
     @Nested
     class AuthenticatePostEndpointTest {
@@ -110,9 +100,9 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
         void shouldReturnExpectedJsonAndStatus201() throws Exception {
             // given
             UserRegisterRequest request = UserTestData.getRegisterRequestJournalist();
-
-            mockWebServer.enqueue(new MockResponse()
-                    .setResponseCode(200));
+            doNothing().when(rabbitTemplate)
+                    .convertAndSend(anyString(), anyString(), any(EmailRequest.class));
+            ReflectionTestUtils.setField(sendDataService, "rabbitTemplate", rabbitTemplate);
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/register/journalist")

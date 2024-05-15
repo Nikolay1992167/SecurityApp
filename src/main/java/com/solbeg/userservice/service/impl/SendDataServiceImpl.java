@@ -10,25 +10,28 @@ import com.solbeg.userservice.service.SendingDataService;
 import com.solbeg.userservice.service.UserTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.solbeg.userservice.util.Constants.ACTIVATION_URL;
 import static com.solbeg.userservice.util.Constants.NAME_LINK;
-import static com.solbeg.userservice.util.Constants.URL_EMAIL_SERVICE;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class SendDataServiceImpl implements SendingDataService {
-    private final RestClient restClient;
 
+    private final RabbitTemplate rabbitTemplate;
     private final UserTokenService userTokenService;
+
+    @Value("${rabbitmq.exchange}")
+    private String exchange;
 
     @Override
     public void sendRequestForActivationUser(User user) {
@@ -36,7 +39,7 @@ public class SendDataServiceImpl implements SendingDataService {
 
         EmailRequest emailRequest = getEmailRequest(user, activationToken);
 
-        sendData(emailRequest);
+        sendMessage("activation", emailRequest);
     }
 
     @Override
@@ -46,24 +49,18 @@ public class SendDataServiceImpl implements SendingDataService {
             case USER_TOKEN_EXPIRATION -> emailRequest = getEmailRequest(user, EmailType.USER_TOKEN_EXPIRATION);
             case USER_WELCOME_EMAIL -> emailRequest = getEmailRequest(user, EmailType.USER_WELCOME_EMAIL);
         }
-        sendData(emailRequest);
+        sendMessage("information", Objects.requireNonNull(emailRequest));
     }
 
-    private void sendData(EmailRequest emailRequest) {
+    private void sendMessage(String nameQueue, EmailRequest emailRequest) {
         try {
-            restClient.post()
-                    .uri(URL_EMAIL_SERVICE)
-                    .contentType(APPLICATION_JSON)
-                    .body(emailRequest)
-                    .retrieve()
-                    .body(EmailRequest.class);
-            log.info("User data successfully sent to mail-service.");
-        } catch (RestClientException exception) {
-            log.error("Failed to send user data to mail-service!");
+            rabbitTemplate.convertAndSend(exchange, nameQueue, emailRequest);
+            log.info("Successfully sent message!");
+        } catch (AmqpException exception) {
+            log.error("Failed to send message!");
             throw new SendDataException(exception.getMessage());
         }
     }
-
 
     private EmailRequest getEmailRequest(User user, UserToken activationToken) {
         return EmailRequest.builder()
