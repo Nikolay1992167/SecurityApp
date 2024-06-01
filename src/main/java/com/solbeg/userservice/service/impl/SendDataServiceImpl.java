@@ -21,6 +21,8 @@ import java.util.Objects;
 
 import static com.solbeg.userservice.util.Constants.ACTIVATION_URL;
 import static com.solbeg.userservice.util.Constants.NAME_LINK;
+import static com.solbeg.userservice.util.Constants.ROUTING_KEY_ACTIVATION;
+import static com.solbeg.userservice.util.Constants.ROUTING_KEY_INFORMATION;
 
 @Slf4j
 @Service
@@ -39,7 +41,7 @@ public class SendDataServiceImpl implements SendingDataService {
 
         EmailRequest emailRequest = getEmailRequest(user, activationToken);
 
-        sendMessage("activation", emailRequest);
+        sendMessage(ROUTING_KEY_ACTIVATION, emailRequest);
     }
 
     @Override
@@ -49,12 +51,12 @@ public class SendDataServiceImpl implements SendingDataService {
             case USER_TOKEN_EXPIRATION -> emailRequest = getEmailRequest(user, EmailType.USER_TOKEN_EXPIRATION);
             case USER_WELCOME_EMAIL -> emailRequest = getEmailRequest(user, EmailType.USER_WELCOME_EMAIL);
         }
-        sendMessage("information", Objects.requireNonNull(emailRequest));
+        sendMessage(ROUTING_KEY_INFORMATION, Objects.requireNonNull(emailRequest));
     }
 
-    private void sendMessage(String nameQueue, EmailRequest emailRequest) {
+    private void sendMessage(String routingKey, EmailRequest emailRequest) {
         try {
-            rabbitTemplate.convertAndSend(exchange, nameQueue, emailRequest);
+            rabbitTemplate.convertAndSend(exchange, routingKey, emailRequest);
             log.info("Successfully sent message!");
         } catch (AmqpException exception) {
             log.error("Failed to send message!");

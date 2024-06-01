@@ -3,12 +3,6 @@ spring:
     active: dev
   application:
     name: user-service
-  rabbitmq:
-    host: localhost
-    port: 5672
-    stream:
-      username: guest
-      password: guest
   cache:
     type: redis
     cache-names: redis-cache
@@ -42,3 +36,7 @@ aop:
     enabled: true
 rabbitmq:
   exchange: nmsExchange
+  host: rabbitmq
+  username: nikolay
+  password: 87654321
+  virtualHost: /
