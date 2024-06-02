@@ -24,7 +24,6 @@ The service that is responsible for creating, storing data and authorizing users
 * Liquibase
 * Spring-boot-starter-test
 * Spring-security-test
-* Spring-cloud-starter-contract-stub-runner
 * Testcontainers-Postgresql 1.19.3
 
 ### Instructions to run application (dev profile):
