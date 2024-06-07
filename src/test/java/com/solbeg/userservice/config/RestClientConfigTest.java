@@ -4,23 +4,23 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-class WebClientConfigTest {
+class RestClientConfigTest {
 
     @InjectMocks
-    private WebClientConfig webClientConfig;
+    private RestClientConfig restClientConfig;
 
     @Test
     void shouldReturnExpectedInstanceOfWebclient() {
         // given
-        Class<WebClient> expectedClass = WebClient.class;
+        Class<RestClient> expectedClass = RestClient.class;
 
         // when
-        WebClient actualClass = webClientConfig.webClient();
+        RestClient actualClass = restClientConfig.restClient();
 
         // then
         assertThat(actualClass).isInstanceOf(expectedClass);

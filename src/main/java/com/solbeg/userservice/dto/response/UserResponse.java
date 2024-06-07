@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -14,7 +15,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserResponse {
+public class UserResponse implements Serializable {
     private UUID id;
     private UUID createdBy;
     private UUID updatedBy;
@@ -24,6 +25,6 @@ public class UserResponse {
     private String lastName;
     private String password;
     private String email;
-    private List<String> roles;
+    private List<RoleResponse> roles;
     private Status status;
 }

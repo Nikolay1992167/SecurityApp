@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
@@ -22,7 +23,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(schema = "security", name = "roles")
-public class Role extends BaseEntity {
+public class Role extends BaseEntity implements Serializable {
     @Column(name = "name", nullable = false, length = 10)
     private String name;
 

@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -27,7 +28,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(schema = "security", name = "user_tokens")
-public class UserToken {
+public class UserToken implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @UuidGenerator(style = UuidGenerator.Style.AUTO)

@@ -2,58 +2,53 @@ package com.solbeg.userservice.util.testdata;
 
 import com.solbeg.userservice.dto.request.JwtRequest;
 import com.solbeg.userservice.dto.response.JwtResponse;
-import lombok.Builder;
-import lombok.Data;
-
-import java.util.UUID;
 
 import static com.solbeg.userservice.util.initdata.InitData.ACCESS_TOKEN;
+import static com.solbeg.userservice.util.initdata.InitData.EMAIL_INCORRECT;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_JOURNALIST_FOR_IT;
+import static com.solbeg.userservice.util.initdata.InitData.EMAIL_NOT_EXIST;
 import static com.solbeg.userservice.util.initdata.InitData.ID_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.PASSWORD_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.PASSWORD_JOURNALIST_FOR_IT;
 import static com.solbeg.userservice.util.initdata.InitData.REFRESH_TOKEN;
 
-@Data
-@Builder(setterPrefix = "with")
 public class JwtData {
 
-    @Builder.Default
-    private UUID id = ID_JOURNALIST;
-
-    @Builder.Default
-    private String email = EMAIL_JOURNALIST;
-
-    @Builder.Default
-    private String accessToken = ACCESS_TOKEN;
-
-    @Builder.Default
-    private String refreshToken = REFRESH_TOKEN;
-
-    @Builder.Default
-    private String password = PASSWORD_JOURNALIST;
-
-    public JwtRequest getJwtRequest() {
+    public static JwtRequest getJwtRequest() {
         return JwtRequest.builder()
-                .email(email)
-                .password(password)
+                .email(EMAIL_JOURNALIST)
+                .password(PASSWORD_JOURNALIST)
                 .build();
     }
 
-    public JwtRequest getJwtRequestForIT() {
+    public static JwtRequest getJwtRequestWithIncorrectEmail() {
+        return JwtRequest.builder()
+                .email(EMAIL_INCORRECT)
+                .password(PASSWORD_JOURNALIST)
+                .build();
+    }
+
+    public static JwtRequest getJwtRequestWithEmailNotExist() {
+        return JwtRequest.builder()
+                .email(EMAIL_NOT_EXIST)
+                .password(PASSWORD_JOURNALIST)
+                .build();
+    }
+
+    public static JwtRequest getJwtRequestForIT() {
         return JwtRequest.builder()
                 .email(EMAIL_JOURNALIST_FOR_IT)
                 .password(PASSWORD_JOURNALIST_FOR_IT)
                 .build();
     }
 
-    public JwtResponse getJwtResponse() {
+    public static JwtResponse getJwtResponse() {
         return JwtResponse.builder()
-                .id(id)
-                .email(email)
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
+                .id(ID_JOURNALIST)
+                .email(EMAIL_JOURNALIST)
+                .accessToken(ACCESS_TOKEN)
+                .refreshToken(REFRESH_TOKEN)
                 .build();
     }
 }

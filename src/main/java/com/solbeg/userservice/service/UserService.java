@@ -7,7 +7,6 @@ import com.solbeg.userservice.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
@@ -19,9 +18,7 @@ public interface UserService {
 
     UserResponse findUserById(UUID userId);
 
-    Optional<User> findUserByEmail(String userEmail);
-
-    User findById(UUID userId);
+    User findActiveUserByEmailOrThrowException(String userEmail);
 
     UserResponse updateUserById(UUID userId, UserUpdateRequest userUpdateRequest);
 

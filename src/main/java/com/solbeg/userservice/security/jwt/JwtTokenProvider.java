@@ -62,7 +62,7 @@ public class JwtTokenProvider {
     public JwtResponse refreshUserToken(String refreshToken) {
         JwtResponse jwtResponse = new JwtResponse();
         UUID userId = UUID.fromString(getId(refreshToken));
-        User user = userIdentityService.getUserById(userId);
+        User user = userIdentityService.getUserOrThrowException(userId);
         jwtResponse.setId(userId);
         jwtResponse.setEmail(user.getEmail());
         jwtResponse.setAccessToken(createAccessToken(userId, user.getEmail(), user.getRoles()));

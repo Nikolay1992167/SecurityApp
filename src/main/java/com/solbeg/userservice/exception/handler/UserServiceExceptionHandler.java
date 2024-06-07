@@ -1,6 +1,13 @@
 package com.solbeg.userservice.exception.handler;
 
-import com.solbeg.userservice.exception.*;
+import com.solbeg.userservice.exception.InformationChangeStatusUserException;
+import com.solbeg.userservice.exception.JwtParsingException;
+import com.solbeg.userservice.exception.NoSuchUserEmailException;
+import com.solbeg.userservice.exception.NotFoundException;
+import com.solbeg.userservice.exception.SendDataException;
+import com.solbeg.userservice.exception.TokenExpirationException;
+import com.solbeg.userservice.exception.UniqueEmailException;
+import com.solbeg.userservice.exception.UserStatusException;
 import com.solbeg.userservice.exception.model.IncorrectData;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,10 +32,16 @@ public class UserServiceExceptionHandler {
         return getResponse(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<IncorrectData> illegalStateException(IllegalStateException exception) {
+        return getResponse(exception.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(SendDataException.class)
     public ResponseEntity<IncorrectData> sendDataException(SendDataException exception) {
         return getResponse(exception.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
     }
+
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<IncorrectData> accessDeniedException(AccessDeniedException exception) {
@@ -57,7 +70,7 @@ public class UserServiceExceptionHandler {
 
     @ExceptionHandler(InformationChangeStatusUserException.class)
     public ResponseEntity<IncorrectData> informationChangeStatusUserException(InformationChangeStatusUserException exception) {
-        return getResponse(exception.getMessage(), HttpStatus.CONFLICT);
+        return getResponse(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(JwtParsingException.class)
@@ -82,7 +95,7 @@ public class UserServiceExceptionHandler {
 
     @ExceptionHandler(UniqueEmailException.class)
     public ResponseEntity<IncorrectData> uniqueEmailException(UniqueEmailException exception) {
-        return getResponse(exception.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+        return getResponse(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

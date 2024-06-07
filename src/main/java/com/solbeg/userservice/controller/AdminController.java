@@ -1,5 +1,6 @@
 package com.solbeg.userservice.controller;
 
+import com.solbeg.annotation.Logging;
 import com.solbeg.userservice.controller.openapi.AdminOpenApi;
 import com.solbeg.userservice.dto.request.UserUpdateRequest;
 import com.solbeg.userservice.dto.response.UserResponse;
@@ -26,6 +27,7 @@ import java.util.UUID;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
+@Logging
 @RestController
 @PreAuthorize("hasAuthority('ADMIN')")
 @RequestMapping(value = "/api/v1/admin", produces = APPLICATION_JSON_VALUE)
