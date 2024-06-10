@@ -2,41 +2,9 @@ spring:
   profiles:
     active: dev
   application:
-    name: user-service
-  cache:
-    type: redis
-    cache-names: redis-cache
-  data:
-    redis:
-      host: ${REDIS_HOST:redis}
-      port: 6379
-      password: ${REDIS_PASSWORD:cGFzc3dvcnRvcmVkaXM=}
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        default_schema: security
-    open-in-view: false
-  liquibase:
-    enabled: true
-    change-log: liquibase/db.changelog-master.yml
-    default-schema: security
-security:
-  jwt:
-    secret: ${SECRET_KEY:73357638792F423F4528482B4D6251655468576D5A7133743677397A24432646}
-    access: ${TIME_ACCESS_TOKEN:1}
-    refresh: ${TIME_REFRESH_TOKEN:2}
-server:
-  port: ${SERVER_PORT:8081}
-aop:
-  logging:
-    enabled: true
-rabbitmq:
-  exchange: nmsExchange
-  host: rabbitmq
-  username: nikolay
-  password: 87654321
-  virtualHost: /
+    name: userservice
+  config:
+    import: configserver:http://spring-cloud-config:8888
+  cloud:
+    config:
+      fail-fast: true

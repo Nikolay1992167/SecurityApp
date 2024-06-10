@@ -5,12 +5,12 @@ import com.solbeg.userservice.entity.Role;
 
 import java.util.List;
 
+import static com.solbeg.userservice.util.Constants.ROLE_JOURNALIST;
+import static com.solbeg.userservice.util.Constants.ROLE_SUBSCRIBER;
 import static com.solbeg.userservice.util.initdata.InitData.CREATED_AT_ROLE;
 import static com.solbeg.userservice.util.initdata.InitData.CREATED_BY_ROLE;
 import static com.solbeg.userservice.util.initdata.InitData.ID_ROLE;
 import static com.solbeg.userservice.util.initdata.InitData.ROLE_NAME_ADMIN;
-import static com.solbeg.userservice.util.initdata.InitData.ROLE_NAME_JOURNALIST;
-import static com.solbeg.userservice.util.initdata.InitData.ROLE_NAME_SUBSCRIBER;
 import static com.solbeg.userservice.util.initdata.InitData.UPDATED_AT_ROLE;
 import static com.solbeg.userservice.util.initdata.InitData.UPDATED_BY_ROLE;
 
@@ -23,7 +23,7 @@ public class RoleTestData {
                 .updatedBy(UPDATED_BY_ROLE)
                 .createdAt(CREATED_AT_ROLE)
                 .updatedAt(UPDATED_AT_ROLE)
-                .name(ROLE_NAME_JOURNALIST)
+                .name(ROLE_JOURNALIST)
                 .users(List.of())
                 .build();
     }
@@ -35,7 +35,7 @@ public class RoleTestData {
                 .updatedBy(UPDATED_BY_ROLE)
                 .createdAt(CREATED_AT_ROLE)
                 .updatedAt(UPDATED_AT_ROLE)
-                .name(ROLE_NAME_SUBSCRIBER)
+                .name(ROLE_SUBSCRIBER)
                 .users(List.of())
                 .build();
     }
@@ -55,7 +55,7 @@ public class RoleTestData {
     public static RoleResponse getRoleResponse() {
         return RoleResponse.builder()
                 .id(ID_ROLE)
-                .name(ROLE_NAME_SUBSCRIBER)
+                .name(ROLE_SUBSCRIBER)
                 .build();
     }
 }

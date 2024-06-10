@@ -8,12 +8,12 @@ import static com.solbeg.userservice.util.initdata.InitData.EMAIL_INCORRECT;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_JOURNALIST_FOR_IT;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_NOT_EXIST;
-import static com.solbeg.userservice.util.initdata.InitData.ID_JOURNALIST;
+import static com.solbeg.userservice.util.initdata.InitData.PASSWORD_INCORRECT;
 import static com.solbeg.userservice.util.initdata.InitData.PASSWORD_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.PASSWORD_JOURNALIST_FOR_IT;
 import static com.solbeg.userservice.util.initdata.InitData.REFRESH_TOKEN;
 
-public class JwtData {
+public class JwtTestData {
 
     public static JwtRequest getJwtRequest() {
         return JwtRequest.builder()
@@ -26,6 +26,13 @@ public class JwtData {
         return JwtRequest.builder()
                 .email(EMAIL_INCORRECT)
                 .password(PASSWORD_JOURNALIST)
+                .build();
+    }
+
+    public static JwtRequest getJwtRequestWithIncorrectEnteredDate() {
+        return JwtRequest.builder()
+                .email(EMAIL_INCORRECT)
+                .password(PASSWORD_INCORRECT)
                 .build();
     }
 
@@ -45,8 +52,6 @@ public class JwtData {
 
     public static JwtResponse getJwtResponse() {
         return JwtResponse.builder()
-                .id(ID_JOURNALIST)
-                .email(EMAIL_JOURNALIST)
                 .accessToken(ACCESS_TOKEN)
                 .refreshToken(REFRESH_TOKEN)
                 .build();

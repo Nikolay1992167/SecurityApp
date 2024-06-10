@@ -9,6 +9,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import static com.solbeg.userservice.util.Constants.EMAIL_ERROR;
+import static com.solbeg.userservice.util.Constants.SIZE_NAME_ERROR;
+import static com.solbeg.userservice.util.Constants.SIZE_PASSWORD_ERROR;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -16,20 +20,20 @@ import lombok.NoArgsConstructor;
 public class UserRegisterRequest {
 
     @NotBlank
-    @Size(min = 2, max = 40)
+    @Size(min = 2, max = 50, message = SIZE_NAME_ERROR)
     @Pattern(regexp = "^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$")
     private String firstName;
 
     @NotBlank
-    @Size(min = 2, max = 50)
+    @Size(min = 2, max = 50, message = SIZE_NAME_ERROR)
     @Pattern(regexp = "^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$")
     private String lastName;
 
     @NotBlank
-    @Email
+    @Email(message = EMAIL_ERROR)
     private String email;
 
     @NotBlank
-    @Size(min = 3, max = 100)
+    @Size(min = 3, max = 100, message = SIZE_PASSWORD_ERROR)
     private String password;
 }

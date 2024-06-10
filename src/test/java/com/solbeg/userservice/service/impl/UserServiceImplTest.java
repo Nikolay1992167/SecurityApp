@@ -45,11 +45,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.solbeg.userservice.util.Constants.ROLE_JOURNALIST;
+import static com.solbeg.userservice.util.Constants.ROLE_SUBSCRIBER;
 import static com.solbeg.userservice.util.initdata.InitData.DEFAULT_PAGE_REQUEST_FOR_IT;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.ID_ADMIN;
 import static com.solbeg.userservice.util.initdata.InitData.ID_JOURNALIST;
-import static com.solbeg.userservice.util.initdata.InitData.ROLE_NAME_SUBSCRIBER;
 import static com.solbeg.userservice.util.initdata.InitData.TOKEN_USERTOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -103,7 +103,7 @@ class UserServiceImplTest {
             // given
             UserRegisterRequest registerRequest = UserTestData.getRegisterRequestJournalist();
             User savedUser = UserTestData.getJournalistWithStatusNotActive();
-            when(userMapper.fromRequest(registerRequest, Status.NOT_ACTIVE))
+            when(userMapper.fromRequest(registerRequest, Status.NOT_ACTIVE, ROLE_JOURNALIST))
                     .thenReturn(savedUser);
             when(roleRepository.findByName(ROLE_JOURNALIST))
                     .thenReturn(RoleTestData.getJournalist());
@@ -126,9 +126,9 @@ class UserServiceImplTest {
             // given
             UserRegisterRequest registerRequest = UserTestData.getRegisterRequestSubscriber();
             User savedUser = UserTestData.getSubscriber();
-            when(userMapper.fromRequest(registerRequest, Status.ACTIVE))
+            when(userMapper.fromRequest(registerRequest, Status.ACTIVE, ROLE_SUBSCRIBER))
                     .thenReturn(savedUser);
-            when(roleRepository.findByName(ROLE_NAME_SUBSCRIBER))
+            when(roleRepository.findByName(ROLE_SUBSCRIBER))
                     .thenReturn(RoleTestData.getSubscriber());
             when(userRepository.persistAndFlush(any(User.class)))
                     .thenReturn(savedUser);
@@ -277,7 +277,7 @@ class UserServiceImplTest {
             userService.activateJournalistAccount(tokenUser);
 
             // then
-            verify(userRepository, times(1)).merge(userCaptor.capture());
+            verify(userRepository, times(1)).update(userCaptor.capture());
             assertThat(userCaptor.getValue())
                     .hasFieldOrPropertyWithValue(User_.EMAIL, user.getEmail())
                     .hasFieldOrPropertyWithValue(User_.PASSWORD, user.getPassword());

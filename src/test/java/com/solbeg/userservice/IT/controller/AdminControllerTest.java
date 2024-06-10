@@ -21,6 +21,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -143,6 +144,7 @@ class AdminControllerTest extends PostgresSqlContainerInitializer {
     }
 
     @Nested
+    @Transactional
     class UpdatePutEndpointTest {
 
         @Test
@@ -196,6 +198,7 @@ class AdminControllerTest extends PostgresSqlContainerInitializer {
     }
 
     @Nested
+    @Transactional
     class DeactivateUserPathEndpointTest {
 
         @Test
@@ -218,6 +221,7 @@ class AdminControllerTest extends PostgresSqlContainerInitializer {
     }
 
     @Nested
+    @Transactional
     class DeleteUserPathEndpointTest {
 
         @Test

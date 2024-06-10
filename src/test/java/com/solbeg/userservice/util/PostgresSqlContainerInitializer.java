@@ -5,8 +5,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestConstructor;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.sql.Connection;
@@ -14,9 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 @ActiveProfiles("test")
-@Transactional
 @SpringBootTest
-@TestPropertySource("classpath:application-test.yml")
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 public class PostgresSqlContainerInitializer {
 

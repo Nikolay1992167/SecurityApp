@@ -8,6 +8,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import static com.solbeg.userservice.util.Constants.EMAIL_ERROR;
+import static com.solbeg.userservice.util.Constants.SIZE_PASSWORD_ERROR;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -15,10 +18,10 @@ import lombok.NoArgsConstructor;
 public class JwtRequest {
 
     @NotBlank
-    @Email
+    @Email(message = EMAIL_ERROR)
     private String email;
 
     @NotBlank
-    @Size(min = 3, max = 100)
+    @Size(min = 3, max = 100, message = SIZE_PASSWORD_ERROR)
     private String password;
 }

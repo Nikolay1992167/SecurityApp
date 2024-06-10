@@ -29,6 +29,7 @@ public class InitData {
     public static String PASSWORD_JOURNALIST = "147896";
     public static String PASSWORD_JOURNALIST_FOR_IT = "654321";
     public static String PASSWORD_SUBSCRIBER = "654321";
+    public static String PASSWORD_INCORRECT = "6";
 
     public static UUID ID_ADMIN = UUID.fromString("44212253-a305-4495-9982-45e833aa74ac");
     public static UUID ID_JOURNALIST = UUID.fromString("f2361e91-718e-41ad-9ddc-4be05ebc09b5");
@@ -57,8 +58,6 @@ public class InitData {
     public static UUID UPDATED_BY_ROLE = null;
     public static LocalDateTime CREATED_AT_ROLE = LocalDateTime.of(2024, 2, 10, 12, 0, 0);
     public static LocalDateTime UPDATED_AT_ROLE = LocalDateTime.of(2024, 2, 11, 12, 0, 0);
-    public static String ROLE_NAME_JOURNALIST = "JOURNALIST";
-    public static String ROLE_NAME_SUBSCRIBER = "SUBSCRIBER";
     public static String ROLE_NAME_ADMIN = "ADMIN";
 
     public static String SECRET_TEST = "73357638792F423F4528482B4D6251655468576D5A7133743677397A24432646";
@@ -70,7 +69,7 @@ public class InitData {
     public static String URL_ADMIN = "/api/v1/admin";
 
     public static UUID ID_USERTOKEN = UUID.fromString("b0c47e3f-152e-4c04-bfbb-8ac1fcef8c31");
-    public static LocalDateTime EXPIRATION_AT_USERTOKEN = LocalDateTime.now().plusDays(3);
+    public static LocalDateTime ACTUAL_AT_USERTOKEN = LocalDateTime.now().plusDays(3);
     public static LocalDateTime EXPIRED_AT_USERTOKEN = LocalDateTime.now().minusDays(1);
     public static String TOKEN_USERTOKEN = "e6bf32a9-22cc-44ec-85eb-4f7632dabfd1";
     public static String TOKEN_USERTOKEN_NOT_EXIST = "b0c47e3f-152e-4c04-bfbb-8ac46546";

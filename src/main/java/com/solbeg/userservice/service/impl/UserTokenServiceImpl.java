@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +32,7 @@ public class UserTokenServiceImpl implements UserTokenService {
     public UserToken createActivationToken(UUID userId) {
         UserToken userToken = UserToken.builder()
                 .user(userIdentityService.getUserOrThrowException(userId))
-                .expirationAt(LocalDateTime.now().plusDays(3))
+                .expirationAt(LocalDateTime.now())
                 .token(UUID.randomUUID().toString())
                 .tokenType(TokenType.ACTIVATION)
                 .build();
@@ -67,13 +66,5 @@ public class UserTokenServiceImpl implements UserTokenService {
                 }
         );
         log.info("IN deleteUserToken - deleted UserToken with token {}", token);
-    }
-
-    @Override
-    @Transactional
-    @Scheduled(fixedRate = 7 * 60 * 60 * 1000)
-    public void deleteOldUserTokens() {
-        tokenRepository.deleteByExpirationAtBefore(LocalDateTime.now());
-        log.info("IN deleteOldUserTokens - the method worked");
     }
 }

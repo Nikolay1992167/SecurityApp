@@ -6,7 +6,7 @@ import com.solbeg.userservice.entity.User;
 import com.solbeg.userservice.mapper.UserMapper;
 import com.solbeg.userservice.security.jwt.JwtTokenProvider;
 import com.solbeg.userservice.service.UserService;
-import com.solbeg.userservice.util.testdata.JwtData;
+import com.solbeg.userservice.util.testdata.JwtTestData;
 import com.solbeg.userservice.util.testdata.UserTestData;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -40,9 +40,9 @@ class AuthServiceImplTest {
     @Test
     void shouldReturnExpectedJwtResponseWhenLogin() {
         // given
-        JwtRequest loginRequest = JwtData.getJwtRequest();
+        JwtRequest loginRequest = JwtTestData.getJwtRequest();
         User user = UserTestData.getJournalist();
-        JwtResponse expectedResponse = JwtData.getJwtResponse();
+        JwtResponse expectedResponse = JwtTestData.getJwtResponse();
         when(userService.findActiveUserByEmailOrThrowException(loginRequest.getEmail()))
                 .thenReturn(user);
         when(jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), user.getRoles()))
@@ -64,7 +64,7 @@ class AuthServiceImplTest {
     void shouldReturnExpectedJwtResponseWhenRefresh() {
         // given
         String refreshToken = REFRESH_TOKEN;
-        JwtResponse expectedResponse = JwtData.getJwtResponse();
+        JwtResponse expectedResponse = JwtTestData.getJwtResponse();
         when(jwtTokenProvider.refreshUserToken(refreshToken))
                 .thenReturn(expectedResponse);
 

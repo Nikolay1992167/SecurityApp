@@ -13,7 +13,6 @@ import com.solbeg.userservice.exception.NoSuchUserEmailException;
 import com.solbeg.userservice.exception.NotFoundException;
 import com.solbeg.userservice.exception.TokenExpirationException;
 import com.solbeg.userservice.mapper.UserMapper;
-import com.solbeg.userservice.repository.RoleRepository;
 import com.solbeg.userservice.repository.UserRepository;
 import com.solbeg.userservice.service.SendingDataService;
 import com.solbeg.userservice.service.UserIdentityService;
@@ -33,7 +32,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import static com.solbeg.userservice.util.Constants.ROLE_JOURNALIST;
@@ -48,7 +46,6 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
 
     private final UserIdentityService userIdentityService;
     private final UserTokenService userTokenService;
@@ -59,8 +56,7 @@ public class UserServiceImpl implements UserService {
     public void registerJournalist(UserRegisterRequest userRegisterRequest) {
         userValidator.checkUniqueEmail(userRegisterRequest.getEmail());
 
-        User user = userMapper.fromRequest(userRegisterRequest, Status.NOT_ACTIVE);
-        user.setRoles(List.of(roleRepository.findByName(ROLE_JOURNALIST)));
+        User user = userMapper.fromRequest(userRegisterRequest, Status.NOT_ACTIVE, ROLE_JOURNALIST);
 
         user = userRepository.persistAndFlush(user);
 
@@ -72,8 +68,7 @@ public class UserServiceImpl implements UserService {
     public void registerSubscriber(UserRegisterRequest userRegisterRequest) {
         userValidator.checkUniqueEmail(userRegisterRequest.getEmail());
 
-        User userToSave = userMapper.fromRequest(userRegisterRequest, Status.ACTIVE);
-        userToSave.setRoles(List.of(roleRepository.findByName(ROLE_SUBSCRIBER)));
+        User userToSave = userMapper.fromRequest(userRegisterRequest, Status.ACTIVE, ROLE_SUBSCRIBER);
 
         userRepository.persistAndFlush(userToSave);
     }
@@ -130,7 +125,7 @@ public class UserServiceImpl implements UserService {
         user.setStatus(Status.ACTIVE);
         user.setUpdatedBy(AuthUtil.getUserId());
 
-        User savedUser = userRepository.merge(user);
+        User savedUser = userRepository.update(user);
 
         userTokenService.deleteUserTokenByToken(userToken);
         sendingDataService.sendInformation(savedUser, EmailType.USER_WELCOME_EMAIL);

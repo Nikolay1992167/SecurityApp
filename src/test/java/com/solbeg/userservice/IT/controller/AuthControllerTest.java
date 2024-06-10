@@ -9,7 +9,7 @@ import com.solbeg.userservice.enums.error_response.ErrorMessage;
 import com.solbeg.userservice.security.jwt.JwtTokenProvider;
 import com.solbeg.userservice.service.impl.SendDataServiceImpl;
 import com.solbeg.userservice.util.PostgresSqlContainerInitializer;
-import com.solbeg.userservice.util.testdata.JwtData;
+import com.solbeg.userservice.util.testdata.JwtTestData;
 import com.solbeg.userservice.util.testdata.UserTestData;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Nested;
@@ -21,11 +21,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static com.solbeg.userservice.util.Constants.EMAIL_ERROR;
+import static com.solbeg.userservice.util.Constants.SIZE_NAME_ERROR;
+import static com.solbeg.userservice.util.Constants.SIZE_PASSWORD_ERROR;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_ADMIN;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_NOT_EXIST;
 import static com.solbeg.userservice.util.initdata.InitData.ID_ADMIN;
 import static com.solbeg.userservice.util.initdata.InitData.INCORRECT_TOKEN;
 import static com.solbeg.userservice.util.initdata.InitData.URL_AUTH;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -50,7 +54,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
         @Test
         void shouldReturnExpectedJsonAndStatus200() throws Exception {
             // given
-            JwtRequest request = JwtData.getJwtRequestForIT();
+            JwtRequest request = JwtTestData.getJwtRequestForIT();
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/authenticate")
@@ -58,8 +62,6 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpectAll(
                             status().isOk(),
-                            jsonPath("$.id").isNotEmpty(),
-                            jsonPath("$.email").value(request.getEmail()),
                             jsonPath("$.accessToken").isString(),
                             jsonPath("$.refreshToken").isString());
         }
@@ -67,21 +69,21 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
         @Test
         void shouldReturnThrowExceptionAndStatus400WhenEmailIncorrect() throws Exception {
             // given
-            JwtRequest request = JwtData.getJwtRequestWithIncorrectEmail();
+            JwtRequest request = JwtTestData.getJwtRequestWithIncorrectEmail();
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/authenticate")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.error_message")
-                            .value("{email=must be a well-formed email address}"));
+                    .andExpect(jsonPath("$.error_message",
+                            containsString(EMAIL_ERROR)));
         }
 
         @Test
         void shouldReturnThrowExceptionAndStatus400WhenEmailNotExist() throws Exception {
             // given
-            JwtRequest request = JwtData.getJwtRequestWithEmailNotExist();
+            JwtRequest request = JwtTestData.getJwtRequestWithEmailNotExist();
 
             // when, then
             mockMvc.perform(post(URL_AUTH + "/authenticate")
@@ -90,6 +92,22 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.error_message")
                             .value(ErrorMessage.USER_NOT_EXIST.getMessage() + EMAIL_NOT_EXIST));
+        }
+
+        @Test
+        void shouldReturnThrowExceptionAndStatus400WhenEnteredDataIncorrect() throws Exception {
+            // given
+            JwtRequest request = JwtTestData.getJwtRequestWithIncorrectEnteredDate();
+
+            // when, then
+            mockMvc.perform(post(URL_AUTH + "/authenticate")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.error_message",
+                            containsString(EMAIL_ERROR)))
+                    .andExpect(jsonPath("$.error_message",
+                            containsString(SIZE_PASSWORD_ERROR)));
         }
     }
 
@@ -123,8 +141,8 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.error_message")
-                            .value("{firstName=size must be between 2 and 40}"));
+                    .andExpect(jsonPath("$.error_message",
+                            containsString(SIZE_NAME_ERROR)));
         }
 
         @Test
@@ -137,8 +155,8 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.error_message")
-                            .value("{lastName=size must be between 2 and 50}"));
+                    .andExpect(jsonPath("$.error_message",
+                            containsString(SIZE_NAME_ERROR)));
         }
     }
 
@@ -169,8 +187,8 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.error_message")
-                            .value("{firstName=size must be between 2 and 40}"));
+                    .andExpect(jsonPath("$.error_message",
+                            containsString(SIZE_NAME_ERROR)));
         }
 
         @Test
@@ -183,8 +201,7 @@ class AuthControllerTest extends PostgresSqlContainerInitializer {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.error_message")
-                            .value("{lastName=size must be between 2 and 50}"));
+                    .andExpect(jsonPath("$.error_message", containsString(SIZE_NAME_ERROR)));
         }
     }
 

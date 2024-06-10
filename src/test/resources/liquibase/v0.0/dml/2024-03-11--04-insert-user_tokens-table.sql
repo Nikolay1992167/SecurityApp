@@ -1,2 +1,2 @@
-INSERT INTO security.user_tokens(id, user_id, token, token_type)
-VALUES ('511a084f-6065-44cd-b7b7-a21acf2eb77a', 'b3afa636-8006-42fe-961e-21ae926b3265', 'e6bf32a9-22cc-44ec-85eb-4f7632dabfd1', 'ACTIVATION');
+INSERT INTO security.user_tokens(id, user_id, expiration_at, token, token_type)
+VALUES ('511a084f-6065-44cd-b7b7-a21acf2eb77a', 'b3afa636-8006-42fe-961e-21ae926b3265', '2024-06-01 10:00:00', 'e6bf32a9-22cc-44ec-85eb-4f7632dabfd1', 'ACTIVATION');

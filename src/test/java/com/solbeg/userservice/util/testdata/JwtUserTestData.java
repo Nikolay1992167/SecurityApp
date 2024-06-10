@@ -5,12 +5,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collections;
 
+import static com.solbeg.userservice.util.Constants.ROLE_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.EMAIL_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.FIRST_NAME_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.ID_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.LAST_NAME_JOURNALIST;
 import static com.solbeg.userservice.util.initdata.InitData.PASSWORD_JOURNALIST;
-import static com.solbeg.userservice.util.initdata.InitData.ROLE_NAME_JOURNALIST;
 
 public class JwtUserTestData {
 
@@ -22,7 +22,7 @@ public class JwtUserTestData {
                 .password(PASSWORD_JOURNALIST)
                 .email(EMAIL_JOURNALIST)
                 .enabled(false)
-                .authorities(Collections.singletonList(new SimpleGrantedAuthority(ROLE_NAME_JOURNALIST)))
+                .authorities(Collections.singletonList(new SimpleGrantedAuthority(ROLE_JOURNALIST)))
                 .build();
     }
 }

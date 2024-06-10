@@ -174,13 +174,13 @@ class UserTokenServiceImplTest {
                     .hasMessageContaining(ErrorMessage.USERTOKEN_NOT_FOUND.getMessage() + token);
         }
     }
-
-    @Test
-    void shouldCallMethodDeleteOldUserTokens() {
-        // given, when
-        userTokenService.deleteOldUserTokens();
-
-        // then
-        verify(tokenRepository, times(1)).deleteByExpirationAtBefore(any(LocalDateTime.class));
-    }
+//
+//    @Test
+//    void shouldCallMethodDeleteOldUserTokens() {
+//        // given, when
+//        userTokenService.deleteOldUserTokens();
+//
+//        // then
+//        verify(tokenRepository, times(1)).deleteByExpirationAtBefore(any(LocalDateTime.class));
+//    }
 }

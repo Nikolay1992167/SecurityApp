@@ -25,9 +25,12 @@ ext {
 	postgresqlContainersVersion = '1.19.3'
 	assertJVersion = '3.24.2'
 	mockWebserver = '4.12.0'
+	set('springCloudVersion', "2023.0.2")
 }
 
 dependencies {
+	implementation 'org.hibernate.orm:hibernate-envers:6.5.2.Final'
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
 	implementation project(':logging-starter')
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 	implementation "io.hypersistence:hypersistence-utils-hibernate-62:${hypersistenceVersion}"
@@ -55,6 +58,12 @@ dependencies {
 	testImplementation "org.springframework.boot:spring-boot-starter-test"
 	testImplementation "org.springframework.security:spring-security-test"
 	testImplementation "org.testcontainers:postgresql:${postgresqlContainersVersion}"
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
 }
 
 tasks.named('test') {

@@ -15,6 +15,4 @@ public interface UserTokenService {
     Page<UserTokenResponse> getAllUserTokens(Pageable pageable);
 
     void deleteUserTokenByToken(String token);
-
-    void deleteOldUserTokens();
 }

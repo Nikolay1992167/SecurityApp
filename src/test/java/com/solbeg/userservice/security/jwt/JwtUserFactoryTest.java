@@ -11,9 +11,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.solbeg.userservice.util.Constants.ROLE_JOURNALIST;
+import static com.solbeg.userservice.util.Constants.ROLE_SUBSCRIBER;
 import static com.solbeg.userservice.util.initdata.InitData.ID_JOURNALIST;
-import static com.solbeg.userservice.util.initdata.InitData.ROLE_NAME_JOURNALIST;
-import static com.solbeg.userservice.util.initdata.InitData.ROLE_NAME_SUBSCRIBER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class JwtUserFactoryTest {
@@ -23,9 +23,9 @@ class JwtUserFactoryTest {
         // given
         User user = UserTestData.getJournalist();
         Role role1 = new Role();
-        role1.setName(ROLE_NAME_SUBSCRIBER);
+        role1.setName(ROLE_SUBSCRIBER);
         Role role2 = new Role();
-        role2.setName(ROLE_NAME_JOURNALIST);
+        role2.setName(ROLE_JOURNALIST);
         user.setRoles(Arrays.asList(role1, role2));
 
         // when

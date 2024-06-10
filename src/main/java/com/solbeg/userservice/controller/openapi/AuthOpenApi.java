@@ -183,8 +183,6 @@ public interface AuthOpenApi {
                                     schema = @Schema(implementation = JwtResponse.class),
                                     examples = @ExampleObject("""
                                             {
-                                                "id": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-                                                "email": "ivan@google.com",
                                                 "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsInJvbGVzIjpbIkFETUlOIl0sImV4cCI6MTcwOTA3ODQ4Nn0.dAagsoFXl3GyZUeHn-BUWtSakIkLv5JEJNDycuwSW_iNfW04f5eroXVJtWRX8yCC6gbgzqcPi-BupOyTu8dXdQ",
                                                 "refreshToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpdmFuQGdvb2dsZS5jb20iLCJpZCI6ImEwZWViYzk5LTljMGItNGVmOC1iYjZkLTZiYjliZDM4MGExMSIsImV4cCI6MTcxMTY2Njg4Nn0.W5FbSle_jHpATJ6SOrWflCdueJSNk9IaT8v1SUSmXN-4HTmL-gmYi_xJGyW7LgCLRumMR4Ad0TuRHldI_p1-uQ"
                                             }
@@ -201,11 +199,11 @@ public interface AuthOpenApi {
                     @ApiResponse(responseCode = "400", description = "Token is not valid.",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IncorrectData.class), examples = @ExampleObject("""
-                                            {
-                                                "timestamp": "2024-03-04T01:55:32.2846064",
-                                                "error_message": "{refreshToken=должно соответствовать \\"^[a-zA-Z0-9_-]+\\\\.[a-zA-Z0-9_-]+\\\\.[a-zA-Z0-9_-]+$\\"}",
-                                                "error_status": 400
-                                            }
+                                   {
+                                        "timestamp": "2024-03-04T01:55:32.2846064",
+                                        "error_message": "{refreshToken=должно соответствовать \\"^[a-zA-Z0-9_-]+\\\\.[a-zA-Z0-9_-]+\\\\.[a-zA-Z0-9_-]+$\\"}",
+                                        "error_status": 400
+                                   }
                                     """)))
             }
     )
