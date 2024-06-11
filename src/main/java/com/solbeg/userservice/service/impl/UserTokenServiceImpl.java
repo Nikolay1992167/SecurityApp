@@ -32,7 +32,7 @@ public class UserTokenServiceImpl implements UserTokenService {
     public UserToken createActivationToken(UUID userId) {
         UserToken userToken = UserToken.builder()
                 .user(userIdentityService.getUserOrThrowException(userId))
-                .expirationAt(LocalDateTime.now())
+                .expirationAt(LocalDateTime.now().plusDays(3))
                 .token(UUID.randomUUID().toString())
                 .tokenType(TokenType.ACTIVATION)
                 .build();
