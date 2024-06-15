@@ -7,7 +7,6 @@ import com.solbeg.userservice.entity.Role;
 import com.solbeg.userservice.entity.User;
 import com.solbeg.userservice.entity.UserToken;
 import com.solbeg.userservice.entity.User_;
-import com.solbeg.userservice.enums.EmailType;
 import com.solbeg.userservice.enums.Status;
 import com.solbeg.userservice.enums.error_response.ErrorMessage;
 import com.solbeg.userservice.exception.InformationChangeStatusUserException;
@@ -22,17 +21,17 @@ import com.solbeg.userservice.service.SendingDataService;
 import com.solbeg.userservice.service.UserIdentityService;
 import com.solbeg.userservice.service.UserTokenService;
 import com.solbeg.userservice.util.testdata.JwtUserTestData;
-import com.solbeg.userservice.util.testdata.RoleTestData;
 import com.solbeg.userservice.util.testdata.UserTestData;
 import com.solbeg.userservice.util.testdata.UserTokenTestData;
 import com.solbeg.userservice.validation.UserValidator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -59,7 +58,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
 
     @InjectMocks
@@ -105,8 +104,6 @@ class UserServiceImplTest {
             User savedUser = UserTestData.getJournalistWithStatusNotActive();
             when(userMapper.fromRequest(registerRequest, Status.NOT_ACTIVE, ROLE_JOURNALIST))
                     .thenReturn(savedUser);
-            when(roleRepository.findByName(ROLE_JOURNALIST))
-                    .thenReturn(RoleTestData.getJournalist());
             when(userRepository.persistAndFlush(savedUser))
                     .thenReturn(savedUser);
 
@@ -128,8 +125,6 @@ class UserServiceImplTest {
             User savedUser = UserTestData.getSubscriber();
             when(userMapper.fromRequest(registerRequest, Status.ACTIVE, ROLE_SUBSCRIBER))
                     .thenReturn(savedUser);
-            when(roleRepository.findByName(ROLE_SUBSCRIBER))
-                    .thenReturn(RoleTestData.getSubscriber());
             when(userRepository.persistAndFlush(any(User.class)))
                     .thenReturn(savedUser);
 
@@ -266,7 +261,6 @@ class UserServiceImplTest {
             JwtUser jwtUser = JwtUserTestData.getJwtUser();
             when(tokenService.getByToken(tokenUser))
                     .thenReturn(userToken);
-            doNothing().when(sendingDataService).sendInformation(user, EmailType.USER_WELCOME_EMAIL);
             when(authentication.getPrincipal())
                     .thenReturn(jwtUser);
             when(securityContext.getAuthentication())

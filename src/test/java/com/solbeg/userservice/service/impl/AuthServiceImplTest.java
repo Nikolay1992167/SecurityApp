@@ -9,17 +9,17 @@ import com.solbeg.userservice.service.UserService;
 import com.solbeg.userservice.util.testdata.JwtTestData;
 import com.solbeg.userservice.util.testdata.UserTestData;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 
-import static com.solbeg.userservice.util.initdata.InitData.ACCESS_TOKEN;
 import static com.solbeg.userservice.util.initdata.InitData.REFRESH_TOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class AuthServiceImplTest {
 
     @InjectMocks
@@ -45,10 +45,6 @@ class AuthServiceImplTest {
         JwtResponse expectedResponse = JwtTestData.getJwtResponse();
         when(userService.findActiveUserByEmailOrThrowException(loginRequest.getEmail()))
                 .thenReturn(user);
-        when(jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), user.getRoles()))
-                .thenReturn(ACCESS_TOKEN);
-        when(jwtTokenProvider.createRefreshToken(user.getId(), user.getEmail()))
-                .thenReturn(REFRESH_TOKEN);
         when(userMapper.toJwtResponse(user))
                 .thenReturn(expectedResponse);
 

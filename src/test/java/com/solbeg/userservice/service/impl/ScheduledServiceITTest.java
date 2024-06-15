@@ -5,12 +5,14 @@ import com.solbeg.userservice.repository.UserTokenRepository;
 import com.solbeg.userservice.util.PostgresSqlContainerInitializer;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.solbeg.userservice.util.initdata.InitData.DEFAULT_PAGE_REQUEST_FOR_IT;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@AutoConfigureMockMvc
 @RequiredArgsConstructor
 class ScheduledServiceITTest extends PostgresSqlContainerInitializer {
     private final UserTokenRepository userTokenRepository;
@@ -24,6 +26,6 @@ class ScheduledServiceITTest extends PostgresSqlContainerInitializer {
 
         // then
         Page<UserToken> userTokens = userTokenRepository.findAll(DEFAULT_PAGE_REQUEST_FOR_IT);
-        assertThat(userTokens).isEmpty();
+        assertThat(userTokens.getContent()).isNotEmpty().hasSize(2);
     }
 }
