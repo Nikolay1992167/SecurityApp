@@ -1,6 +1,7 @@
 # User Service
 
-The service that is responsible for creating, storing data and authorizing users
+* The service that is responsible for creating, storing data and authorizing users.
+* This service works in conjunction with other services: config service, email service and news service.
 
 ### Technologies that I used on the project:
 

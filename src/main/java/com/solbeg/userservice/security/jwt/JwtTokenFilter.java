@@ -63,15 +63,15 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
     public void handleException(HttpServletResponse response, Exception exception) throws IOException {
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
-        response.setCharacterEncoding("utf-8");
-        IncorrectData incorrectData = new IncorrectData(
-                LocalDateTime.now(),
-                exception.getMessage(),
-                HttpStatus.UNAUTHORIZED.value());
-        String responseMessage = objectMapper.writeValueAsString(incorrectData);
-        log.error(incorrectData.toString());
-        response.getWriter().write(responseMessage);
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
+            response.setCharacterEncoding("utf-8");
+            IncorrectData incorrectData = new IncorrectData(
+                    LocalDateTime.now(),
+                    exception.getMessage(),
+                    HttpStatus.UNAUTHORIZED.value());
+            String responseMessage = objectMapper.writeValueAsString(incorrectData);
+            log.error(incorrectData.toString());
+            response.getWriter().write(responseMessage);
     }
 }
